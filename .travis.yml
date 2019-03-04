@@ -1,0 +1,14 @@
+dist: trusty
+sudo: required
+language: node_js
+node_js: 8
+cache: npm
+install:
+  - npm install -D
+script:
+  - npm run lint
+  - npm test
+after_success:
+  - npm run coverage
+after_script:
+  - npm run coverage_publish
