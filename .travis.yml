@@ -6,7 +6,7 @@ cache: npm
 install:
   - npm install -D
 script:
-  - npm run lint
+  - npm run lint:solhint
   - npm test
 after_success:
   - npm run coverage
