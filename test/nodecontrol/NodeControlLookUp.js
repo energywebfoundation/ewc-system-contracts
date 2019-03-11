@@ -1,4 +1,4 @@
-const NodeControlLookUp = artifacts.require("NodeControlLookUp");
+const NodeControlLookUp = artifacts.require("nodeControl/NodeControlLookUp");
 
 contract('NodeControlLookUp', (accounts) => {
 
