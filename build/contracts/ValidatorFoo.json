@@ -46,24 +46,24 @@
       "type": "function"
     }
   ],
-  "bytecode": "0x608060405234801561001057600080fd5b5060405160208061014a8339810180604052602081101561003057600080fd5b8101908080519060200190929190505050806000819055505060f3806100576000396000f3fe6080604052348015600f57600080fd5b5060043610604f576000357c0100000000000000000000000000000000000000000000000000000000900480630c55699c1460545780634018d9aa146070575b600080fd5b605a60b3565b6040518082815260200191505060405180910390f35b609960048036036020811015608457600080fd5b810190808035906020019092919050505060b9565b604051808215151515815260200191505060405180910390f35b60005481565b60008160008190555091905056fea165627a7a72305820f2cd1c4cce31e39a8bb79e6013b3acbb89b720b5ebe000aae2408ae3838c9d860029",
-  "deployedBytecode": "0x6080604052348015600f57600080fd5b5060043610604f576000357c0100000000000000000000000000000000000000000000000000000000900480630c55699c1460545780634018d9aa146070575b600080fd5b605a60b3565b6040518082815260200191505060405180910390f35b609960048036036020811015608457600080fd5b810190808035906020019092919050505060b9565b604051808215151515815260200191505060405180910390f35b60005481565b60008160008190555091905056fea165627a7a72305820f2cd1c4cce31e39a8bb79e6013b3acbb89b720b5ebe000aae2408ae3838c9d860029",
-  "sourceMap": "60:222:12:-;;;121:63;8:9:-1;5:2;;;30:1;27;20:12;5:2;121:63:12;;;;;;;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;121:63:12;;;;;;;;;;;;;;;;175:2;171:1;:6;;;;121:63;60:222;;;;;;",
-  "deployedSourceMap": "60:222:12:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;60:222:12;;;;;;;;;;;;;;;;;;;;;;;;;101:13;;;:::i;:::-;;;;;;;;;;;;;;;;;;;190:90;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;190:90:12;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;101:13;;;;:::o;190:90::-;247:4;271:2;267:1;:6;;;;190:90;;;:::o",
-  "source": "pragma solidity ^0.5.0;\n\nimport \"../interfaces/SetX.sol\";\n\n\ncontract ValidatorFoo is SetX {\n    \n    uint public x;\n\n    constructor(uint _x)\n        public\n    {\n        x = _x;\n    }\n\n    function setX(uint _x)\n        external\n        returns (bool)\n    {\n        x = _x;\n    }\n}\n",
-  "sourcePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/validatorset/ValidatorFoo.sol",
+  "bytecode": "0x608060405234801561001057600080fd5b5060405160208061014a8339810180604052602081101561003057600080fd5b8101908080519060200190929190505050806000819055505060f3806100576000396000f3fe6080604052348015600f57600080fd5b5060043610604f576000357c0100000000000000000000000000000000000000000000000000000000900480630c55699c1460545780634018d9aa146070575b600080fd5b605a60b3565b6040518082815260200191505060405180910390f35b609960048036036020811015608457600080fd5b810190808035906020019092919050505060b9565b604051808215151515815260200191505060405180910390f35b60005481565b60008160008190555091905056fea165627a7a7230582051494820eb972330739c7ebbb22603b735871bd06e48a3e7f73ee409aaeceefa0029",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b5060043610604f576000357c0100000000000000000000000000000000000000000000000000000000900480630c55699c1460545780634018d9aa146070575b600080fd5b605a60b3565b6040518082815260200191505060405180910390f35b609960048036036020811015608457600080fd5b810190808035906020019092919050505060b9565b604051808215151515815260200191505060405180910390f35b60005481565b60008160008190555091905056fea165627a7a7230582051494820eb972330739c7ebbb22603b735871bd06e48a3e7f73ee409aaeceefa0029",
+  "sourceMap": "60:218:10:-;;;117:63;8:9:-1;5:2;;;30:1;27;20:12;5:2;117:63:10;;;;;;;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;117:63:10;;;;;;;;;;;;;;;;171:2;167:1;:6;;;;117:63;60:218;;;;;;",
+  "deployedSourceMap": "60:218:10:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;60:218:10;;;;;;;;;;;;;;;;;;;;;;;;;97:13;;;:::i;:::-;;;;;;;;;;;;;;;;;;;186:90;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;186:90:10;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;97:13;;;;:::o;186:90::-;243:4;267:2;263:1;:6;;;;186:90;;;:::o",
+  "source": "pragma solidity ^0.5.0;\n\nimport \"../interfaces/SetX.sol\";\n\n\ncontract ValidatorFoo is SetX {\n\n    uint public x;\n\n    constructor(uint _x)\n        public\n    {\n        x = _x;\n    }\n\n    function setX(uint _x)\n        external\n        returns (bool)\n    {\n        x = _x;\n    }\n}\n",
+  "sourcePath": "/Users/heikoburkhardt/Documents/genome-system-contracts/contracts/validatorset/ValidatorFoo.sol",
   "ast": {
-    "absolutePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/validatorset/ValidatorFoo.sol",
+    "absolutePath": "/Users/heikoburkhardt/Documents/genome-system-contracts/contracts/validatorset/ValidatorFoo.sol",
     "exportedSymbols": {
       "ValidatorFoo": [
-        940
+        521
       ]
     },
-    "id": 941,
+    "id": 522,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 912,
+        "id": 493,
         "literals": [
           "solidity",
           "^",
@@ -71,16 +71,16 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:12"
+        "src": "0:23:10"
       },
       {
-        "absolutePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/interfaces/SetX.sol",
+        "absolutePath": "/Users/heikoburkhardt/Documents/genome-system-contracts/contracts/interfaces/SetX.sol",
         "file": "../interfaces/SetX.sol",
-        "id": 913,
+        "id": 494,
         "nodeType": "ImportDirective",
-        "scope": 941,
-        "sourceUnit": 177,
-        "src": "25:32:12",
+        "scope": 522,
+        "sourceUnit": 131,
+        "src": "25:32:10",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -90,42 +90,42 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 914,
+              "id": 495,
               "name": "SetX",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 176,
-              "src": "85:4:12",
+              "referencedDeclaration": 130,
+              "src": "85:4:10",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SetX_$176",
+                "typeIdentifier": "t_contract$_SetX_$130",
                 "typeString": "contract SetX"
               }
             },
-            "id": 915,
+            "id": 496,
             "nodeType": "InheritanceSpecifier",
-            "src": "85:4:12"
+            "src": "85:4:10"
           }
         ],
         "contractDependencies": [
-          176
+          130
         ],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 940,
+        "id": 521,
         "linearizedBaseContracts": [
-          940,
-          176
+          521,
+          130
         ],
         "name": "ValidatorFoo",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": false,
-            "id": 917,
+            "id": 498,
             "name": "x",
             "nodeType": "VariableDeclaration",
-            "scope": 940,
-            "src": "101:13:12",
+            "scope": 521,
+            "src": "97:13:10",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -133,10 +133,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 916,
+              "id": 497,
               "name": "uint",
               "nodeType": "ElementaryTypeName",
-              "src": "101:4:12",
+              "src": "97:4:10",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -147,26 +147,26 @@
           },
           {
             "body": {
-              "id": 926,
+              "id": 507,
               "nodeType": "Block",
-              "src": "161:23:12",
+              "src": "157:23:10",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 924,
+                    "id": 505,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "argumentTypes": null,
-                      "id": 922,
+                      "id": 503,
                       "name": "x",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 917,
-                      "src": "171:1:12",
+                      "referencedDeclaration": 498,
+                      "src": "167:1:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -176,47 +176,47 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 923,
+                      "id": 504,
                       "name": "_x",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 919,
-                      "src": "175:2:12",
+                      "referencedDeclaration": 500,
+                      "src": "171:2:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "src": "171:6:12",
+                    "src": "167:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
-                  "id": 925,
+                  "id": 506,
                   "nodeType": "ExpressionStatement",
-                  "src": "171:6:12"
+                  "src": "167:6:10"
                 }
               ]
             },
             "documentation": null,
-            "id": 927,
+            "id": 508,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [],
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 920,
+              "id": 501,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 919,
+                  "id": 500,
                   "name": "_x",
                   "nodeType": "VariableDeclaration",
-                  "scope": 927,
-                  "src": "133:7:12",
+                  "scope": 508,
+                  "src": "129:7:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -224,10 +224,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 918,
+                    "id": 499,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "133:4:12",
+                    "src": "129:4:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -237,42 +237,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "132:9:12"
+              "src": "128:9:10"
             },
             "returnParameters": {
-              "id": 921,
+              "id": 502,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "161:0:12"
+              "src": "157:0:10"
             },
-            "scope": 940,
-            "src": "121:63:12",
+            "scope": 521,
+            "src": "117:63:10",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 938,
+              "id": 519,
               "nodeType": "Block",
-              "src": "257:23:12",
+              "src": "253:23:10",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 936,
+                    "id": 517,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "argumentTypes": null,
-                      "id": 934,
+                      "id": 515,
                       "name": "x",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 917,
-                      "src": "267:1:12",
+                      "referencedDeclaration": 498,
+                      "src": "263:1:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -282,47 +282,47 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 935,
+                      "id": 516,
                       "name": "_x",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 929,
-                      "src": "271:2:12",
+                      "referencedDeclaration": 510,
+                      "src": "267:2:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "src": "267:6:12",
+                    "src": "263:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
-                  "id": 937,
+                  "id": 518,
                   "nodeType": "ExpressionStatement",
-                  "src": "267:6:12"
+                  "src": "263:6:10"
                 }
               ]
             },
             "documentation": null,
-            "id": 939,
+            "id": 520,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "setX",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 930,
+              "id": 511,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 929,
+                  "id": 510,
                   "name": "_x",
                   "nodeType": "VariableDeclaration",
-                  "scope": 939,
-                  "src": "204:7:12",
+                  "scope": 520,
+                  "src": "200:7:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -330,10 +330,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 928,
+                    "id": 509,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "204:4:12",
+                    "src": "200:4:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -343,19 +343,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "203:9:12"
+              "src": "199:9:10"
             },
             "returnParameters": {
-              "id": 933,
+              "id": 514,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 932,
+                  "id": 513,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 939,
-                  "src": "247:4:12",
+                  "scope": 520,
+                  "src": "243:4:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -363,10 +363,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 931,
+                    "id": 512,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "247:4:12",
+                    "src": "243:4:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -376,33 +376,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "246:6:12"
+              "src": "242:6:10"
             },
-            "scope": 940,
-            "src": "190:90:12",
+            "scope": 521,
+            "src": "186:90:10",
             "stateMutability": "nonpayable",
-            "superFunction": 175,
+            "superFunction": 129,
             "visibility": "external"
           }
         ],
-        "scope": 941,
-        "src": "60:222:12"
+        "scope": 522,
+        "src": "60:218:10"
       }
     ],
-    "src": "0:283:12"
+    "src": "0:279:10"
   },
   "legacyAST": {
-    "absolutePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/validatorset/ValidatorFoo.sol",
+    "absolutePath": "/Users/heikoburkhardt/Documents/genome-system-contracts/contracts/validatorset/ValidatorFoo.sol",
     "exportedSymbols": {
       "ValidatorFoo": [
-        940
+        521
       ]
     },
-    "id": 941,
+    "id": 522,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 912,
+        "id": 493,
         "literals": [
           "solidity",
           "^",
@@ -410,16 +410,16 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:12"
+        "src": "0:23:10"
       },
       {
-        "absolutePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/interfaces/SetX.sol",
+        "absolutePath": "/Users/heikoburkhardt/Documents/genome-system-contracts/contracts/interfaces/SetX.sol",
         "file": "../interfaces/SetX.sol",
-        "id": 913,
+        "id": 494,
         "nodeType": "ImportDirective",
-        "scope": 941,
-        "sourceUnit": 177,
-        "src": "25:32:12",
+        "scope": 522,
+        "sourceUnit": 131,
+        "src": "25:32:10",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -429,42 +429,42 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 914,
+              "id": 495,
               "name": "SetX",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 176,
-              "src": "85:4:12",
+              "referencedDeclaration": 130,
+              "src": "85:4:10",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SetX_$176",
+                "typeIdentifier": "t_contract$_SetX_$130",
                 "typeString": "contract SetX"
               }
             },
-            "id": 915,
+            "id": 496,
             "nodeType": "InheritanceSpecifier",
-            "src": "85:4:12"
+            "src": "85:4:10"
           }
         ],
         "contractDependencies": [
-          176
+          130
         ],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 940,
+        "id": 521,
         "linearizedBaseContracts": [
-          940,
-          176
+          521,
+          130
         ],
         "name": "ValidatorFoo",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": false,
-            "id": 917,
+            "id": 498,
             "name": "x",
             "nodeType": "VariableDeclaration",
-            "scope": 940,
-            "src": "101:13:12",
+            "scope": 521,
+            "src": "97:13:10",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -472,10 +472,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 916,
+              "id": 497,
               "name": "uint",
               "nodeType": "ElementaryTypeName",
-              "src": "101:4:12",
+              "src": "97:4:10",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -486,26 +486,26 @@
           },
           {
             "body": {
-              "id": 926,
+              "id": 507,
               "nodeType": "Block",
-              "src": "161:23:12",
+              "src": "157:23:10",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 924,
+                    "id": 505,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "argumentTypes": null,
-                      "id": 922,
+                      "id": 503,
                       "name": "x",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 917,
-                      "src": "171:1:12",
+                      "referencedDeclaration": 498,
+                      "src": "167:1:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -515,47 +515,47 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 923,
+                      "id": 504,
                       "name": "_x",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 919,
-                      "src": "175:2:12",
+                      "referencedDeclaration": 500,
+                      "src": "171:2:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "src": "171:6:12",
+                    "src": "167:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
-                  "id": 925,
+                  "id": 506,
                   "nodeType": "ExpressionStatement",
-                  "src": "171:6:12"
+                  "src": "167:6:10"
                 }
               ]
             },
             "documentation": null,
-            "id": 927,
+            "id": 508,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [],
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 920,
+              "id": 501,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 919,
+                  "id": 500,
                   "name": "_x",
                   "nodeType": "VariableDeclaration",
-                  "scope": 927,
-                  "src": "133:7:12",
+                  "scope": 508,
+                  "src": "129:7:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -563,10 +563,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 918,
+                    "id": 499,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "133:4:12",
+                    "src": "129:4:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -576,42 +576,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "132:9:12"
+              "src": "128:9:10"
             },
             "returnParameters": {
-              "id": 921,
+              "id": 502,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "161:0:12"
+              "src": "157:0:10"
             },
-            "scope": 940,
-            "src": "121:63:12",
+            "scope": 521,
+            "src": "117:63:10",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 938,
+              "id": 519,
               "nodeType": "Block",
-              "src": "257:23:12",
+              "src": "253:23:10",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 936,
+                    "id": 517,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "argumentTypes": null,
-                      "id": 934,
+                      "id": 515,
                       "name": "x",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 917,
-                      "src": "267:1:12",
+                      "referencedDeclaration": 498,
+                      "src": "263:1:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -621,47 +621,47 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 935,
+                      "id": 516,
                       "name": "_x",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 929,
-                      "src": "271:2:12",
+                      "referencedDeclaration": 510,
+                      "src": "267:2:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "src": "267:6:12",
+                    "src": "263:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
-                  "id": 937,
+                  "id": 518,
                   "nodeType": "ExpressionStatement",
-                  "src": "267:6:12"
+                  "src": "263:6:10"
                 }
               ]
             },
             "documentation": null,
-            "id": 939,
+            "id": 520,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "setX",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 930,
+              "id": 511,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 929,
+                  "id": 510,
                   "name": "_x",
                   "nodeType": "VariableDeclaration",
-                  "scope": 939,
-                  "src": "204:7:12",
+                  "scope": 520,
+                  "src": "200:7:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -669,10 +669,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 928,
+                    "id": 509,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "204:4:12",
+                    "src": "200:4:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -682,19 +682,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "203:9:12"
+              "src": "199:9:10"
             },
             "returnParameters": {
-              "id": 933,
+              "id": 514,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 932,
+                  "id": 513,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 939,
-                  "src": "247:4:12",
+                  "scope": 520,
+                  "src": "243:4:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -702,10 +702,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 931,
+                    "id": 512,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "247:4:12",
+                    "src": "243:4:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -715,20 +715,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "246:6:12"
+              "src": "242:6:10"
             },
-            "scope": 940,
-            "src": "190:90:12",
+            "scope": 521,
+            "src": "186:90:10",
             "stateMutability": "nonpayable",
-            "superFunction": 175,
+            "superFunction": 129,
             "visibility": "external"
           }
         ],
-        "scope": 941,
-        "src": "60:222:12"
+        "scope": 522,
+        "src": "60:218:10"
       }
     ],
-    "src": "0:283:12"
+    "src": "0:279:10"
   },
   "compiler": {
     "name": "solc",
@@ -736,7 +736,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-03-07T15:05:03.505Z",
+  "updatedAt": "2019-03-12T15:17:51.960Z",
   "devdoc": {
     "methods": {}
   },

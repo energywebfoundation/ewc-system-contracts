@@ -26,9 +26,9 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.5.0;\n\n\n/// @title EternalStorageProxy contract interface\n/// @dev This interface must be implemented by a storage proxy contract who allows the\n/// upgrade of its implementation.\ninterface IEternalStorageProxy {\n    function upgradeTo(address) external returns(bool);\n}\n",
-  "sourcePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/interfaces/IEternalStorageProxy.sol",
+  "sourcePath": "/Users/heikoburkhardt/Documents/genome-system-contracts/contracts/interfaces/IEternalStorageProxy.sol",
   "ast": {
-    "absolutePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/interfaces/IEternalStorageProxy.sol",
+    "absolutePath": "/Users/heikoburkhardt/Documents/genome-system-contracts/contracts/interfaces/IEternalStorageProxy.sol",
     "exportedSymbols": {
       "IEternalStorageProxy": [
         85
@@ -151,7 +151,7 @@
     "src": "0:289:2"
   },
   "legacyAST": {
-    "absolutePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/interfaces/IEternalStorageProxy.sol",
+    "absolutePath": "/Users/heikoburkhardt/Documents/genome-system-contracts/contracts/interfaces/IEternalStorageProxy.sol",
     "exportedSymbols": {
       "IEternalStorageProxy": [
         85
@@ -279,7 +279,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-03-07T16:41:00.438Z",
+  "updatedAt": "2019-03-12T15:17:51.958Z",
   "devdoc": {
     "details": "This interface must be implemented by a storage proxy contract who allows the upgrade of its implementation.",
     "methods": {},

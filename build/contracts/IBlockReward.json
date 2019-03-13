@@ -34,9 +34,9 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.5.0;\n\n\n/// @title BlockReward contract interface\n/// @dev This interface must be implemented by a system contract that implements the\n/// reward logic.\ninterface IBlockReward {\n\n    /// @notice Produces rewards for the given benefactors,\n    /// with corresponding reward codes.\n    /// @dev Only callable by `SYSTEM_ADDRESS`.\n    /// @param benefactors The list of addresses who can be rewarded.\n    /// @param kind The corresponding list of reward types for the benefactors.\n    /// @return The list of addresses to be rewarded and the corresponding list of reward amounts.\n    function reward(address[] calldata benefactors, uint16[] calldata kind)\n        external\n        returns (address[] memory, uint256[] memory);\n}\n",
-  "sourcePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/interfaces/IBlockReward.sol",
+  "sourcePath": "/Users/heikoburkhardt/Documents/genome-system-contracts/contracts/interfaces/IBlockReward.sol",
   "ast": {
-    "absolutePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/interfaces/IBlockReward.sol",
+    "absolutePath": "/Users/heikoburkhardt/Documents/genome-system-contracts/contracts/interfaces/IBlockReward.sol",
     "exportedSymbols": {
       "IBlockReward": [
         75
@@ -252,7 +252,7 @@
     "src": "0:744:1"
   },
   "legacyAST": {
-    "absolutePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/interfaces/IBlockReward.sol",
+    "absolutePath": "/Users/heikoburkhardt/Documents/genome-system-contracts/contracts/interfaces/IBlockReward.sol",
     "exportedSymbols": {
       "IBlockReward": [
         75
@@ -473,7 +473,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-03-07T16:41:00.435Z",
+  "updatedAt": "2019-03-12T15:17:51.959Z",
   "devdoc": {
     "details": "This interface must be implemented by a system contract that implements the reward logic.",
     "methods": {

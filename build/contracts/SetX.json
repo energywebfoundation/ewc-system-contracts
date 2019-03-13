@@ -26,19 +26,19 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.5.0;\n\n\ninterface SetX {\n    function setX(uint _x) external returns (bool);\n}\n",
-  "sourcePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/interfaces/SetX.sol",
+  "sourcePath": "/Users/heikoburkhardt/Documents/genome-system-contracts/contracts/interfaces/SetX.sol",
   "ast": {
-    "absolutePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/interfaces/SetX.sol",
+    "absolutePath": "/Users/heikoburkhardt/Documents/genome-system-contracts/contracts/interfaces/SetX.sol",
     "exportedSymbols": {
       "SetX": [
-        176
+        130
       ]
     },
-    "id": 177,
+    "id": 131,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 168,
+        "id": 122,
         "literals": [
           "solidity",
           "^",
@@ -46,7 +46,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:5"
+        "src": "0:23:4"
       },
       {
         "baseContracts": [],
@@ -54,9 +54,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 176,
+        "id": 130,
         "linearizedBaseContracts": [
-          176
+          130
         ],
         "name": "SetX",
         "nodeType": "ContractDefinition",
@@ -64,23 +64,23 @@
           {
             "body": null,
             "documentation": null,
-            "id": 175,
+            "id": 129,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "setX",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 171,
+              "id": 125,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 170,
+                  "id": 124,
                   "name": "_x",
                   "nodeType": "VariableDeclaration",
-                  "scope": 175,
-                  "src": "61:7:5",
+                  "scope": 129,
+                  "src": "61:7:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -88,10 +88,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 169,
+                    "id": 123,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "61:4:5",
+                    "src": "61:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -101,19 +101,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "60:9:5"
+              "src": "60:9:4"
             },
             "returnParameters": {
-              "id": 174,
+              "id": 128,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 173,
+                  "id": 127,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 175,
-                  "src": "88:4:5",
+                  "scope": 129,
+                  "src": "88:4:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -121,10 +121,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 172,
+                    "id": 126,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "88:4:5",
+                    "src": "88:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -134,33 +134,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "87:6:5"
+              "src": "87:6:4"
             },
-            "scope": 176,
-            "src": "47:47:5",
+            "scope": 130,
+            "src": "47:47:4",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 177,
-        "src": "26:70:5"
+        "scope": 131,
+        "src": "26:70:4"
       }
     ],
-    "src": "0:97:5"
+    "src": "0:97:4"
   },
   "legacyAST": {
-    "absolutePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/interfaces/SetX.sol",
+    "absolutePath": "/Users/heikoburkhardt/Documents/genome-system-contracts/contracts/interfaces/SetX.sol",
     "exportedSymbols": {
       "SetX": [
-        176
+        130
       ]
     },
-    "id": 177,
+    "id": 131,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 168,
+        "id": 122,
         "literals": [
           "solidity",
           "^",
@@ -168,7 +168,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:5"
+        "src": "0:23:4"
       },
       {
         "baseContracts": [],
@@ -176,9 +176,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 176,
+        "id": 130,
         "linearizedBaseContracts": [
-          176
+          130
         ],
         "name": "SetX",
         "nodeType": "ContractDefinition",
@@ -186,23 +186,23 @@
           {
             "body": null,
             "documentation": null,
-            "id": 175,
+            "id": 129,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "setX",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 171,
+              "id": 125,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 170,
+                  "id": 124,
                   "name": "_x",
                   "nodeType": "VariableDeclaration",
-                  "scope": 175,
-                  "src": "61:7:5",
+                  "scope": 129,
+                  "src": "61:7:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -210,10 +210,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 169,
+                    "id": 123,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "61:4:5",
+                    "src": "61:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -223,19 +223,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "60:9:5"
+              "src": "60:9:4"
             },
             "returnParameters": {
-              "id": 174,
+              "id": 128,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 173,
+                  "id": 127,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 175,
-                  "src": "88:4:5",
+                  "scope": 129,
+                  "src": "88:4:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -243,10 +243,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 172,
+                    "id": 126,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "88:4:5",
+                    "src": "88:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -256,20 +256,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "87:6:5"
+              "src": "87:6:4"
             },
-            "scope": 176,
-            "src": "47:47:5",
+            "scope": 130,
+            "src": "47:47:4",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 177,
-        "src": "26:70:5"
+        "scope": 131,
+        "src": "26:70:4"
       }
     ],
-    "src": "0:97:5"
+    "src": "0:97:4"
   },
   "compiler": {
     "name": "solc",
@@ -277,7 +277,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-03-07T15:05:03.497Z",
+  "updatedAt": "2019-03-12T15:17:51.958Z",
   "devdoc": {
     "methods": {}
   },
