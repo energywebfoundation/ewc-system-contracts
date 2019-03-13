@@ -11,7 +11,7 @@ npm install -D
 and code away.
 
 ## Guidelines
- - **Development**:
+ - **Development**: check out our guidelines repo: https://github.com/energywebfoundation/docs-and-guidelines
    - **Commit style**: [Angular](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commits)
    - **PRs**: 2 reviews are needed + build pass on travis. Review according to: https://github.com/energywebfoundation/docs-and-guidelines/blob/master/review.md
      - When opening the PR, request 2 reviewers, ping them and set yourself as Assignee.
