@@ -39,13 +39,14 @@ contract NodeControlDb {
     ///@param _chainSpecSha The sha of the chainSpecFile
     ///@param _chainSpecUrl The url where the chainSpecFile can be found
     ///@param _isSigning Indicates if the validator shall sign blocks
-    function setState(
+    function setState (
         address _targetValidator, 
         bytes memory _dockerSha, 
         string memory _dockerName, 
         bytes memory _chainSpecSha, 
         string memory _chainSpecUrl, 
-        bool _isSigning) public onlyLogic {
+        bool _isSigning) public onlyLogic 
+    {
         currentState[_targetValidator].dockerSha = _dockerSha;
         currentState[_targetValidator].dockerName = _dockerName;
         currentState[_targetValidator].chainSpecSha = _chainSpecSha;
