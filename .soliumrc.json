@@ -1,7 +1,7 @@
 {
   "extends": "solium:all",
   "plugins": [
-    "security"
+    "security", "zeppelin"
   ],
   "rules": {
     "quotes": [
@@ -9,12 +9,16 @@
       "double"
     ],
     "indentation": [
-      "error",
+      "warning",
       4
     ],
     "linebreak-style": [
       "error",
       "unix"
-    ]
+    ],
+    "error-reason": "error",
+    "operator-whitespace": "warning",
+    "zeppelin/missing-natspec-comments": "warning",
+    "security/no-inline-assembly": "warning"
   }
 }

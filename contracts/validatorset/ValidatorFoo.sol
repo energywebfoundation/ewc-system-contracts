@@ -4,7 +4,7 @@ import "../interfaces/SetX.sol";
 
 
 contract ValidatorFoo is SetX {
-    
+
     uint public x;
 
     constructor(uint _x)
