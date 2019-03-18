@@ -38,6 +38,20 @@ contract('NodeControlDb', (accounts) => {
     assert(!isFailed, "Should have thrown exception")
   })
 
+  it("must only allow owner to change logic contract", async () => {
+    const NodeControlDbInstance = await NodeControlDb.deployed();
+    isFailed = false;
+    try {
+      await NodeControlDbInstance.changeLogicContract('0x0000000000000000000000000000000000000001', {
+        from: accounts[1]
+      });
+      isFailed = true;
+    } catch (e) {
+      assert(true, "Should have thrown an exception")
+    }
+    assert(!isFailed, "Should have thrown exception")
+  })
+
   it('must set the new owner correctly', async () => {
     const NodeControlDbInstance = await NodeControlDb.deployed();
 
@@ -60,6 +74,20 @@ contract('NodeControlDb', (accounts) => {
     try {
       await NodeControlDbInstance.setOwner('0x0000000000000000000000000000000000000000', {
         from: accounts[0]
+      });
+      isFailed = true;
+    } catch (e) {
+      assert(true, "Should have thrown an exception")
+    }
+    assert(!isFailed, "Should have thrown exception")
+  })
+
+  it("must only allow owner to change owner", async () => {
+    const NodeControlDbInstance = await NodeControlDb.deployed();
+    isFailed = false;
+    try {
+      await NodeControlDbInstance.setOwner('0x0000000000000000000000000000000000000001', {
+        from: accounts[1]
       });
       isFailed = true;
     } catch (e) {
