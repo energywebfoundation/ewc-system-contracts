@@ -70,7 +70,9 @@ contract NodeControlDb {
 
     ///@notice gets the state for a validator
     ///@param _targetValidator The validator whos state you want
-    function getState(address _targetValidator) public view onlyLogic returns (NodeControlInterface.ValidatorState memory) {
+    function getState(address _targetValidator) public view onlyLogic 
+    returns (NodeControlInterface.ValidatorState memory) 
+    {
         return currentState[_targetValidator];
     }
 
