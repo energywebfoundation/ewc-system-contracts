@@ -24,6 +24,20 @@ contract('NodeControlDb', (accounts) => {
     assert(postState == NodeControlSimple.address, "Should be the logic instance address")
   })
 
+  it("must not allow 0x0 as address for new logic contract", async () => {
+    const NodeControlDbInstance = await NodeControlDb.deployed();
+    isFailed = false;
+    try {
+      await NodeControlDbInstance.changeLogicContract('0x0000000000000000000000000000000000000000', {
+        from: accounts[0]
+      });
+      isFailed = true;
+    } catch (e) {
+      assert(true, "Should have thrown an exception")
+    }
+    assert(!isFailed, "Should have thrown exception")
+  })
+
   it('must set the new owner correctly', async () => {
     const NodeControlDbInstance = await NodeControlDb.deployed();
 
@@ -38,6 +52,20 @@ contract('NodeControlDb', (accounts) => {
     postState = await NodeControlDbInstance.owner();
 
     assert(postState == accounts[0], "Should be the logic instance address")
+  })
+
+  it("must not allow 0x0 as address for new owner", async () => {
+    const NodeControlDbInstance = await NodeControlDb.deployed();
+    isFailed = false;
+    try {
+      await NodeControlDbInstance.setOwner('0x0000000000000000000000000000000000000000', {
+        from: accounts[0]
+      });
+      isFailed = true;
+    } catch (e) {
+      assert(true, "Should have thrown an exception")
+    }
+    assert(!isFailed, "Should have thrown exception")
   })
 
   it("must only let the logic contract call setState", async () => {

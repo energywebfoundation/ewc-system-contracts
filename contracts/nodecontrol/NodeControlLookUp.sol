@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 pragma experimental ABIEncoderV2;
 
+
 ///@notice Serves as a lookup table. Currently used for the NodeControlContract
 contract NodeControlLookUp {
     ///@notice 0 reserved for NodeControlLogic

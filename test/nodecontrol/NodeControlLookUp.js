@@ -12,4 +12,18 @@ contract('NodeControlLookUp', (accounts) => {
     assert(entry == accounts[0], "Should be the same")
   })
 
+  it('must only be callable by the owner', async () => {
+    const NodeControlLookUpInstance = await NodeControlLookUp.deployed();
+    isFailed = false;
+    try {
+      await NodeControlLookUpInstance.addAddress(0, accounts[0], {
+        from: accounts[1]
+      });
+      isFailed = true;
+    } catch (e) {
+      assert(true, "Should have thrown an exception")
+    }
+    assert(!isFailed, "Should have thrown exception")
+  })
+
 })

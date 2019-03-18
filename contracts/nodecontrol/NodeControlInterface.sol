@@ -12,6 +12,6 @@ interface NodeControlInterface {
         uint updateConfirmed;
     }
     event UpdateAvailable(address targetValidator);
-    function RetrieveUpdate(address _targetValidator) external view returns (ValidatorState memory);
+    function retrieveUpdate(address _targetValidator) external view returns (ValidatorState memory);
     function confirmUpdate() external;
 }

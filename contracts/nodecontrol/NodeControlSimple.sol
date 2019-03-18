@@ -4,6 +4,7 @@ pragma experimental ABIEncoderV2;
 import "./NodeControlInterface.sol";
 import "./NodeControlDb.sol";
 
+
 contract NodeControlSimple is NodeControlInterface {
 
     NodeControlDb public nodeControlDb;
@@ -15,6 +16,7 @@ contract NodeControlSimple is NodeControlInterface {
 
     ///@notice Constructor
     ///@dev Change 'msg.sender' to an actual admin address since this contract will be deployed via chainspec
+    ///@param _nodeControlDb The db contract that should be used
     constructor(NodeControlDb _nodeControlDb) public {
         owner = msg.sender;
         nodeControlDb = _nodeControlDb;
@@ -23,25 +25,44 @@ contract NodeControlSimple is NodeControlInterface {
     ///@notice Returns the current state of a validator
     ///@param _targetValidator The validator whos state you want
     ///@return The state of the validator
-    function RetrieveUpdate(address _targetValidator) external view returns (ValidatorState memory) {
+    function retrieveUpdate(address _targetValidator) external view returns (ValidatorState memory) {
         ValidatorState memory vs = nodeControlDb.getState(_targetValidator);
         return vs;
-    }
-
-    ///@notice sets the state for a validator and emits update event
-    ///@param _targetValidator The validator whos state needs to be updated
-    function updateValidator(address _targetValidator, bytes memory _dockerSha, string memory _dockerName, bytes memory _chainSpecSha, string memory _chainSpecUrl, bool _isSigning) public onlyOwner {
-        require(!(sha256(bytes(nodeControlDb.getDockerSha(_targetValidator))) == sha256(bytes(_dockerSha)) && sha256(bytes(nodeControlDb.getDockerName(_targetValidator))) == sha256(bytes(_dockerName)) && sha256(bytes(nodeControlDb.getChainSpecSha(_targetValidator))) == sha256(bytes(_chainSpecSha)) && sha256(bytes(nodeControlDb.getChainSpecUrl(_targetValidator))) == sha256(bytes(_chainSpecUrl)) && nodeControlDb.getIsSigning(_targetValidator) == _isSigning), "");
-        
-        nodeControlDb.setState(_targetValidator, _dockerSha, _dockerName, _chainSpecSha, _chainSpecUrl, _isSigning);
-
-        emit UpdateAvailable(_targetValidator);
     }
 
     ///@notice Lets the validator confirm the update
     function confirmUpdate() external {
         require(nodeControlDb.getDockerSha(msg.sender).length != 0, "Error: You are not a validator!");
         nodeControlDb.setUpdateConfirmed(msg.sender);
+    }
+
+    ///@notice sets the state for a validator and emits update event
+    ///@param _targetValidator The validator whos state needs to be updated
+    ///@param _dockerSha The sha of the dockerfile
+    ///@param _dockerName The name of the dockerfile
+    ///@param _chainSpecSha The sha of the chainSpecFile
+    ///@param _chainSpecUrl The url where the chainSpecFile can be found
+    ///@param _isSigning Indicates if the validator shall sign blocks
+    function updateValidator(
+        address _targetValidator, 
+        bytes memory _dockerSha, 
+        string memory _dockerName, 
+        bytes memory _chainSpecSha,
+        string memory _chainSpecUrl,
+        bool _isSigning) public onlyOwner 
+    {
+        require(
+            !(sha256(bytes(nodeControlDb.getDockerSha(_targetValidator))) == sha256(bytes(_dockerSha)) && sha256(bytes(nodeControlDb.getDockerName(_targetValidator))) == sha256(bytes(_dockerName)) && sha256(bytes(nodeControlDb.getChainSpecSha(_targetValidator))) == sha256(bytes(_chainSpecSha)) && sha256(bytes(nodeControlDb.getChainSpecUrl(_targetValidator))) == sha256(bytes(_chainSpecUrl)) && nodeControlDb.getIsSigning(_targetValidator) == _isSigning), "");
+        
+        nodeControlDb.setState(
+            _targetValidator, 
+            _dockerSha, 
+            _dockerName, 
+            _chainSpecSha, 
+            _chainSpecUrl, 
+            _isSigning);
+
+        emit UpdateAvailable(_targetValidator);
     }
 
     ///@notice Changes the owner of the NodeControlContract
