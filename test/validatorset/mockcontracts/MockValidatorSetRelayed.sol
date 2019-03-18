@@ -17,26 +17,6 @@ contract MockValidatorSetRelayed is ValidatorSetRelayed {
            
     }
 
-    function addValidatorWithEvent(address _validator)
-        external
-    {
-        if (addValidator(_validator)) {
-            emit AddSuccess();
-            return;
-        }
-        emit AddFail();
-    }
-
-    function removeValidatorWithEvent(address _validator)
-        external
-    {
-        if (removeValidator(_validator)) {
-            emit RemoveSuccess();
-            return;
-        }
-        emit RemoveFail();
-    }
-
     function triggerRelayCallbackWithEvent(bytes32 _bHash, address[] calldata _vals)
         external
         onlyOwner

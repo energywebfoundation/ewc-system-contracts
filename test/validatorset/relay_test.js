@@ -127,7 +127,7 @@ contract('ValidatorSetRELAY [all features]', function(accounts) {
             currentValidators.should.be.deep.equal([accounts[1]]);
 
             
-            await addValidatorWithEvent(accounts[2], true, {from: owner});
+            await relayed.addValidator(accounts[2], {from: owner}).should.be.fulfilled;
             (await relay.getValidators.call()).should.be.deep.equal(currentValidators);
 
             await relay.finalizeChange({from: system}).should.be.fulfilled;
@@ -136,7 +136,7 @@ contract('ValidatorSetRELAY [all features]', function(accounts) {
             currentValidators.should.be.deep.equal([accounts[1], accounts[2]]);
 
 
-            await removeValidatorWithEvent(accounts[1], true, {from: owner});
+            await relayed.removeValidator(accounts[1], {from: owner}).should.be.fulfilled;
             (await relay.getValidators.call()).should.be.deep.equal(currentValidators);
 
             await relay.finalizeChange({from: system}).should.be.fulfilled;
@@ -144,11 +144,11 @@ contract('ValidatorSetRELAY [all features]', function(accounts) {
             currentValidators = await relay.getValidators.call();
             currentValidators.should.be.deep.equal([accounts[2]]);
             
-            await relayed.addValidatorWithEvent(accounts[1], {from: accounts[1]})
+            await relayed.addValidator(accounts[1], {from: accounts[1]})
                 .should.be.rejectedWith(REVERT_ERROR_MSG);
             (await relay.getValidators.call()).should.be.deep.equal(currentValidators);
 
-            await relayed.removeValidatorWithEvent(accounts[2], {from: accounts[1]})
+            await relayed.removeValidator(accounts[2], {from: accounts[1]})
                 .should.be.rejectedWith(REVERT_ERROR_MSG);
             (await relay.getValidators.call()).should.be.deep.equal(currentValidators);
             
@@ -200,14 +200,14 @@ contract('ValidatorSetRELAY [all features]', function(accounts) {
             let currentValidators = await relayed.getValidators.call();
             let pendingValidators = await relayed.getPendingValidators.call();
 
-            await addValidatorWithEvent(accounts[2], true, {from: owner}).should.be.fulfilled;
+            await relayed.addValidator(accounts[2], {from: owner}).should.be.fulfilled;
             await relay.finalizeChange({from: system}).should.be.fulfilled;
             
             currentValidators = await relayed.getValidators.call();
             pendingValidators = await relayed.getPendingValidators.call();
             currentValidators.should.be.deep.equal(pendingValidators);
 
-            await addValidatorWithEvent(accounts[3], true, {from: owner}).should.be.fulfilled;
+            await relayed.addValidator(accounts[3], {from: owner}).should.be.fulfilled;
             await relay.finalizeChange({from: system}).should.be.fulfilled;
 
             currentValidators = await relayed.getValidators.call();
@@ -272,7 +272,7 @@ contract('ValidatorSetRELAY [all features]', function(accounts) {
 
         beforeEach(async function() {
             await relay.finalizeChange({from: system}).should.be.fulfilled;
-            await addValidatorWithEvent(accounts[2], true, {from: owner}).should.be.fulfilled;
+            await relayed.addValidator(accounts[2], {from: owner}).should.be.fulfilled;
             await relay.finalizeChange({from: system}).should.be.fulfilled;
         });
 
@@ -333,7 +333,7 @@ contract('ValidatorSetRELAY [all features]', function(accounts) {
         });
 
         it('should not accept report on a pending-to-be-added validator', async function() {
-            await addValidatorWithEvent(accounts[3], true, {from: owner}).should.be.fulfilled;
+            await relayed.addValidator(accounts[3], {from: owner}).should.be.fulfilled;
             let bn = await web3.eth.getBlockNumber();
             await relay.reportMalicious(accounts[3], bn, "0x0", {from: accounts[1]}).should.be.rejectedWith(REVERT_ERROR_MSG);
             await relay.finalizeChange({from: system}).should.be.fulfilled;
@@ -342,7 +342,7 @@ contract('ValidatorSetRELAY [all features]', function(accounts) {
         });
 
         it('should accept repor on a pending-to-be-removed validator', async function() {
-            await removeValidatorWithEvent(accounts[2], true, {from: owner}).should.be.fulfilled;
+            await relayed.removeValidator(accounts[2], {from: owner}).should.be.fulfilled;
             let bn = await web3.eth.getBlockNumber();
             await relay.reportMalicious(accounts[2], bn, "0x0", {from: accounts[2]}).should.be.fulfilled;
             await relay.finalizeChange({from: system}).should.be.fulfilled;
@@ -370,7 +370,7 @@ contract('ValidatorSetRELAY [all features]', function(accounts) {
 
         beforeEach(async function() {
             await relay.finalizeChange({from: system}).should.be.fulfilled;
-            await addValidatorWithEvent(accounts[2], true, {from: owner}).should.be.fulfilled;
+            await relayed.addValidator(accounts[2], {from: owner}).should.be.fulfilled;
             await relay.finalizeChange({from: system}).should.be.fulfilled;
         });
 
@@ -431,7 +431,7 @@ contract('ValidatorSetRELAY [all features]', function(accounts) {
         });
 
         it('should not accept report on a pending-to-be-added validator', async function() {
-            await addValidatorWithEvent(accounts[3], true, {from: owner}).should.be.fulfilled;
+            await relayed.addValidator(accounts[3], {from: owner}).should.be.fulfilled;
             let bn = await web3.eth.getBlockNumber();
             await relay.reportBenign(accounts[3], bn, {from: accounts[1]}).should.be.rejectedWith(REVERT_ERROR_MSG);
             await relay.finalizeChange({from: system}).should.be.fulfilled;
@@ -440,7 +440,7 @@ contract('ValidatorSetRELAY [all features]', function(accounts) {
         });
 
         it('should accept repor on a pending-to-be-removed validator', async function() {
-            await removeValidatorWithEvent(accounts[2], true, {from: owner}).should.be.fulfilled;
+            await relayed.removeValidator(accounts[2], {from: owner}).should.be.fulfilled;
             let bn = await web3.eth.getBlockNumber();
             await relay.reportBenign(accounts[2], bn, {from: accounts[2]}).should.be.fulfilled;
             await relay.finalizeChange({from: system}).should.be.fulfilled;
@@ -449,26 +449,6 @@ contract('ValidatorSetRELAY [all features]', function(accounts) {
         });
     });
 });
-
-async function addValidatorWithEvent(_validator, shouldBeSuccessful, options) {
-    const _result = await relayed.addValidatorWithEvent(_validator, options).should.be.fulfilled;
-    if (shouldBeSuccessful) {
-        _result.logs[0].event.should.be.equal("AddSuccess");
-    } else {
-        _result.logs[0].event.should.be.equal("AddFail");
-    }
-    return _result;
-}
-
-async function removeValidatorWithEvent(_validator, shouldBeSuccessful, options) {
-    const _result = await relayed.removeValidatorWithEvent(_validator, options).should.be.fulfilled;
-    if (shouldBeSuccessful) {
-        _result.logs[0].event.should.be.equal("RemoveSuccess");
-    } else {
-        _result.logs[0].event.should.be.equal("RemoveFail");
-    }
-    return _result;
-}
 
 async function callBackWithEvent(_bHash, _vals, options) {
     const _result = await relayed.triggerRelayCallbackWithEvent(_bHash, _vals, options).should.be.fulfilled;

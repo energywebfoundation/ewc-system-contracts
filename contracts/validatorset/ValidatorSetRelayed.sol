@@ -163,7 +163,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         return addressStatus[_somebody].isValidator;
     }
 
-    function isFinalizedValidator(address _somebody)
+    function isActiveValidator(address _somebody)
         external
         view
         returns (bool)
@@ -180,27 +180,19 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     }
 
     function addValidator(address _validator)
-        public
+        external
         onlyOwner
-        returns(bool)
     {
-        if (_addValidatorAllowed(_validator)) {
-            _addValidator(_validator);
-            return true;
-        }
-        return false;
+        require(_addValidatorAllowed(_validator), "Adding (this) validator is not allowed");
+        _addValidator(_validator);
     }
 
     function removeValidator( address _validator)
-        public
+        external
         onlyOwner
-        returns(bool)
     {
-        if (_removeValidatorAllowed(_validator)) {
-            _removeValidator(_validator);
-            return true;
-        }
-        return false;
+        require(_removeValidatorAllowed(_validator), "Removing (this) validator is not allowed");
+        _removeValidator(_validator);
     }
 
     function _triggerChange()
