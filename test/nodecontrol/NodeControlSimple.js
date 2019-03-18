@@ -18,7 +18,7 @@ contract('NodeControlSimple', (accounts) => {
       from: accounts[0]
     });
 
-    nodeControl = await NodeControlSimpleInstance.RetrieveUpdate(accounts[1])
+    nodeControl = await NodeControlSimpleInstance.retrieveUpdate(accounts[1])
 
     assert('0x01' === nodeControl.dockerSha, "dockerSha should be the same as parameter from function")
     assert("dockerName123" === nodeControl.dockerName, "dockerName should be the same as parameter from function")
@@ -39,15 +39,15 @@ contract('NodeControlSimple', (accounts) => {
       from: accounts[0]
     });
 
-    nodeControl1 = await NodeControlSimpleInstance.RetrieveUpdate(accounts[1])
-    nodeControl2 = await NodeControlSimpleInstance.RetrieveUpdate(accounts[2])
+    nodeControl1 = await NodeControlSimpleInstance.retrieveUpdate(accounts[1])
+    nodeControl2 = await NodeControlSimpleInstance.retrieveUpdate(accounts[2])
 
   //check for events
   });
   it('must return the correct stateStruct of a validator', async () => {
     const NodeControlSimpleInstance = await NodeControlSimple.deployed();
 
-    nodeControl = await NodeControlSimpleInstance.RetrieveUpdate(accounts[1])
+    nodeControl = await NodeControlSimpleInstance.retrieveUpdate(accounts[1])
 
     assert('0x01' === nodeControl.dockerSha, "dockerSha should be the same as parameter from function")
     assert("dockerName123" === nodeControl.dockerName, "dockerName should be the same as parameter from function")
@@ -131,11 +131,11 @@ contract('NodeControlSimple', (accounts) => {
   })
 
   //** Function tests */
-  //** RetrieveUpdate */
+  //** retrieveUpdate */
   it('must return the correct state of a specific validator', async () => {
     const NodeControlSimpleInstance = await NodeControlSimple.deployed();
 
-    returnCall = await NodeControlSimpleInstance.RetrieveUpdate(accounts[1])
+    returnCall = await NodeControlSimpleInstance.retrieveUpdate(accounts[1])
 
     assert(returnCall.dockerSha === '0x03', "dockerSha should be the same")
     assert(returnCall.dockerName === 'dockerName123', "dockerName should be the same")
@@ -155,7 +155,7 @@ contract('NodeControlSimple', (accounts) => {
       from: accounts[0]
     });
 
-    nodeControl = await NodeControlSimpleInstance.RetrieveUpdate(accounts[2])
+    nodeControl = await NodeControlSimpleInstance.retrieveUpdate(accounts[2])
 
     assert(dockerSha === nodeControl.dockerSha, "dockerSha should be the same as parameter from function")
   });
@@ -168,7 +168,7 @@ contract('NodeControlSimple', (accounts) => {
       from: accounts[0]
     });
 
-    nodeControl = await NodeControlSimpleInstance.RetrieveUpdate(accounts[2])
+    nodeControl = await NodeControlSimpleInstance.retrieveUpdate(accounts[2])
 
     assert(dockerName === nodeControl.dockerName, "dockerName should be the same as parameter from function")
   });
@@ -181,7 +181,7 @@ contract('NodeControlSimple', (accounts) => {
       from: accounts[0]
     });
 
-    nodeControl = await NodeControlSimpleInstance.RetrieveUpdate(accounts[2])
+    nodeControl = await NodeControlSimpleInstance.retrieveUpdate(accounts[2])
 
     assert(chainSpecSha === nodeControl.chainSpecSha, "chainSpecSha should be the same as parameter from function")
   });
@@ -194,7 +194,7 @@ contract('NodeControlSimple', (accounts) => {
       from: accounts[0]
     });
 
-    nodeControl = await NodeControlSimpleInstance.RetrieveUpdate(accounts[2])
+    nodeControl = await NodeControlSimpleInstance.retrieveUpdate(accounts[2])
 
     assert(chainSpecUrl === nodeControl.chainSpecUrl, "chainSpecUrl should be the same as parameter from function")
   });
@@ -207,7 +207,7 @@ contract('NodeControlSimple', (accounts) => {
       from: accounts[0]
     });
 
-    nodeControl = await NodeControlSimpleInstance.RetrieveUpdate(accounts[2])
+    nodeControl = await NodeControlSimpleInstance.retrieveUpdate(accounts[2])
 
     assert(isSigning === nodeControl.isSigning, "isSigning should be the same as parameter from function")
   });
@@ -236,7 +236,7 @@ contract('NodeControlSimple', (accounts) => {
   it('must revert if not called by the owner', async () => {
     const NodeControlSimpleInstance = await NodeControlSimple.deployed();
 
-    preTransactionNodeControl = await NodeControlSimpleInstance.RetrieveUpdate(accounts[2])
+    preTransactionNodeControl = await NodeControlSimpleInstance.retrieveUpdate(accounts[2])
 
     isFailed = false
     try {
@@ -248,7 +248,7 @@ contract('NodeControlSimple', (accounts) => {
       assert(true, "Should have thrown an exception")
     }
     assert(!isFailed, "Should have thrown exception")
-    postTransactionNodeControl = await NodeControlSimpleInstance.RetrieveUpdate(accounts[2])
+    postTransactionNodeControl = await NodeControlSimpleInstance.retrieveUpdate(accounts[2])
 
     assert(postTransactionNodeControl.dockerSha === preTransactionNodeControl.dockerSha, "dockerSha should be the same")
     assert(postTransactionNodeControl.dockerName === preTransactionNodeControl.dockerName, "dockerName should be the same")
@@ -276,20 +276,20 @@ contract('NodeControlSimple', (accounts) => {
   it('must change the updateConfirm timestamp to now', async () => {
     const NodeControlSimpleInstance = await NodeControlSimple.deployed();
 
-    preTransactionNodeControl = await NodeControlSimpleInstance.RetrieveUpdate(accounts[2])
+    preTransactionNodeControl = await NodeControlSimpleInstance.retrieveUpdate(accounts[2])
 
     await NodeControlSimpleInstance.confirmUpdate({
       from: accounts[2]
     })
 
-    postTransactionNodeControl = await NodeControlSimpleInstance.RetrieveUpdate(accounts[2])
+    postTransactionNodeControl = await NodeControlSimpleInstance.retrieveUpdate(accounts[2])
 
     assert(preTransactionNodeControl.updateConfirmed.toString() != postTransactionNodeControl.updateConfirmed.toString(), "Should have updated the timestamp")
   });
 
   it('must not be callable by an address whos dockersha length is 0', async () => {
     const NodeControlSimpleInstance = await NodeControlSimple.deployed();
-    NodeControl = await NodeControlSimpleInstance.RetrieveUpdate(accounts[5])
+    NodeControl = await NodeControlSimpleInstance.retrieveUpdate(accounts[5])
 
     assert(NodeControl.dockerSha == '0x', "dockerSha should be empty")
 
