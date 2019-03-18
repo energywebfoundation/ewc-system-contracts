@@ -29,7 +29,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     // The relay validator contract
     IValidatorSetRelay public relaySet;
 
-    event ChangeFinalized(address[] currentSet);
+    event ChangeFinalized(address[] validatorSet);
     event ReportedMalicious(address indexed reporter, address indexed reported, uint indexed blocknum);
     event ReportedBenign(address indexed reporter, address indexed reported, uint indexed blocknum);
 

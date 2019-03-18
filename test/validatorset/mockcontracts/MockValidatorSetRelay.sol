@@ -10,19 +10,4 @@ contract MockValidatorSetRelay is ValidatorSetRelay {
     {
         
     }
-
-/*
-    function callbackInitiateChange(bytes32, address[] calldata)
-        external
-        returns (bool)
-    {
-        return true;
-    }
-*/
-    function setSystem(address _system)
-        external
-        onlyOwner
-    {
-        SYSTEM_ADDRESS = _system;
-    }
 }

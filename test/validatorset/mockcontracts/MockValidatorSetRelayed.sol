@@ -8,6 +8,7 @@ contract MockValidatorSetRelayed is ValidatorSetRelayed {
     event AddFail();
     event RemoveSuccess();
     event RemoveFail();
+    event CallbackSuccess();
 
     constructor(address _relayedSet, address[] memory _initial)
         ValidatorSetRelayed(_relayedSet, _initial)
@@ -34,5 +35,15 @@ contract MockValidatorSetRelayed is ValidatorSetRelayed {
             return;
         }
         emit RemoveFail();
+    }
+
+    function triggerRelayCallbackWithEvent(bytes32 _bHash, address[] calldata _vals)
+        external
+        onlyOwner
+    {
+        if (relaySet.callbackInitiateChange(_bHash, _vals)) {
+            emit CallbackSuccess();
+            return;
+        }
     }
 }

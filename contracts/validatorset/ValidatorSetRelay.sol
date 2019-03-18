@@ -10,7 +10,7 @@ contract ValidatorSetRelay is IValidatorSet, IValidatorSetRelay, Ownable {
 
     event NewRelayed(address indexed old, address indexed current);
 
-    // System address, used by the block sealer
+    /// System address, used by the block sealer
     // solhint-disable-next-line var-name-mixedcase
     address public SYSTEM_ADDRESS = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
     
@@ -23,6 +23,11 @@ contract ValidatorSetRelay is IValidatorSet, IValidatorSetRelay, Ownable {
         _setRelayed(_relayedSet);
     }
 
+    modifier nonDefaultAddress(address _address) {
+        require(_address != address(0), "Address cannot be 0x0");
+        _;
+    }
+
     modifier onlySystem() {
         require(msg.sender == SYSTEM_ADDRESS, "Sender is not SYSTEM");
         _;
@@ -31,6 +36,14 @@ contract ValidatorSetRelay is IValidatorSet, IValidatorSetRelay, Ownable {
     modifier onlyRelayed() {
         require(msg.sender == address(relayedSet), "Sender is not the Relayed contract");
         _;
+    }
+
+    function setSystem(address _systemAddress)
+        external
+        onlyOwner
+        nonDefaultAddress(_systemAddress)
+    {
+        SYSTEM_ADDRESS = _systemAddress;
     }
 
     function callbackInitiateChange(bytes32 _parentHash, address[] calldata _newSet)
@@ -83,11 +96,12 @@ contract ValidatorSetRelay is IValidatorSet, IValidatorSetRelay, Ownable {
 
     function _setRelayed(address _relayedSet)
         private
+        nonDefaultAddress(_relayedSet)
     {
-        require(_relayedSet != address(0), "Relayed contract address cannot be 0.");
         require(_relayedSet != address(relayedSet),
             "New relayed contract address cannot be the same as the current one.");
+        address oldRelayed = address(relayedSet);
         relayedSet = IValidatorSetRelayed(_relayedSet);
-        emit NewRelayed(address(relayedSet), _relayedSet);
+        emit NewRelayed(oldRelayed, _relayedSet);
     }
 }
