@@ -76,5 +76,5 @@ module.exports = {
     color: true
   },
 
-   plugins: [ "truffle-security" ],
+  plugins: [ "truffle-security" ]
 }
