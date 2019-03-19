@@ -7,6 +7,7 @@ install:
   - npm install -D
 script:
   - npm run lint:solhint
+  - npm run lint:solium
   - npm test
 after_success:
   - npm run coverage
