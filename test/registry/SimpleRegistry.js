@@ -5,24 +5,8 @@ const SimpleRegistry = artifacts.require("./SimpleRegistry.sol");
 contract("SimpleRegistry", accounts => {
 
   const address = accounts[0];
-  const owner = accounts[0];
   const nameEntry = "awesome";
   const name = web3.utils.sha3(nameEntry);
-
-  it("should allow reserving a new name", async () => {
-    const simpleReg = await SimpleRegistry.deployed();
-
-    // reservation requires a fee of 1 ETH
-    let txReturn = await simpleReg.reserve(name, {
-      value: web3.utils.toWei("1", "ether")
-    });
-
-    // if successful the contract should emit a `Reserved` event
-    assert(txReturn.logs[0].event == 'Reserved', "Should have thrown the event")
-    // reserved should be true
-    const reserved = await simpleReg.reserved(name);
-    assert.equal(reserved, true);
-  });
 
   it("should only allow owner to reserve a new name", async () => {
     const simpleReg = await SimpleRegistry.deployed();
@@ -38,6 +22,37 @@ contract("SimpleRegistry", accounts => {
     }
     assert(!isFailed, "Should have thrown exception")
 
+  });
+
+  it("should only allow to reserve a new name when fee is available", async () => {
+    const simpleReg = await SimpleRegistry.deployed();
+    let isFailed = false
+    try {
+      await simpleReg.reserve(name, {
+        value: web3.utils.toWei("0.5", "ether"),
+        from: accounts[1]
+      })
+      isFailed = true
+    } catch (e) {
+      assert(true, "Should have thrown an exception")
+    }
+    assert(!isFailed, "Should have thrown exception")
+
+  });
+
+  it("should allow reserving a new name", async () => {
+    const simpleReg = await SimpleRegistry.deployed();
+
+    // reservation requires a fee of 1 ETH
+    let txReturn = await simpleReg.reserve(name, {
+      value: web3.utils.toWei("1", "ether")
+    });
+
+    // if successful the contract should emit a `Reserved` event
+    assert(txReturn.logs[0].event == 'Reserved', "Should have thrown the event")
+    // reserved should be true
+    const reserved = await simpleReg.reserved(name);
+    assert.equal(reserved, true);
   });
 
   it("should allow name owner to set new metadata for the name", async () => {
@@ -298,7 +313,6 @@ contract("SimpleRegistry", accounts => {
     assert(!isFailed, "Should have thrown an exception")
 
     const balance = await web3.eth.getBalance(accounts[0]);
-    console.log(balance)
     await simpleReg.drain({
       from: accounts[0]
     });
@@ -393,5 +407,18 @@ contract("SimpleRegistry", accounts => {
       assert(true, "Should have thrown an exception")
     }
     assert(!isFailed, "Should have thrown an exception")
+  });
+
+  it("should set a new owner", async () => {
+    const simpleReg = await SimpleRegistry.deployed();
+    let isFailed = false
+
+    let txReturn = await simpleReg.setOwner(accounts[1], {
+      from: accounts[0]
+    });
+
+    assert(txReturn.logs[0].event == "NewOwner", "Should have thrown the event")
+    assert(txReturn.logs[0].args.old === accounts[0], "Should have the old owner");
+    assert(txReturn.logs[0].args.current === accounts[1], "Should have a new owner");
   });
 });
