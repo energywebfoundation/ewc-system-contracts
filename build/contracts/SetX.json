@@ -26,9 +26,9 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity >=0.4.21 <0.6.0;\n\n\ninterface SetX {\n    function setX(uint _x) external returns (bool);\n}\n",
-  "sourcePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/interfaces/SetX.sol",
+  "sourcePath": "/Users/jbentke/Documents/EWF_Governance/genome-system-contracts/contracts/interfaces/SetX.sol",
   "ast": {
-    "absolutePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/interfaces/SetX.sol",
+    "absolutePath": "/Users/jbentke/Documents/EWF_Governance/genome-system-contracts/contracts/interfaces/SetX.sol",
     "exportedSymbols": {
       "SetX": [
         67
@@ -153,7 +153,7 @@
     "src": "0:106:1"
   },
   "legacyAST": {
-    "absolutePath": "/home/aznagy/work/ewf/genome/genome-system-contracts/contracts/interfaces/SetX.sol",
+    "absolutePath": "/Users/jbentke/Documents/EWF_Governance/genome-system-contracts/contracts/interfaces/SetX.sol",
     "exportedSymbols": {
       "SetX": [
         67
@@ -283,7 +283,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-03-04T13:48:54.329Z",
+  "updatedAt": "2019-03-18T14:45:55.784Z",
   "devdoc": {
     "methods": {}
   },
