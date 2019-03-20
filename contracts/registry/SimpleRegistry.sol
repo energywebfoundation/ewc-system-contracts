@@ -147,7 +147,8 @@ contract SimpleRegistry is Owned, MetadataRegistry, OwnerRegistry, ReverseRegist
         returns (bool success)
     {
         bytes32 sha3Name = keccak256(bytes(_name));
-        if (entries[sha3Name].reverse != address(0) && keccak256(bytes(reverses[entries[sha3Name].reverse])) == sha3Name) {
+        if (entries[sha3Name].reverse != address(0) && keccak256(bytes(reverses[entries[sha3Name].reverse])) == 
+        sha3Name) {
             delete reverses[entries[sha3Name].reverse];
             emit ReverseRemoved(_name, entries[sha3Name].reverse);
         }

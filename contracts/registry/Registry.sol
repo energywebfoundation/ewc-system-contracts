@@ -18,58 +18,58 @@ pragma solidity ^0.5.0;
 
 
 interface MetadataRegistry {
-	event DataChanged(bytes32 indexed name, string key, string plainKey);
+    event DataChanged(bytes32 indexed name, string key, string plainKey);
 
-	function getData(bytes32 _name, string calldata _key)
-		external
-		view
-		returns (bytes32);
+    function getData(bytes32 _name, string calldata _key)
+            external
+            view
+            returns (bytes32);
+            
+    function getAddress(bytes32 _name, string calldata _key)
+            external
+            view
+            returns (address);
 
-	function getAddress(bytes32 _name, string calldata _key)
-		external
-		view
-		returns (address);
-
-	function getUint(bytes32 _name, string calldata _key)
-		external
-		view
-		returns (uint);
+    function getUint(bytes32 _name, string calldata _key)
+            external
+            view
+            returns (uint);
 }
 
 
 interface OwnerRegistry {
-	event Reserved(bytes32 indexed name, address indexed owner);
-	event Transferred(bytes32 indexed name, address indexed oldOwner, address indexed newOwner);
-	event Dropped(bytes32 indexed name, address indexed owner);
+    event Reserved(bytes32 indexed name, address indexed owner);
+    event Transferred(bytes32 indexed name, address indexed oldOwner, address indexed newOwner);
+    event Dropped(bytes32 indexed name, address indexed owner);
 
-	function getOwner(bytes32 _name)
-		external
-		view
-		returns (address);
+    function getOwner(bytes32 _name)
+            external
+            view
+            returns (address);
 }
 
 
 interface ReverseRegistry {
-	event ReverseConfirmed(string name, address indexed reverse);
-	event ReverseRemoved(string name, address indexed reverse);
+    event ReverseConfirmed(string name, address indexed reverse);
+    event ReverseRemoved(string name, address indexed reverse);
 
-	function hasReverse(bytes32 _name)
-		external
-		view
-		returns (bool);
+    function hasReverse(bytes32 _name)
+            external
+            view
+            returns (bool);
 
-	function getReverse(bytes32 _name)
-		external
-		view
-		returns (address);
+    function getReverse(bytes32 _name)
+            external
+            view
+            returns (address);
 
-	function canReverse(address _data)
-		external
-		view
-		returns (bool);
+    function canReverse(address _data)
+            external
+            view
+            returns (bool);
 
-	function reverse(address _data)
-		external
-		view
-		returns (string memory);
+    function reverse(address _data)
+            external
+            view
+            returns (string memory);
 }
