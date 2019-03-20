@@ -4,14 +4,12 @@ import "../../../contracts/vesting/Holding.sol";
 
 contract HoldingMock is Holding {
 
-    constructor(address _account, uint256 _funding, uint _time)
-        public
-        payable
+    
+
+    function initHoldingData()
+        internal 
     {
-        holders[_account] = Holder({
-            availableAmount: _funding,
-            time: _time
-        });
+        addHolding(0xdD870fA1b7C4700F2BD7f44238821C26f7392148, 98, 2000000000);
     }
 
 

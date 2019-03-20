@@ -1,4 +1,6 @@
-let Holding = artifacts.require('./mockcontracts/HoldingMock');
+let Holding = artifacts.require('../../contracts/vesting/Holding.sol');
+let HoldingMock = artifacts.require('./mockcontracts/HoldingMock.sol');
+let HoldingMockB = artifacts.require('./mockcontracts/HoldingMockB.sol');
 const Utils = require('../utils.js');
 
 let rpcId = 1;
@@ -14,15 +16,17 @@ require('chai')
 contract('Holding', function (accounts) {
     
 
-    describe('Holding mock', async function() {
+    describe('Holding', async function() {
 
-        let holdingMock;
-        let time; 
+        let holding;
         let snapshotId;
 
         const ACCOUNT_WITH_FUNDS = '0xdD870fA1b7C4700F2BD7f44238821C26f7392148';
-        const ACCOUNT_FUNDING = '3';
+        const ACCOUNT_FUNDING = '99';
         const ACCOUNT_WITH_NO_FUNDS = '0xaf9DdE98b6aeB2225bf87C2cB91c58833fbab2Ab';
+
+        const TARGET_AMOUNT = 143;
+
 
         before(async () => {
             snapshotId =  await Utils.createSnapshot();
@@ -33,47 +37,79 @@ contract('Holding', function (accounts) {
             await Utils.revertSnapshot(snapshotId, rpcId++);
             snapshotId =  await Utils.createSnapshot();
             deployer = accounts[0];
-            time = new web3.utils.BN((await web3.eth.getBlock(await web3.eth.getBlockNumber())).timestamp + 10000, 10)
-            holdingMock = await Holding.new(ACCOUNT_WITH_FUNDS, ACCOUNT_FUNDING, time, {from: deployer, value: web3.utils.toWei(ACCOUNT_FUNDING, 'ether')}).should.be.fulfilled;
-
+         
         });
 
         it('Test holder amount should be set correctly', async function() {
-            let holderStruct = await holdingMock.holders(ACCOUNT_WITH_FUNDS);
+            holding = await Holding.new({from: deployer, value: TARGET_AMOUNT}).should.be.fulfilled;
+            let holderStruct = await holding.holders(ACCOUNT_WITH_FUNDS);
             holderStruct.availableAmount.should.be.bignumber.equal(ACCOUNT_FUNDING);
         });
 
         it('Test holder time should be set correctly', async function() {
-            let holderStruct = await holdingMock.holders(ACCOUNT_WITH_FUNDS);
-            holderStruct.time.should.be.bignumber.equal(time);
+            holding = await Holding.new({from: deployer, value: TARGET_AMOUNT}).should.be.fulfilled;
+            let holderStruct = await holding.holders(ACCOUNT_WITH_FUNDS);
+            holderStruct.lockedUntilBlocktimestamp.should.be.bignumber.equal(new web3.utils.BN('2000000000', 10));
         });
 
         it('It should not be possible to release funds before time', async function() {
-            await holdingMock.releaseFunds(ACCOUNT_WITH_FUNDS)
+            holding = await Holding.new({from: deployer, value: TARGET_AMOUNT}).should.be.fulfilled;
+            await holding.releaseFunds(ACCOUNT_WITH_FUNDS)
                 .should.be.rejectedWith('Holding period is not over.'); 
         });
 
         it('It should not be possible to release funds from a account which has no funds', async function() {
-            await holdingMock.releaseFunds(ACCOUNT_WITH_NO_FUNDS)
+            holding = await Holding.new({from: deployer, value: TARGET_AMOUNT}).should.be.fulfilled;
+            await holding.releaseFunds(ACCOUNT_WITH_NO_FUNDS)
                 .should.be.rejectedWith('Available amount is 0.'); 
         });
 
         it('It should be possible to release funds after time', async function() {
-            await Utils.timeTravel(10001)
+            holding = await Holding.new({from: deployer, value: TARGET_AMOUNT}).should.be.fulfilled;
+            await Utils.timeTravel(2000000000)
             const balanceOfAccountBeforeRelease = new web3.utils.BN(await web3.eth.getBalance(ACCOUNT_WITH_FUNDS))
-            await holdingMock.releaseFunds(ACCOUNT_WITH_FUNDS)
+            await holding.releaseFunds(ACCOUNT_WITH_FUNDS)
             const balanceOfAccountAfterRelease = new web3.utils.BN(await web3.eth.getBalance(ACCOUNT_WITH_FUNDS))
             balanceOfAccountAfterRelease.should.be.bignumber.equal(balanceOfAccountBeforeRelease.add(new web3.utils.BN(ACCOUNT_FUNDING)))
 
         });
 
         it('It should only be possible to release funds once', async function() {
-            await Utils.timeTravel(10001)
+            holding = await Holding.new({from: deployer, value: TARGET_AMOUNT}).should.be.fulfilled;
+            await Utils.timeTravel(2000000000)
 
-            await holdingMock.releaseFunds(ACCOUNT_WITH_FUNDS)
-            await holdingMock.releaseFunds(ACCOUNT_WITH_FUNDS)
+            await holding.releaseFunds(ACCOUNT_WITH_FUNDS)
+            await holding.releaseFunds(ACCOUNT_WITH_FUNDS)
                 .should.be.rejectedWith('Available amount is 0.'); 
 
         });
+
+        it('Should throw if contract balance is less than expected', async function() {
+            holding = await Holding.new({from: deployer, value: TARGET_AMOUNT - 1}).should.be
+                .rejectedWith('Balance should equal target amount.');
+
+        });
+
+        it('Should throw if contract balance is higher than expected', async function() {
+            holding = await Holding.new({from: deployer, value: TARGET_AMOUNT + 1}).should.be
+                .rejectedWith('Balance should equal target amount.');
+
+        });
+
+        it('Should throw if inital locked up amount does not equal target amount', async function() {
+            holding = await HoldingMock.new({from: deployer, value: TARGET_AMOUNT}).should.be.fulfilled
+                .rejectedWith('Target amount should equal actual amount.');
+            
+
+        });
+
+        it('Should throw if the vesting data set conatains two times the same address', async function() {
+            holding = await HoldingMockB.new({from: deployer, value: TARGET_AMOUNT}).should.be.fulfilled
+                .rejectedWith('Holding for this address was already set.');
+            
+
+        });
     });
+
+
 });
