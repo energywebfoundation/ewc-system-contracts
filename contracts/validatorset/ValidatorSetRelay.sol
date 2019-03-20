@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.4;
 
 import "../misc/Ownable.sol";
 import "../interfaces/IValidatorSetRelay.sol";
