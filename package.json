@@ -34,6 +34,7 @@
     "lint:solhint": "npx solhint \"contracts/**/*.sol\"",
     "ganache": "npx ganache-cli --port 8545",
     "parity": "parity --chain dev --jsonrpc-port 8545 --jsonrpc-apis all",
+    "verify": "npx truffle run verify --all",
     "security": "slither . --config-file .slither.conf.json"
   },
   "devDependencies": {
@@ -46,8 +47,9 @@
     "solhint": "1.5.1",
     "solidity-coverage": "^0.6.0-beta.3",
     "solium-plugin-zeppelin": "0.0.2",
-    "truffle": "^5.0.5",
-    "web3": "^1.0.0-beta.37"
+    "truffle": "^5.0.8",
+    "truffle-security": "^1.3.1",
+    "web3": "1.0.0-beta.37"
   },
   "dependencies": {}
 }

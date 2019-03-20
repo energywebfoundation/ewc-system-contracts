@@ -1,7 +1,7 @@
-// Source: https://github.com/parity-contracts/kovan-validator-set
-
-const REVERT_ERROR_MSG = 'VM Exception while processing transaction: revert';
+const REVERT_ERROR_MSG = "VM Exception while processing transaction: revert";
 const DEFAULT_ADDRESS = "0x0000000000000000000000000000000000000000";
+const SYSTEM_ADDRESS = "0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE";
+const EMPTY_BYTES32 = "0x0000000000000000000000000000000000000000000000000000000000000000";
 
 const send = (method, params = []) => {
     return new Promise((resolve, reject) => web3.currentProvider.send({id: 0, jsonrpc: '2.0', method, params }, (e, data) => {
@@ -77,5 +77,7 @@ module.exports = {
     timeTravel,
     assertThrowsAsync,
     REVERT_ERROR_MSG,
-    DEFAULT_ADDRESS
+    DEFAULT_ADDRESS,
+    SYSTEM_ADDRESS,
+    EMPTY_BYTES32,
 };
