@@ -1,1 +1,5 @@
-* @ngyam @hai-ko @jbentke @JonathanWfels @ETHorHIL
+* @ngyam 
+contracts/vesting @hai-ko 
+test/vesting @hai-ko
+contracts/nodecontrol @jbentke 
+test/nodecontrol @jbentke 

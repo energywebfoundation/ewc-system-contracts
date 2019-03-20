@@ -75,4 +75,6 @@ module.exports = {
     enableTimeouts: false,
     color: true
   },
+
+  plugins: [ "truffle-security" ]
 }
