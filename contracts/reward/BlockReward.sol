@@ -2,20 +2,25 @@ pragma solidity ^0.5.4;
 
 import "../interfaces/IBlockReward.sol";
 import "../storage/EternalStorage.sol";
+import "./SCurveProvider.sol";
 import "../libs/SafeMath.sol";
 
 
-contract BlockReward is EternalStorage, IBlockReward {
+/// @dev Might remove Eternal Storage alltogether. This contract is not expected to be upgraded
+/// and only stores uints
+contract BlockReward is EternalStorage, SCurveProvider, IBlockReward {
     using SafeMath for uint256;
 
     bytes32 internal constant MINTED_TOTALLY = keccak256("mintedTotally");
-    bytes32 internal constant MINTED_FOR_COMMUNITY = "mintedForCommunity";
+    bytes32 internal constant MINTED_FOR_COMMUNITY = keccak256("mintedForCommunity");
     bytes32 internal constant MINTED_FOR_COMMUNITY_FOR_ACCOUNT = "mintedForCommunityForAccount";
     bytes32 internal constant MINTED_FOR_ACCOUNT = "mintedForAccount";
     bytes32 internal constant MINTED_FOR_ACCOUNT_IN_BLOCK = "mintedForAccountInBlock";
     bytes32 internal constant MINTED_IN_BLOCK = "mintedInBlock";
 
     uint256 public constant COMMUNITY_FUND_AMOUNT = 1 ether;
+    address internal SYSTEM_ADDRESS = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
+    // Needs
     address public communityFund = 0x0000000000000000000000000000000000000000;
 
     mapping(address => address) public payoutAddresses;
@@ -23,8 +28,26 @@ contract BlockReward is EternalStorage, IBlockReward {
     event Rewarded(address[] receivers, uint256[] rewards);
 
     modifier onlySystem {
-        require(msg.sender == 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE);
+        require(
+            msg.sender == SYSTEM_ADDRESS,
+            "Caller is not the SYSTEM"
+        );
         _;
+    }
+
+    modifier onlyCommunityFund {
+        require(
+            msg.sender == communityFund,
+            "Caller is not the community fund"
+        );
+        _;
+    }
+
+    function setCommunityFund(address _newFund)
+        external
+        onlyCommunityFund
+    {
+        communityFund = _newFund;
     }
 
     function setPayoutAddress(address _newPayoutAddress)
@@ -56,14 +79,16 @@ contract BlockReward is EternalStorage, IBlockReward {
         uint256[] memory rewards = new uint256[](receivers.length);
 
         receivers[0] = _getPayoutAddress(benefactors[0]);
-        rewards[0] = _getBlockReward();
+        rewards[0] = getBlockReward(block.number);
         
         receivers[1] = _getPayoutAddress(communityFund);
         rewards[1] = COMMUNITY_FUND_AMOUNT;
 
-        _setMinted(rewards[0], receivers[0]);
-        _setCommunityMinted(rewards[0], receivers[1]);
+        _trackMinted(rewards[0], receivers[0]);
+        _trackCommunityMinted(rewards[0], receivers[1]);
         
+        // We might take this out cause service transactions
+        // cannot emit events
         emit Rewarded(receivers, rewards);
     
         return (receivers, rewards);
@@ -74,9 +99,7 @@ contract BlockReward is EternalStorage, IBlockReward {
         view
         returns(uint256)
     {
-        return uintStorage[
-            keccak256(abi.encode(MINTED_FOR_COMMUNITY))
-        ];
+        return uintStorage[MINTED_FOR_COMMUNITY];
     }
 
     function mintedForCommunityForAccount(address _account)
@@ -127,15 +150,6 @@ contract BlockReward is EternalStorage, IBlockReward {
         return uintStorage[MINTED_TOTALLY];
     }
 
-    function _getBlockReward()
-        private
-        view
-        returns (uint256)
-    {
-        //placeholder
-        return block.number;
-    }
-
     function _getPayoutAddress(address _blockAuthor)
         private
         view
@@ -148,21 +162,21 @@ contract BlockReward is EternalStorage, IBlockReward {
         return _payoutAddress;
     }
 
-    function _setCommunityMinted(uint256 _amount, address _account)
+    function _trackCommunityMinted(uint256 _amount, address _account)
         private
     {
         bytes32 hash;
         
-        hash = keccak256(abi.encode(MINTED_FOR_COMMUNITY));
+        hash = MINTED_FOR_COMMUNITY;
         uintStorage[hash] = uintStorage[hash].add(_amount);
 
         hash = keccak256(abi.encode(MINTED_FOR_COMMUNITY_FOR_ACCOUNT, _account));
         uintStorage[hash] = uintStorage[hash].add(_amount);
         
-        _setMinted(_amount, _account);
+        _trackMinted(_amount, _account);
     }
 
-    function _setMinted(uint256 _amount, address _account)
+    function _trackMinted(uint256 _amount, address _account)
         private
     {
         bytes32 hash;
