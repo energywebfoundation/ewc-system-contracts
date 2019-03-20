@@ -32,8 +32,8 @@ contract SimpleRegistry is Owned, MetadataRegistry, OwnerRegistry, ReverseRegist
     event FeeChanged(uint amount);
     event ReverseProposed(string name, address indexed reverse);
 
-    mapping (bytes32 => Entry) entries;
-    mapping (address => string) reverses;
+    mapping (bytes32 => Entry) public entries;
+    mapping (address => string) public reverses;
 
     uint public fee = 1 ether;
 
