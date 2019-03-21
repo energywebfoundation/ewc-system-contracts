@@ -39,10 +39,10 @@ contract Holding {
         
     }
 
+    // solhint-disable function-max-lines
     function initHoldingData()
         internal 
     {
-
         addHolding(0x2526AeE4A3b281a5F17324E1F306a051bb4607Ae, 99, 2000000000);
         addHolding(0x0733e48DC2a92DcA29CDA3c6EAE4d23EB11BEa60, 44, 2000000000);
         addHolding(0xE286aBBC34d6E5D0F057D3e6f5343e5fB31e4c32, 1, 2000000000);
@@ -245,6 +245,7 @@ contract Holding {
         addHolding(0x834E24559FAdE6b940B31Cff775ad21Dbfb24FB5, 1, 2000000000);
 
     }
+    // solhint-enable function-max-lines
 
     function addHolding(address investor, uint256 amountToHold, uint256 lockUntil) 
         internal
