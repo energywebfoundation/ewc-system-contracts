@@ -11,7 +11,8 @@ contract Holding {
         uint256 availableAmount;
         uint256 lockedUntilBlocktimestamp;
     }
-        
+
+    ///@notice loads holding data and checks for sanity
     constructor()
         public
         payable
@@ -40,6 +41,7 @@ contract Holding {
     }
 
     // solhint-disable function-max-lines
+    ///@notice loads holding data
     function initHoldingData()
         internal 
     {
@@ -247,6 +249,11 @@ contract Holding {
     }
     // solhint-enable function-max-lines
 
+
+    /// @notice Adds a holding entry
+    /// @param investor owner of the holded funds
+    /// @param amountToHold the amount that should be holded
+    /// @param lockUntil the timestamp of the date until the funds should be locked up
     function addHolding(address investor, uint256 amountToHold, uint256 lockUntil) 
         internal
     {
