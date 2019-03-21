@@ -249,7 +249,6 @@ contract Holding {
     }
     // solhint-enable function-max-lines
 
-
     /// @notice Adds a holding entry
     /// @param investor owner of the holded funds
     /// @param amountToHold the amount that should be holded
