@@ -21,11 +21,11 @@ contract('Holding', function (accounts) {
         let holding;
         let snapshotId;
 
-        const ACCOUNT_WITH_FUNDS = '0xdD870fA1b7C4700F2BD7f44238821C26f7392148';
+        const ACCOUNT_WITH_FUNDS = '0x2526AeE4A3b281a5F17324E1F306a051bb4607Ae';
         const ACCOUNT_FUNDING = '99';
         const ACCOUNT_WITH_NO_FUNDS = '0xaf9DdE98b6aeB2225bf87C2cB91c58833fbab2Ab';
 
-        const TARGET_AMOUNT = 143;
+        const TARGET_AMOUNT = 341;
 
 
         before(async () => {
