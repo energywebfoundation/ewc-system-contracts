@@ -25,18 +25,18 @@ contract Holding {
     }
 
     /// @notice Rlease funds for a specific address
-    /// @param _holderAddress the ethereum address which should get its funds
-    function releaseFunds(address payable _holderAddress) 
+    /// @param holderAddress the ethereum address which should get its funds
+    function releaseFunds(address payable holderAddress) 
         public 
     {
-        Holder storage holder = holders[_holderAddress];
+        Holder storage holder = holders[holderAddress];
         
         require(holder.availableAmount > 0, "Available amount is 0");
         require(now > holder.lockedUntilBlocktimestamp, "Holding period is not over");
         
         uint256 amountToTransfer = holder.availableAmount;
         holder.availableAmount = 0;
-        _holderAddress.transfer(amountToTransfer);
+        holderAddress.transfer(amountToTransfer);
         
     }
 
