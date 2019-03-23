@@ -3,6 +3,7 @@ pragma solidity ^0.5.4;
 import "../interfaces/IBlockReward.sol";
 import "../storage/EternalStorage.sol";
 import "./SCurveProvider.sol";
+
 import "../libs/SafeMath.sol";
 
 
@@ -18,14 +19,17 @@ contract BlockReward is EternalStorage, SCurveProvider, IBlockReward {
     bytes32 internal constant MINTED_FOR_ACCOUNT_IN_BLOCK = "mintedForAccountInBlock";
     bytes32 internal constant MINTED_IN_BLOCK = "mintedInBlock";
 
-    uint256 public constant COMMUNITY_FUND_AMOUNT = 1 ether;
+    // solhint-disable var-name-mixedcase
+    
+    /// SYSTEM_ADDRESS: 2^160 - 2
     address internal SYSTEM_ADDRESS = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
-    // Needs
-    address public communityFund = 0x0000000000000000000000000000000000000000;
-
+    /// The constant amount that gets sent to the
+    /// community fund with each new block. It is a constant
+    /// value but can be set in the constructor.
+    uint256 public communityFundAmount;
+    address public communityFund;
     mapping(address => address) public payoutAddresses;
-
-    event Rewarded(address[] receivers, uint256[] rewards);
+    // solhint-enable var-name-mixedcase
 
     modifier onlySystem {
         require(
@@ -41,6 +45,13 @@ contract BlockReward is EternalStorage, SCurveProvider, IBlockReward {
             "Caller is not the community fund"
         );
         _;
+    }
+
+    constructor(address _communityFundAddress, uint256 _communityFundAmount)
+        public
+    {
+        communityFund = _communityFundAddress;
+        communityFundAmount = _communityFundAmount;
     }
 
     function setCommunityFund(address _newFund)
@@ -67,9 +78,9 @@ contract BlockReward is EternalStorage, SCurveProvider, IBlockReward {
         onlySystem
         returns (address[] memory, uint256[] memory)
     {
-        require(benefactors.length == kind.length);
-        require(benefactors.length == 1);
-        require(kind[0] == 0);
+        require(benefactors.length == kind.length, "Benefactors/types length differs");
+        require(benefactors.length == 1, "Benefactors length is not 1");
+        require(kind[0] == 0, "Benefactor is not the block author.");
 
         if (benefactors[0] == address(0)) {
             return (new address[](0), new uint256[](0));
@@ -82,14 +93,10 @@ contract BlockReward is EternalStorage, SCurveProvider, IBlockReward {
         rewards[0] = getBlockReward(block.number);
         
         receivers[1] = _getPayoutAddress(communityFund);
-        rewards[1] = COMMUNITY_FUND_AMOUNT;
+        rewards[1] = communityFundAmount;
 
-        _trackMinted(rewards[0], receivers[0]);
-        _trackCommunityMinted(rewards[0], receivers[1]);
-        
-        // We might take this out cause service transactions
-        // cannot emit events
-        emit Rewarded(receivers, rewards);
+        _logMinted(rewards[0], receivers[0]);
+        _logCommunityMinted(rewards[1], receivers[1]);
     
         return (receivers, rewards);
     }
@@ -162,35 +169,35 @@ contract BlockReward is EternalStorage, SCurveProvider, IBlockReward {
         return _payoutAddress;
     }
 
-    function _trackCommunityMinted(uint256 _amount, address _account)
+    function _logCommunityMinted(uint256 _amount, address _account)
         private
     {
-        bytes32 hash;
+        bytes32 _hash;
         
-        hash = MINTED_FOR_COMMUNITY;
-        uintStorage[hash] = uintStorage[hash].add(_amount);
+        _hash = MINTED_FOR_COMMUNITY;
+        uintStorage[_hash] = uintStorage[_hash].add(_amount);
 
-        hash = keccak256(abi.encode(MINTED_FOR_COMMUNITY_FOR_ACCOUNT, _account));
-        uintStorage[hash] = uintStorage[hash].add(_amount);
+        _hash = keccak256(abi.encode(MINTED_FOR_COMMUNITY_FOR_ACCOUNT, _account));
+        uintStorage[_hash] = uintStorage[_hash].add(_amount);
         
-        _trackMinted(_amount, _account);
+        _logMinted(_amount, _account);
     }
 
-    function _trackMinted(uint256 _amount, address _account)
+    function _logMinted(uint256 _amount, address _account)
         private
     {
-        bytes32 hash;
+        bytes32 _hash;
 
-        hash = keccak256(abi.encode(MINTED_FOR_ACCOUNT_IN_BLOCK, _account, block.number));
-        uintStorage[hash] = _amount;
+        _hash = keccak256(abi.encode(MINTED_FOR_ACCOUNT_IN_BLOCK, _account, block.number));
+        uintStorage[_hash] = uintStorage[_hash].add(_amount);
 
-        hash = keccak256(abi.encode(MINTED_FOR_ACCOUNT, _account));
-        uintStorage[hash] = uintStorage[hash].add(_amount);
+        _hash = keccak256(abi.encode(MINTED_FOR_ACCOUNT, _account));
+        uintStorage[_hash] = uintStorage[_hash].add(_amount);
 
-        hash = keccak256(abi.encode(MINTED_IN_BLOCK, block.number));
-        uintStorage[hash] = uintStorage[hash].add(_amount);
+        _hash = keccak256(abi.encode(MINTED_IN_BLOCK, block.number));
+        uintStorage[_hash] = uintStorage[_hash].add(_amount);
 
-        hash = MINTED_TOTALLY;
-        uintStorage[hash] = uintStorage[hash].add(_amount);
+        _hash = MINTED_TOTALLY;
+        uintStorage[_hash] = uintStorage[_hash].add(_amount);
     }
 }
