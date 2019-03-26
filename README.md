@@ -23,6 +23,7 @@ and code away.
      - Security analysis: install [slither (a pip package, not npm)](https://github.com/trailofbits/slither#how-to-install) and do ```npm run security```. It is not used for checks by Travis. Run it and see if there are some security flaws and suggestions that would make sense to apply.
        1. Make sure a python 3.6 env is active
        2. run: ```pip install slither-analyzer``` (or sometimes ```pip3 install slither-analyzer```)
+     - Security analysis 2: `npm run verify` to run MythX security checker (truffle security plugin by ConsenSys)
    - **JS style (tests)**:
      - use ;
      - await/async is easier to read than callbacks
