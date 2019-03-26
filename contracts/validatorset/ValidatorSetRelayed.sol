@@ -34,17 +34,18 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     /// The Relay validator-set contract
     IValidatorSetRelay public relaySet;
 
+    event NewRelay(address indexed relay);
     event ChangeFinalized(address[] validatorSet);
     event ReportedMalicious(address indexed reporter, address indexed reported, uint indexed blocknum);
     event ReportedBenign(address indexed reporter, address indexed reported, uint indexed blocknum);
 
-    modifier onlyActiveValidator(address _someone) {
-        require(_isActiveValidator(_someone), "Address is not an active validator");
+    modifier onlyActiveValidator(address _somebody) {
+        require(_isActiveValidator(_somebody), "Address is not an active validator");
         _;
     }
 
     modifier onlyRelay() {
-        require(msg.sender == address(relaySet), "Caller is not the relay contract");
+        require(msg.sender == address(relaySet), "Caller is not the Relay contract");
         _;
     }
 
@@ -60,7 +61,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
 
     /// @notice throws if blocknumber is in the future
     modifier blockNumberValid(uint _blockNumber) {
-        require(_blockNumber < block.number, "Block number is not valid.");
+        require(_blockNumber < block.number, "Block number is not valid");
         _;
     }
 
@@ -68,10 +69,10 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         public
     {
         require(_relaySet != address(0), "Relay contract address cannot be 0x0");
-        relaySet = IValidatorSetRelay(_relaySet);
+        _setRelay(_relaySet);
 
         for (uint i = 0; i < _initial.length; i++) {
-            require(_initial[i] != address(0), "Initial validator address cannot be 0x0");
+            require(_initial[i] != address(0), "Validator address cannot be 0x0");
             
             addressStatus[_initial[i]].isValidator = true;
             addressStatus[_initial[i]].isPending = false;
@@ -124,9 +125,11 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         onlyOwner
     {
         require(_relaySet != address(0), "Relay contract address cannot be 0x0");
-        require(_relaySet != address(relaySet),
-            "New relay contract address cannot be the same as the current one.");
-        relaySet = IValidatorSetRelay(_relaySet);
+        require(
+            _relaySet != address(relaySet),
+            "New relay contract address cannot be the same as the current one"
+        );
+        _setRelay(_relaySet);
     }
 
     /// @notice Called by the relay to finalize changes made to the validator set.
@@ -165,8 +168,10 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     function addValidator(address _validator)
         external
         onlyOwner
+        whenFinalized
     {
-        require(_addValidatorAllowed(_validator), "Adding (this) validator is not allowed");
+        require(_validator != address(0), "Validator address cannot be 0x0");
+        require(!_isActiveValidator(_validator), "This validator is already active");
         _addValidator(_validator);
     }
 
@@ -177,11 +182,12 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     /// @dev First removes the validator from `pendingValidators`, then calls the `callbackInitiateChange`
     /// of the Relay contract which emits the `InitiateChange` event
     /// @param _validator The address to be removed
-    function removeValidator( address _validator)
+    function removeValidator(address _validator)
         external
         onlyOwner
+        whenFinalized
+        onlyActiveValidator(_validator)
     {
-        require(_removeValidatorAllowed(_validator), "Removing (this) validator is not allowed");
         _removeValidator(_validator);
     }
 
@@ -227,7 +233,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         return addressStatus[_somebody].isValidator;
     }
 
-    /// @notice Checks whether the address is a currently active validator
+    /// @notice Checks whether the address is a currently active (sealing) validator
     /// @return True or false, depending on the check
     function isActiveValidator(address _somebody)
         external
@@ -247,46 +253,34 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         return addressStatus[_somebody].isPending;
     }
 
+    /// @dev Sets the relay address and emits the `NewRelay` event
+    function _setRelay(address _relaySet)
+        private
+    {
+        relaySet = IValidatorSetRelay(_relaySet);
+        emit NewRelay(_relaySet);
+    }
+
     /// @dev Sets `finalized` to false and initiates a change
     /// with the Relay contract
     function _triggerChange()
         private
-        whenFinalized
     {
         finalized = false;
-        _initiateChange();
-    }
-
-    /// @dev Calls Relay callback to emit
-    /// the `InitiateChange` event for the
-    /// Parity client
-    function _initiateChange()
-        private
-    {
-        relaySet.callbackInitiateChange(blockhash(block.number - 1), pendingValidators);
-    }
-
-    /// @dev Checks whether a certain address can be added. Only checks
-    /// if the address is valid and whether the validator is already active.
-    function _addValidatorAllowed(address _validator)
-        private
-        view
-        returns (bool)    
-    {
-        if (_validator == address(0) || _isActiveValidator(_validator)) {
-            return false;
-        }
-        return true;
+        require(
+            relaySet.callbackInitiateChange(blockhash(block.number - 1), pendingValidators),
+            "Relay contract InitiateChange callback failed."
+        );
     }
 
     /// @dev Checks whether validator is active based on its status flags.
-    function _isActiveValidator(address _someone)
+    function _isActiveValidator(address _somebody)
         private
         view
         returns(bool)
     {
-        bool isV = addressStatus[_someone].isValidator;
-        bool isP = addressStatus[_someone].isPending;
+        bool isV = addressStatus[_somebody].isValidator;
+        bool isP = addressStatus[_somebody].isPending;
 
         // already in the active set, or in the active set but about to be removed
         return ((isV && !isP) || (!isV && isP));
@@ -304,25 +298,14 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         _triggerChange();
     }
 
-    /// @dev Checks whether a certain validator can be removed. Only checks
-    /// pending list size and whether the validator is active.
-    function _removeValidatorAllowed(address _validator)
-        private
-        view
-        returns(bool)
-    {
-        if (pendingValidators.length == 0 || !_isActiveValidator(_validator)) {
-            return false;
-        }
-        return true;
-    }
-
     /// @dev Removes validator from pending, sets status flags and triggers change.
     /// Replaces the removed element with the last element. Must not be called with
     /// an empty pending validators list
     function _removeValidator(address _validator)
         private
     {
+        require(pendingValidators.length != 0, "There are no validators to remove from");
+
         uint256 removedIndex = addressStatus[_validator].index;
         uint256 lastIndex = pendingValidators.length - 1;
         address lastValidator = pendingValidators[lastIndex];

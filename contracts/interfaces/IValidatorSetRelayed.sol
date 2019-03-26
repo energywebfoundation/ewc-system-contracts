@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.4;
 
 
 /// @title Reporting validator set interface
@@ -17,7 +17,11 @@ interface IValidatorSetRelayed {
     /// @param reporter Address of the reporter.
     /// @param validator Address of the validator to report.
     /// @param blockNumber The blocknumber to report on.
-    function reportBenign(address reporter, address validator, uint256 blockNumber)
+    function reportBenign(
+        address reporter,
+        address validator,
+        uint256 blockNumber
+    )
         external;
 
     /// @notice Reports malicious misbehavior of validator of the current validator set
@@ -26,7 +30,12 @@ interface IValidatorSetRelayed {
     /// @param validator Address of the validator to report.
     /// @param blockNumber The blocknumber to report on.
     /// @param proof Proof attached.
-    function reportMalicious(address reporter, address validator, uint256 blockNumber, bytes calldata proof)
+    function reportMalicious(
+        address reporter,
+        address validator,
+        uint256 blockNumber,
+        bytes calldata proof
+    )
         external;
 
     /// @notice Get current validator set (last enacted or initial if no changes ever made).

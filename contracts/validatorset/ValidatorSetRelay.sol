@@ -33,7 +33,7 @@ contract ValidatorSetRelay is IValidatorSet, IValidatorSetRelay, Ownable {
     }
 
     modifier onlySystem() {
-        require(msg.sender == SYSTEM_ADDRESS, "Sender is not SYSTEM");
+        require(msg.sender == SYSTEM_ADDRESS, "Sender is not system");
         _;
     }
 
@@ -138,8 +138,10 @@ contract ValidatorSetRelay is IValidatorSet, IValidatorSetRelay, Ownable {
         private
         nonDefaultAddress(_relayedSet)
     {
-        require(_relayedSet != address(relayedSet),
-            "New relayed contract address cannot be the same as the current one.");
+        require(
+            _relayedSet != address(relayedSet),
+            "New relayed contract address cannot be the same as the current one"
+        );
         address oldRelayed = address(relayedSet);
         relayedSet = IValidatorSetRelayed(_relayedSet);
         emit NewRelayed(oldRelayed, _relayedSet);
