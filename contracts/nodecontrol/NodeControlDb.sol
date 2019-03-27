@@ -55,13 +55,13 @@ contract NodeControlDb {
         currentState[_targetValidator].chainSpecSha = _chainSpecSha;
         currentState[_targetValidator].chainSpecUrl = _chainSpecUrl;
         currentState[_targetValidator].isSigning = _isSigning;
-        currentState[_targetValidator].updateIntroduced = now;
+        currentState[_targetValidator].updateIntroduced = block.number;
     }
 
     ///@notice sets the confirm
     ///@param _targetValidator the validator that confirms the update
     function setUpdateConfirmed(address _targetValidator) external onlyLogic {
-        currentState[_targetValidator].updateConfirmed = now;
+        currentState[_targetValidator].updateConfirmed = block.number;
     }
 
     ///@notice sets a new owner

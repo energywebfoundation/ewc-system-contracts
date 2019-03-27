@@ -273,6 +273,12 @@ contract('NodeControlSimple', (accounts) => {
     assert(!isFailed, "Should have thrown exception")
   });
 
+  it('must return false for isUpdateConfirmed', async () => {
+    const NodeControlSimpleInstance = await NodeControlSimple.deployed();
+    boolReturn = await NodeControlSimpleInstance.isUpdateConfirmed(accounts[2])
+    assert(boolReturn == false, "Should have returned false")
+  })
+
   it('must change the updateConfirm timestamp to now', async () => {
     const NodeControlSimpleInstance = await NodeControlSimple.deployed();
 
@@ -286,6 +292,12 @@ contract('NodeControlSimple', (accounts) => {
 
     assert(preTransactionNodeControl.updateConfirmed.toString() != postTransactionNodeControl.updateConfirmed.toString(), "Should have updated the timestamp")
   });
+
+  it('must return true for isUpdateConfirmed', async () => {
+    const NodeControlSimpleInstance = await NodeControlSimple.deployed();
+    boolReturn = await NodeControlSimpleInstance.isUpdateConfirmed(accounts[2])
+    assert(boolReturn == true, "Should have returned true")
+  })
 
   it('must not be callable by an address whos dockersha length is 0', async () => {
     const NodeControlSimpleInstance = await NodeControlSimple.deployed();
