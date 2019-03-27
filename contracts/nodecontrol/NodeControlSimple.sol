@@ -37,6 +37,12 @@ contract NodeControlSimple is NodeControlInterface {
         return vs;
     }
 
+    ///@notice View method to check if an update was confirmed by the validator
+    ///@param _targetValidator The validator that is supposed to be checked
+    function isUpdateConfirmed(address _targetValidator) external view returns(bool) {
+        return nodeControlDb.isUpdateConfirmed(_targetValidator);
+    }
+
     ///@notice sets the state for a validator and emits update event
     ///@param _targetValidator The validator whos state needs to be updated
     ///@param _dockerSha The sha of the dockerfile
@@ -72,12 +78,6 @@ contract NodeControlSimple is NodeControlInterface {
             _isSigning);
 
         emit UpdateAvailable(_targetValidator);
-    }
-
-    ///@notice View method to check if an update was confirmed by the validator
-    ///@param _targetValidator The validator that is supposed to be checked
-    function isUpdateConfirmed(address _targetValidator) external view returns(bool) {
-        return nodeControlDb.isUpdateConfirmed(_targetValidator);
     }
 
     ///@notice Changes the owner of the NodeControlContract
