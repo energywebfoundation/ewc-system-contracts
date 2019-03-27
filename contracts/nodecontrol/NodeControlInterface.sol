@@ -13,7 +13,7 @@ interface NodeControlInterface {
         uint updateConfirmed;
     }
 
-    event UpdateAvailable(address indexed targetValidator);
+    event UpdateAvailable(address indexed _targetValidator);
 
     ///@notice set the timestamp in the validatorstate
     function confirmUpdate() external;
