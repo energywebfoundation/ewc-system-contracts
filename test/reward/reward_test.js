@@ -477,7 +477,7 @@ contract('BlockReward [all features]', function (accounts) {
 
                 // pre-calculate the block reward
                 currentBlockReward = new web3.utils.BN(calculateBlockReward(blockNumber + 1).toString(10));
-                
+
                 // increase counter values
                 totalBlockRewardCounter.iadd(currentBlockReward);
                 totalCommunityCounter.iadd(bnCFundAmount);
@@ -492,7 +492,7 @@ contract('BlockReward [all features]', function (accounts) {
                 mintedForCommunity.total.iadd(bnCFundAmount);
 
                 if (mintedForAccount[communityFund][blockNumber + 1] == undefined) {
-                    mintedForAccount[communityFund][blockNumber + 1] = bnCFundAmount.clone(); 
+                    mintedForAccount[communityFund][blockNumber + 1] = bnCFundAmount.clone();
                 } else {
                     mintedForAccount[communityFund][blockNumber + 1].iadd(bnCFundAmount);
                 }
@@ -516,92 +516,92 @@ contract('BlockReward [all features]', function (accounts) {
         it("should match TOTAL_MINTED to the sum of individual MINTED_FOR_ACCOUNTs", async function () {
             let total = await rewardContract.mintedTotally.call();
 
-            let expected = new web3.utils.BN("0");
+            let expectedTotal = new web3.utils.BN("0");
             let mForAccounts = new web3.utils.BN("0");
             let mAcc;
             for (let i = 0; i < accounts.length; i++) {
                 mAcc = await rewardContract.mintedForAccount.call(accounts[i]);
                 mintedForAccount[accounts[i]].total.should.be.bignumber.equal(mAcc);
-                expected.iadd(mintedForAccount[accounts[i]].total);
+                expectedTotal.iadd(mintedForAccount[accounts[i]].total);
                 mForAccounts.iadd(mAcc);
             }
-            expected.should.be.bignumber.equal(total);
-            expected.should.be.bignumber.equal(mForAccounts);
+            total.should.be.bignumber.equal(expectedTotal);
+            mForAccounts.should.be.bignumber.equal(expectedTotal);
         });
 
         it("should match TOTAL_MINTED to the sum of individual MINTED_IN_BLOCKs", async function () {
             let total = await rewardContract.mintedTotally.call();
 
-            let expected = new web3.utils.BN("0");
+            let expectedTotal = new web3.utils.BN("0");
             let mInBlocks = new web3.utils.BN("0");
-            let mBl;
+            let minBlock;
 
             for (let j = blocknumStart; j <= blockNumEnd; j++) {
-                mBl = await rewardContract.mintedInBlock.call(j);
-                mintedInBlock[j].should.be.bignumber.equal(mBl);
-                expected.iadd(mintedInBlock[j]);
-                mInBlocks.iadd(mBl);
+                minBlock = await rewardContract.mintedInBlock.call(j);
+                mintedInBlock[j].should.be.bignumber.equal(minBlock);
+                expectedTotal.iadd(mintedInBlock[j]);
+                mInBlocks.iadd(minBlock);
             }
-            expected.should.be.bignumber.equal(mInBlocks);
-            expected.should.be.bignumber.equal(total);
+            mInBlocks.should.be.bignumber.equal(expectedTotal);
+            total.should.be.bignumber.equal(expectedTotal);
         });
 
         it("should match MINTED_FOR_ACCOUNTs to sum of corresponding MINTED_FOR_ACCOUNT_IN_BLOCKs", async function () {
             let total = await rewardContract.mintedTotally.call();
 
-            let expected = new web3.utils.BN("0");
-            let m4acc;
+            let expectedTotal = new web3.utils.BN("0");
+            let minForAcc;
 
             for (let i = 0; i < accounts.length; i++) {
-                m4acc = await rewardContract.mintedForAccount.call(accounts[i]);
-                let m4AccInBs = new web3.utils.BN("0");
-                let accInBlock;
+                minForAcc = await rewardContract.mintedForAccount.call(accounts[i]);
+                let minForAccInBlocks = new web3.utils.BN("0");
+                let minForAccInBlock;
                 let testTo;
                 for (let j = blocknumStart; j <= blockNumEnd; j++) {
-                    accInBlock = await rewardContract.mintedForAccountInBlock.call(accounts[i], j);
+                    minForAccInBlock = await rewardContract.mintedForAccountInBlock.call(accounts[i], j);
                     testTo = mintedForAccount[accounts[i]][j];
-                    accInBlock.should.be.bignumber.equal(testTo ? testTo : "0");
-                    expected.iadd(accInBlock);
-                    m4AccInBs.iadd(accInBlock);
+                    minForAccInBlock.should.be.bignumber.equal(testTo ? testTo : "0");
+                    expectedTotal.iadd(minForAccInBlock);
+                    minForAccInBlocks.iadd(minForAccInBlock);
                 }
-                m4acc.should.be.bignumber.equal(m4AccInBs);
+                minForAcc.should.be.bignumber.equal(minForAccInBlocks);
             }
-            total.should.be.bignumber.equal(expected);
+            total.should.be.bignumber.equal(expectedTotal);
         });
 
         it("should match MINTED_IN_BLOCKs to the sum of corresponding MINTED_FOR_ACCOUNT_IN_BLOCKs", async function () {
             let total = await rewardContract.mintedTotally.call();
 
-            let expected = new web3.utils.BN("0");
+            let expectedTotal = new web3.utils.BN("0");
             let mInBlock;
 
             for (let j = blocknumStart; j <= blockNumEnd; j++) {
                 mInBlock = await rewardContract.mintedInBlock.call(j);
-                let m4accsInB = new web3.utils.BN("0");
-                let m4acc;
-                for (let i = 0; i < accounts.length; i++) {    
-                    m4acc = await rewardContract.mintedForAccountInBlock.call(accounts[i], j);
+                let minForAccsInBlock = new web3.utils.BN("0");
+                let minForAcc;
+                for (let i = 0; i < accounts.length; i++) {
+                    minForAcc = await rewardContract.mintedForAccountInBlock.call(accounts[i], j);
                     testTo = mintedForAccount[accounts[i]][j];
-                    m4acc.should.be.bignumber.equal(testTo ? testTo : "0");
-                    m4accsInB.iadd(m4acc);
+                    minForAcc.should.be.bignumber.equal(testTo ? testTo : "0");
+                    minForAccsInBlock.iadd(minForAcc);
                 }
-                m4accsInB.should.be.bignumber.equal(mInBlock);
-                expected.iadd(mInBlock);
+                minForAccsInBlock.should.be.bignumber.equal(mInBlock);
+                expectedTotal.iadd(mInBlock);
             }
-            total.should.be.bignumber.equal(expected);
+            total.should.be.bignumber.equal(expectedTotal);
         });
 
         it("should match MINTED_FOR_COMMUNITY to the sum of individual MINTED_FOR_COMMUNITY_FOR_ACCOUNTs", async function () {
             let totalCommunity = await rewardContract.mintedForCommunity.call();
 
-            let totalM4acc = new web3.utils.BN("0");
-            let m4acc;
-            for (let i = 0; i < accounts.length; i++) {    
-                m4acc = await rewardContract.mintedForCommunityForAccount.call(accounts[i]);
-                m4acc.should.be.bignumber.equal(mintedForCommunity[accounts[i]]);
-                totalM4acc.iadd(m4acc);
+            let totalMinForAccs = new web3.utils.BN("0");
+            let minForCommForAcc;
+            for (let i = 0; i < accounts.length; i++) {
+                minForCommForAcc = await rewardContract.mintedForCommunityForAccount.call(accounts[i]);
+                minForCommForAcc.should.be.bignumber.equal(mintedForCommunity[accounts[i]]);
+                totalMinForAccs.iadd(minForCommForAcc);
             }
-            totalCommunity.should.be.bignumber.equal(totalM4acc);
+            totalCommunity.should.be.bignumber.equal(totalMinForAccs);
             totalCommunity.should.be.bignumber.equal(mintedForCommunity.total);
         });
     });
