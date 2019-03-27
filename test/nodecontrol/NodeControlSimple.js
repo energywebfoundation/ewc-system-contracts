@@ -67,6 +67,8 @@ contract('NodeControlSimple', (accounts) => {
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: Not owner"), "Should have thrown the right exception")
+
     }
     assert(!isFailed, "Should have thrown exception")
   });
@@ -85,6 +87,7 @@ contract('NodeControlSimple', (accounts) => {
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception: wrong owner")
+      assert(e.toString().includes("Error: Not owner"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
     assert(newOwner == accounts[1], "Should still be the previous owner")
@@ -106,6 +109,7 @@ contract('NodeControlSimple', (accounts) => {
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception: No 0x0 address")
+      assert(e.toString().includes("Error: New owner can not be null"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   });
@@ -126,6 +130,7 @@ contract('NodeControlSimple', (accounts) => {
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: No changes in the passed State"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   })
@@ -246,6 +251,7 @@ contract('NodeControlSimple', (accounts) => {
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: Not owner"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
     postTransactionNodeControl = await NodeControlSimpleInstance.retrieveExpectedState(accounts[2])
@@ -269,6 +275,7 @@ contract('NodeControlSimple', (accounts) => {
       isFailed = true
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: You are not a validator!"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   });
@@ -313,6 +320,7 @@ contract('NodeControlSimple', (accounts) => {
       isFailed = true
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: You are not a validator!"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   });
@@ -329,6 +337,7 @@ contract('NodeControlSimple', (accounts) => {
       isFailed = true
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: Not owner"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
 
@@ -355,6 +364,7 @@ contract('NodeControlSimple', (accounts) => {
       isFailed = true
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: New owner can not be null"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   });

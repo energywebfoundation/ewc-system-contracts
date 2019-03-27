@@ -34,6 +34,7 @@ contract('NodeControlDb', (accounts) => {
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: newLogic is not allowed to be 0x0"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   })
@@ -48,6 +49,7 @@ contract('NodeControlDb', (accounts) => {
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: onlyOwner Db"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   })
@@ -78,6 +80,7 @@ contract('NodeControlDb', (accounts) => {
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: Owner is not allowed to be 0x0"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   })
@@ -92,6 +95,7 @@ contract('NodeControlDb', (accounts) => {
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: onlyOwner Db"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   })
@@ -106,6 +110,7 @@ contract('NodeControlDb', (accounts) => {
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   })
@@ -114,12 +119,13 @@ contract('NodeControlDb', (accounts) => {
     const NodeControlDbInstance = await NodeControlDb.deployed();
     isFailed = false;
     try {
-      await NodeControlDbInstance.setUpdateConfirmed(accounts[1], '0x02', "dockerName123", '0x02', "chainSpecUrl123", true, {
+      await NodeControlDbInstance.setUpdateConfirmed(accounts[1], {
         from: accounts[1]
       });
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   })
@@ -134,6 +140,7 @@ contract('NodeControlDb', (accounts) => {
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   })
@@ -148,6 +155,7 @@ contract('NodeControlDb', (accounts) => {
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   })
@@ -162,6 +170,7 @@ contract('NodeControlDb', (accounts) => {
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   })
@@ -176,6 +185,7 @@ contract('NodeControlDb', (accounts) => {
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   })
@@ -190,6 +200,7 @@ contract('NodeControlDb', (accounts) => {
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   })
@@ -204,6 +215,7 @@ contract('NodeControlDb', (accounts) => {
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
+      assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   })
