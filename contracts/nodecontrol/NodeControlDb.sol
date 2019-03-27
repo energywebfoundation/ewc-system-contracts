@@ -27,7 +27,7 @@ contract NodeControlDb {
 
     ///@notice changes the logic contract (can only be called by the owner of the database)
     ///@param _newLogic the new logic that is allowed to write data
-    function changeLogicContract(address _newLogic) public onlyOwner {
+    function changeLogicContract(address _newLogic) external onlyOwner {
         require(_newLogic != address(0x0), "Error: newLogic is not allowed to be 0x0");
         nodeControlLogic = _newLogic;
     }
@@ -41,11 +41,14 @@ contract NodeControlDb {
     ///@param _isSigning Indicates if the validator shall sign blocks
     function setState (
         address _targetValidator, 
-        bytes memory _dockerSha, 
-        string memory _dockerName, 
-        bytes memory _chainSpecSha, 
-        string memory _chainSpecUrl, 
-        bool _isSigning) public onlyLogic 
+        bytes calldata _dockerSha, 
+        string calldata _dockerName, 
+        bytes calldata _chainSpecSha, 
+        string calldata _chainSpecUrl, 
+        bool _isSigning
+    )   
+        external 
+        onlyLogic 
     {
         currentState[_targetValidator].dockerSha = _dockerSha;
         currentState[_targetValidator].dockerName = _dockerName;
@@ -57,52 +60,61 @@ contract NodeControlDb {
 
     ///@notice sets the confirm
     ///@param _targetValidator the validator that confirms the update
-    function setUpdateConfirmed(address _targetValidator) public onlyLogic {
+    function setUpdateConfirmed(address _targetValidator) external onlyLogic {
         currentState[_targetValidator].updateConfirmed = now;
     }
 
     ///@notice sets a new owner
     ///@param _newOwner the new owner
-    function setOwner(address _newOwner) public onlyOwner {
+    function setOwner(address _newOwner) external onlyOwner {
         require(_newOwner != address(0x0), "Error: Owner is not allowed to be 0x0");
         owner = _newOwner;
     }
 
+    ///@notice View method to check if an update was confirmed by the validator
+    ///@param _targetValidator The validator that is supposed to be checked
+    function isUpdateConfirmed(address _targetValidator) external view returns(bool) {
+        return (currentState[_targetValidator].updateIntroduced < currentState[_targetValidator].updateConfirmed);
+    }
+
     ///@notice gets the state for a validator
     ///@param _targetValidator The validator whos state you want
-    function getState(address _targetValidator) public view onlyLogic 
-    returns (NodeControlInterface.ValidatorState memory) 
+    function getState(address _targetValidator) 
+        external 
+        view 
+        onlyLogic 
+        returns (NodeControlInterface.ValidatorState memory) 
     {
         return currentState[_targetValidator];
     }
 
     ///@notice gets the dockerSha
     ///@param _targetValidator The validator whos dockerSha you want
-    function getDockerSha(address _targetValidator) public view onlyLogic returns(bytes memory) {
+    function getDockerSha(address _targetValidator) external view onlyLogic returns(bytes memory) {
         return currentState[_targetValidator].dockerSha;
     }
 
     ///@notice gets the dockerName
     ///@param _targetValidator The validator whos dockerName you want
-    function getDockerName(address _targetValidator) public view onlyLogic returns(string memory) {
+    function getDockerName(address _targetValidator) external view onlyLogic returns(string memory) {
         return currentState[_targetValidator].dockerName;
     }
 
     ///@notice gets the chainSpecSha
     ///@param _targetValidator The validator whos chainSpecSha you want
-    function getChainSpecSha(address _targetValidator) public view onlyLogic returns(bytes memory) {
+    function getChainSpecSha(address _targetValidator) external view onlyLogic returns(bytes memory) {
         return currentState[_targetValidator].chainSpecSha;
     }
 
     ///@notice gets the chainSpecUrl
     ///@param _targetValidator The validator whos chainSpecUrl you want
-    function getChainSpecUrl(address _targetValidator) public view onlyLogic returns(string memory) {
+    function getChainSpecUrl(address _targetValidator) external view onlyLogic returns(string memory) {
         return currentState[_targetValidator].chainSpecUrl;
     }
 
     ///@notice gets the isSigning
     ///@param _targetValidator The validator you want to know of if they are signing
-    function getIsSigning(address _targetValidator) public view onlyLogic returns(bool) {
+    function getIsSigning(address _targetValidator) external view onlyLogic returns(bool) {
         return currentState[_targetValidator].isSigning;
     }
 }

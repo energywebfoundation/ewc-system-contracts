@@ -10,9 +10,10 @@ contract NodeControlSimple is NodeControlInterface {
     NodeControlDb public nodeControlDb;
     address public owner;
 
-    event UpdateAvailable(address _targetValidator);
-
-    modifier onlyOwner{require(msg.sender == owner, "Error: Not owner");_;}
+    modifier onlyOwner {
+        require(msg.sender == owner, "Error: Not owner");
+        _;
+    }
 
     ///@notice Constructor
     ///@dev Change 'msg.sender' to an actual admin address since this contract will be deployed via chainspec
@@ -28,10 +29,10 @@ contract NodeControlSimple is NodeControlInterface {
         nodeControlDb.setUpdateConfirmed(msg.sender);
     }
 
-    ///@notice Returns the current state of a validator
+    ///@notice Returns the expected state of a validator
     ///@param _targetValidator The validator whos state you want
     ///@return The state of the validator
-    function retrieveUpdate(address _targetValidator) external view returns (ValidatorState memory) {
+    function retrieveExpectedState(address _targetValidator) external view returns (ValidatorState memory) {
         ValidatorState memory vs = nodeControlDb.getState(_targetValidator);
         return vs;
     }
@@ -49,14 +50,18 @@ contract NodeControlSimple is NodeControlInterface {
         string memory _dockerName, 
         bytes memory _chainSpecSha,
         string memory _chainSpecUrl,
-        bool _isSigning) public onlyOwner 
+        bool _isSigning
+    ) 
+        public 
+        onlyOwner 
     {
         require(
             !(sha256(bytes(nodeControlDb.getDockerSha(_targetValidator))) == 
             sha256(bytes(_dockerSha)) && sha256(bytes(nodeControlDb.getDockerName(_targetValidator))) == 
             sha256(bytes(_dockerName)) && sha256(bytes(nodeControlDb.getChainSpecSha(_targetValidator))) == 
             sha256(bytes(_chainSpecSha)) && sha256(bytes(nodeControlDb.getChainSpecUrl(_targetValidator))) == 
-            sha256(bytes(_chainSpecUrl)) && nodeControlDb.getIsSigning(_targetValidator) == _isSigning), "");
+            sha256(bytes(_chainSpecUrl)) && nodeControlDb.getIsSigning(_targetValidator) == _isSigning), 
+            "Error: No changes in the passed State");
         
         nodeControlDb.setState(
             _targetValidator, 
@@ -67,6 +72,12 @@ contract NodeControlSimple is NodeControlInterface {
             _isSigning);
 
         emit UpdateAvailable(_targetValidator);
+    }
+
+    ///@notice View method to check if an update was confirmed by the validator
+    ///@param _targetValidator The validator that is supposed to be checked
+    function isUpdateConfirmed(address _targetValidator) external view returns(bool) {
+        return nodeControlDb.isUpdateConfirmed(_targetValidator);
     }
 
     ///@notice Changes the owner of the NodeControlContract
