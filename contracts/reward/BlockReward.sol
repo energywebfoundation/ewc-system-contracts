@@ -90,16 +90,24 @@ contract BlockReward is SCurveProvider, IBlockReward {
         delete payoutAddresses[msg.sender];
     }
 
+    /// @notice The function that is called by the client to issue rewards at a new block. The rewards are
+    /// minted: the balances of the corresponing addresses are simply increased with the amount
+    /// @dev It is a service transaction invoked by system, which doesn't cost anyhting but still can
+    /// modify state. Cannot emit events.
+    /// @param benefactors List of addresses that can be rewarded
+    /// @param kind List of type codes belonging to the benefactors. They determine the category
+    /// an address belongs to. 0 is for block authors which we are only interested in
+    /// @return List of addreses to be rewarded, and list of corresponding reward amounts in wei
     function reward(address[] calldata benefactors, uint16[] calldata kind)
         external
         onlySystem
         returns (address[] memory, uint256[] memory)
     {
-        require(benefactors.length == kind.length, "Benefactors/types length differs");
-        require(benefactors.length == 1, "Benefactors length is not 1");
-        require(kind[0] == 0, "Benefactor is not the block author.");
+        require(benefactors.length == kind.length, "Benefactors/types list length differs");
+        require(benefactors.length == 1, "Benefactors list length is not 1");
+        require(kind[0] == 0, "Benefactor is not the block author");
 
-        if (benefactors[0] == address(0)) {
+        if (benefactors[0] == address(0) || _checkRewardPeriodEnded(block.number)) {
             return (new address[](0), new uint256[](0));
         }
 

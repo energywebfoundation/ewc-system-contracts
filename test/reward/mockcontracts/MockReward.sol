@@ -5,14 +5,12 @@ import "../../../contracts/reward/BlockReward.sol";
 contract MockReward is BlockReward {
 
     address private _tester;
-    uint256[] public _steps;
 
     constructor(address _communityFundAddress, uint256 _communityFundAmount)
         BlockReward(_communityFundAddress, _communityFundAmount)
         public
     {
         _tester = msg.sender;
-        _steps = [uint256(10), 20, 30, 40, 50, 60, 70, 80, 90, 100];
     }
 
     function setSystemAddress(address _address)
@@ -22,20 +20,18 @@ contract MockReward is BlockReward {
         SYSTEM_ADDRESS = _address;
     }
 
-    /// We mock the blockreward for the tests only
-    function getBlockReward(uint256 _currentBlock)
+    function calcBlockReward(uint256 _blockNumber)
         public
         view
         returns (uint256)
     {
-        uint256 rem = _currentBlock % 100;
+        return getBlockReward(_blockNumber);
+    }
 
-        uint i;
-        for (i = 0; i < _steps.length; i++) {
-            if (rem <= _steps[i]) {
-                return 110 - _steps[i];
-            }
-        }
-        return 0;
+    function setRewardPeriodLimit(uint256 _blockNumber)
+        public
+    {
+        require(_tester == msg.sender, "Not the tester");
+        rewardPeriodEnd = _blockNumber;
     }
 }

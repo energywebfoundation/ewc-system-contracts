@@ -9,7 +9,13 @@ const {
     EMPTY_BYTES32
 } = require(__dirname + "/../utils.js");
 
-const { calculateBlockReward } = require(__dirname + "/blockreward_function.js");
+const NOT_SYS_ERR = "Caller is not the system";
+const NOT_CFUND_ERR = "Caller is not the community fund";
+const BENEF_SIZE_ERR = "Benefactors list length is not 1";
+const BENEF_SIZE_MISMATCH_ERR = "Benefactors/types list length differs";
+const BENEF_KIND_ERR = "Benefactor is not the block author";
+
+const testCurveProvider = new (require(__dirname + "/blockreward_function.js"))(web3);
 
 require('chai')
     .use(require('chai-as-promised'))
@@ -24,7 +30,6 @@ let communityFundPayoutAddress;
 let system;
 
 let communityFundAmount;
-let testBlockRewardAmount;
 
 contract('BlockReward [all features]', function (accounts) {
 
@@ -35,7 +40,6 @@ contract('BlockReward [all features]', function (accounts) {
         system = accounts[7];
 
         communityFundAmount = web3.utils.toWei("1", "ether");
-        testBlockRewardAmount = 5;
 
         validators = [accounts[1], accounts[2], accounts[3], accounts[4]];
         validatorPayoutAddresses = [accounts[5], accounts[6], DEFAULT_ADDRESS, DEFAULT_ADDRESS];
@@ -96,17 +100,19 @@ contract('BlockReward [all features]', function (accounts) {
 
         it("should allow only the community fund to set its own address", async function () {
             await rewardContract.setCommunityFund(accounts[2], { from: accounts[3] })
-                .should.be.rejectedWith(REVERT_ERROR_MSG);
+                .should.be.rejectedWith(NOT_CFUND_ERR);
             await rewardContract.setCommunityFund(system, { from: system })
-                .should.be.rejectedWith(REVERT_ERROR_MSG);
+                .should.be.rejectedWith(NOT_CFUND_ERR);
             await rewardContract.setCommunityFund(accounts[5], { from: accounts[6] })
-                .should.be.rejectedWith(REVERT_ERROR_MSG);
+                .should.be.rejectedWith(NOT_CFUND_ERR);
             (await rewardContract.communityFund.call()).should.be.equal(communityFund);
+
             await rewardContract.setCommunityFund(accounts[0], { from: communityFund })
                 .should.be.fulfilled;
             (await rewardContract.communityFund.call()).should.be.equal(accounts[0]);
             await rewardContract.setCommunityFund(accounts[0], { from: communityFund })
-                .should.be.rejectedWith(REVERT_ERROR_MSG);
+                .should.be.rejectedWith(NOT_CFUND_ERR);
+
             await rewardContract.setCommunityFund(communityFund, { from: accounts[0] })
                 .should.be.fulfilled;
             (await rewardContract.communityFund.call()).should.be.equal(communityFund);
@@ -198,54 +204,40 @@ contract('BlockReward [all features]', function (accounts) {
 
         it("should only be called by SYSTEM", async function () {
             await rewardContract.reward([accounts[1]], [0], { from: accounts[3] })
-                .should.be.rejectedWith(REVERT_ERROR_MSG);
+                .should.be.rejectedWith(NOT_SYS_ERR);
             await rewardContract.reward([communityFund], [0], { from: communityFund })
-                .should.be.rejectedWith(REVERT_ERROR_MSG);
+                .should.be.rejectedWith(NOT_SYS_ERR);
             await rewardContract.reward([deployer], [0], { from: deployer })
-                .should.be.rejectedWith(REVERT_ERROR_MSG);
+                .should.be.rejectedWith(NOT_SYS_ERR);
 
             await rewardContract.reward([accounts[1]], [0], { from: system })
                 .should.be.fulfilled;
         });
 
-        // needs verification by POA and Parity
         it("should only be called with block author as beneficiary", async function () {
             for (let i = 1; i < 151; i++) {
                 await rewardContract.reward([accounts[i % accounts.length]], [i], { from: system })
-                    .should.be.rejectedWith(REVERT_ERROR_MSG);
+                    .should.be.rejectedWith(BENEF_KIND_ERR);
             }
-
             await rewardContract.reward([accounts[1]], [0], { from: system })
                 .should.be.fulfilled;
         });
 
-        // needs verification by POA and Parity
         it("should only be called if beneficiary and kind arrays match in length", async function () {
-            for (let i = 1; i < 151; i++) {
-                await rewardContract.reward([accounts[i % accounts.length]], [i], { from: system })
-                    .should.be.rejectedWith(REVERT_ERROR_MSG);
-            }
-
-            await rewardContract.reward([accounts[1]], [0], { from: system })
-                .should.be.fulfilled;
-        });
-
-        // needs verification by POA and Parity
-        it("should only be called if beneficiary array length is one, thus the block author", async function () {
             for (let i = 2; i < 10; i++) {
                 await rewardContract.reward(
-                    (new Array(i)).map((x, j) => accounts[i]),
+                    (new Array(i)).fill().map((x, j) => accounts[i]),
                     [0],
                     { from: system }
-                ).should.be.rejectedWith(REVERT_ERROR_MSG);
+                ).should.be.rejectedWith(BENEF_SIZE_MISMATCH_ERR);
             }
 
             for (let i = 2; i < 10; i++) {
                 await rewardContract.reward(
-                    (new Array(i)).map((x, j) => accounts[j]),
+                    (new Array(i)).fill().map((x, j) => accounts[j]),
                     [0],
                     { from: system }
-                ).should.be.rejectedWith(REVERT_ERROR_MSG);
+                ).should.be.rejectedWith(BENEF_SIZE_MISMATCH_ERR);
             }
 
             for (let i = 2; i < 10; i++) {
@@ -253,15 +245,42 @@ contract('BlockReward [all features]', function (accounts) {
                     [accounts[i]],
                     (new Array(i)).fill(0),
                     { from: system }
-                ).should.be.rejectedWith(REVERT_ERROR_MSG);
+                ).should.be.rejectedWith(BENEF_SIZE_MISMATCH_ERR);
             }
 
             await rewardContract.reward([accounts[1]], [0], { from: system })
                 .should.be.fulfilled;
         });
 
-        // needs verification by POA and Parity
-        it("should return empty arrays only if the beneficiary address is 0x0", async function () {
+        it("should only be called if benefactors array length is one", async function () {
+            for (let i = 2; i < 10; i++) {
+                await rewardContract.reward(
+                    (new Array(i)).fill().map((x, j) => accounts[j]),
+                    (new Array(i)).fill(0),
+                    { from: system }
+                ).should.be.rejectedWith(BENEF_SIZE_ERR);
+            }
+            for (let i = 2; i < 10; i++) {
+                await rewardContract.reward(
+                    [accounts[i]],
+                    [0],
+                    { from: system }
+                ).should.be.fulfilled;
+            }
+        });
+
+        it("should only be called if beneficiary is the block author", async function () {
+            for (let i = 1; i < 151; i++) {
+                await rewardContract.reward([accounts[i % accounts.length]], [i], { from: system })
+                    .should.be.rejectedWith(BENEF_KIND_ERR);
+            }
+            for (let i = 0; i < accounts.length; i++) {
+                await rewardContract.reward([accounts[i]], [0], { from: system })
+                    .should.be.fulfilled;
+            }
+        });
+
+        it("should return empty arrays if the beneficiary address is 0x0", async function () {
             await rewardContract.setSystemAddress(systemContract.address).should.be.fulfilled;
 
             const cases = [accounts[1], DEFAULT_ADDRESS, accounts[2], accounts[3], DEFAULT_ADDRESS];
@@ -277,10 +296,37 @@ contract('BlockReward [all features]', function (accounts) {
             for (let i = 0; i < cases.length; i++) {
                 expected = (cases[i] == DEFAULT_ADDRESS) ? [[], []] : [
                     [cases[i], communityFund],
-                    [calculateBlockReward((await web3.eth.getBlockNumber()) + 1), communityFundAmount]
+                    [testCurveProvider.calculateBlockReward((await web3.eth.getBlockNumber()) + 1), communityFundAmount]
                 ];
                 const { logs } = await systemContract.rewardWithEvent(
                     [cases[i]],
+                    [0],
+                    { from: deployer }
+                ).should.be.fulfilled;
+                await checkRewarded(logs, expected);
+            }
+        });
+
+        it("should return empty arrays if the block reward period is over", async function () {
+            await rewardContract.setSystemAddress(systemContract.address).should.be.fulfilled;
+
+            let expected = [
+                [validators[0], communityFund],
+                [testCurveProvider.calculateBlockReward((await web3.eth.getBlockNumber()) + 1), communityFundAmount]
+            ];
+            const { logs } = await systemContract.rewardWithEvent(
+                [validators[0]],
+                [0],
+                { from: deployer }
+            ).should.be.fulfilled;
+            await checkRewarded(logs, expected);
+
+            await rewardContract.setRewardPeriodLimit(await web3.eth.getBlockNumber() + 1, { from: deployer });
+
+            for (let i = 0; i < validators.length; i++) {
+                expected = [[], []];
+                const { logs } = await systemContract.rewardWithEvent(
+                    [validators[i]],
                     [0],
                     { from: deployer }
                 ).should.be.fulfilled;
@@ -306,7 +352,7 @@ contract('BlockReward [all features]', function (accounts) {
             for (let i = 0; i < accounts.length; i++) {
                 expected = [
                     [accounts[i], communityFund],
-                    [calculateBlockReward((await web3.eth.getBlockNumber()) + 1), communityFundAmount]
+                    [testCurveProvider.calculateBlockReward((await web3.eth.getBlockNumber()) + 1), communityFundAmount]
                 ];
 
                 (await rewardContract.payoutAddresses.call(accounts[i]))
@@ -337,7 +383,7 @@ contract('BlockReward [all features]', function (accounts) {
             for (let i = 0; i < validators.length; i++) {
                 expected = [
                     [validatorPayoutAddresses[i], communityFund].map((x) => x === DEFAULT_ADDRESS ? validators[i] : x),
-                    [calculateBlockReward((await web3.eth.getBlockNumber()) + 1), communityFundAmount]
+                    [testCurveProvider.calculateBlockReward((await web3.eth.getBlockNumber()) + 1), communityFundAmount]
                 ];
                 const { logs } = await systemContract.rewardWithEvent(
                     [validators[i]],
@@ -354,7 +400,7 @@ contract('BlockReward [all features]', function (accounts) {
             for (let i = 0; i < accounts.length; i++) {
                 expected = [
                     [accounts[i], communityFund],
-                    [calculateBlockReward((await web3.eth.getBlockNumber()) + 1), communityFundAmount]
+                    [testCurveProvider.calculateBlockReward((await web3.eth.getBlockNumber()) + 1), communityFundAmount]
                 ];
 
                 (await rewardContract.payoutAddresses.call(communityFund))
@@ -384,7 +430,7 @@ contract('BlockReward [all features]', function (accounts) {
 
                 expected = [
                     [accounts[i], communityFundPayoutAddress],
-                    [calculateBlockReward((await web3.eth.getBlockNumber()) + 1), communityFundAmount]
+                    [testCurveProvider.calculateBlockReward((await web3.eth.getBlockNumber()) + 1), communityFundAmount]
                 ];
 
                 const { logs } = await systemContract.rewardWithEvent(
@@ -409,7 +455,7 @@ contract('BlockReward [all features]', function (accounts) {
                 for (let i = 0; i < accounts.length / 2; i++) {
                     expected = [
                         [accounts[i], communityFund],
-                        [calculateBlockReward((await web3.eth.getBlockNumber()) + 1), communityFundAmount]
+                        [testCurveProvider.calculateBlockReward((await web3.eth.getBlockNumber()) + 1), communityFundAmount]
                     ];
                     const { logs } = await systemContract.rewardWithEvent(
                         [accounts[i]],
@@ -466,17 +512,18 @@ contract('BlockReward [all features]', function (accounts) {
             }
 
             blocknumStart = await web3.eth.getBlockNumber() + 1;
-            for (let i = 0; i < 100; i++) {
+            // 50 is arbitrarily chosen
+            for (let i = 0; i < 50; i++) {
                 acc = accounts[i % 10];
                 blockNumber = await web3.eth.getBlockNumber();
 
                 expected = [
                     [acc, communityFund],
-                    [calculateBlockReward(blockNumber + 1), communityFundAmount]
+                    [testCurveProvider.calculateBlockReward(blockNumber + 1), communityFundAmount]
                 ];
 
                 // pre-calculate the block reward
-                currentBlockReward = new web3.utils.BN(calculateBlockReward(blockNumber + 1).toString(10));
+                currentBlockReward = new web3.utils.BN(testCurveProvider.calculateBlockReward(blockNumber + 1).toString(10));
 
                 // increase counter values
                 totalBlockRewardCounter.iadd(currentBlockReward);
@@ -505,7 +552,6 @@ contract('BlockReward [all features]', function (accounts) {
                 await checkRewarded(logs, expected);
             }
             blockNumEnd = await web3.eth.getBlockNumber();
-            console.log(blocknumStart, blockNumEnd);
         });
 
         it("should set TOTAL_MINTED correctly", async function () {
@@ -518,12 +564,12 @@ contract('BlockReward [all features]', function (accounts) {
 
             let expectedTotal = new web3.utils.BN("0");
             let mForAccounts = new web3.utils.BN("0");
-            let mAcc;
+            let minForAcc;
             for (let i = 0; i < accounts.length; i++) {
-                mAcc = await rewardContract.mintedForAccount.call(accounts[i]);
-                mintedForAccount[accounts[i]].total.should.be.bignumber.equal(mAcc);
+                minForAcc = await rewardContract.mintedForAccount.call(accounts[i]);
+                mintedForAccount[accounts[i]].total.should.be.bignumber.equal(minForAcc);
                 expectedTotal.iadd(mintedForAccount[accounts[i]].total);
-                mForAccounts.iadd(mAcc);
+                mForAccounts.iadd(minForAcc);
             }
             total.should.be.bignumber.equal(expectedTotal);
             mForAccounts.should.be.bignumber.equal(expectedTotal);
@@ -605,6 +651,106 @@ contract('BlockReward [all features]', function (accounts) {
             totalCommunity.should.be.bignumber.equal(mintedForCommunity.total);
         });
     });
+
+    describe("#checkRewardPeriodEnded", async function () {
+
+        beforeEach(async function () {
+            await basicSetup();
+        });
+
+        it("should return false before the reward period", async function () {
+            const expected = false;
+            (await rewardContract.checkRewardPeriodEnded.call()).should.be.equal(expected);
+        });
+
+        it("should return true only at the end + after the reward period", async function () {
+            const expected = true;
+            (await rewardContract.checkRewardPeriodEnded.call()).should.be.equal(false);
+            await rewardContract.setRewardPeriodLimit(await web3.eth.getBlockNumber() + 1, { from: deployer });
+            (await rewardContract.checkRewardPeriodEnded.call()).should.be.equal(expected);
+        });
+    });
+
+    describe("#getBlockReward", async function () {
+
+        let rpcId = 1;
+        let snapshotID;
+
+        beforeEach(async function () {
+            await basicSetup();
+        });
+
+        it("should return 0 on blocknumber 0", async function () {
+            const expected = testCurveProvider.calculateBlockReward(0);
+            const actual = await rewardContract.calcBlockReward.call(0);
+            actual.should.be.bignumber.equal(expected);
+        });
+
+        it("should return 0 on blocknumber 63072000", async function () {
+            const expected = testCurveProvider.calculateBlockReward(63072000);
+            const actual = await rewardContract.calcBlockReward.call(63072000);
+            actual.should.be.bignumber.equal(expected);
+        });
+
+        it("should return 0 on blocknumbers above 63072000", async function () {
+            const expected = new web3.utils.BN("0");
+            let actual;
+            const max = testCurveProvider.maxBlockNumReward.addn(30);
+            for (let i = testCurveProvider.maxBlockNumReward.clone(); i.lt(max); i.iaddn(1)) {
+                actual = await rewardContract.calcBlockReward.call(i);
+                actual.should.be.bignumber.equal(expected);
+            }
+        });
+
+        it("should return the correct values on edge cases", async function () {
+            let expected;
+            let actual;
+            const max = testCurveProvider.maxBlockNumReward;
+            for (let i = new web3.utils.BN("0"); i.lt(max); i.iadd(testCurveProvider.stepSize)) {
+                expected = testCurveProvider.calculateBlockReward(i);
+                actual = await rewardContract.calcBlockReward.call(i);
+                actual.should.be.bignumber.equal(expected);
+            }
+        });
+
+        it("should return the correct values on randomly selected block numbers", async function () {
+            let expected;
+            let actual;
+            let rnd;
+            for (let i = 0; i < 100; i++) {
+                rnd = randomIntInc(0, 64000000);
+                expected = testCurveProvider.calculateBlockReward(rnd);
+                actual = await rewardContract.calcBlockReward.call(rnd);
+                actual.should.be.bignumber.equal(expected);
+            }
+        });
+
+        // Takes forever to run (obviously), just here for display
+        xit("should issue the correct reward amount based on the blocknumber", async function () {
+            let expected;
+            const max = testCurveProvider.maxBlockNumReward;
+
+            systemContract = await MockSystem.new(rewardContract.address, { from: deployer }).should.be.fulfilled;
+            await rewardContract.setSystemAddress(systemContract.address).should.be.fulfilled;
+
+            snapshotID = await createSnapshot();
+
+            for (let i = new web3.utils.BN("0"); i.lt(max); i.iadd(testCurveProvider.stepSize.subn(1))) {
+                await mineTill(i.toNumber(10));
+                expected = [
+                    [accounts[4], communityFund],
+                    [testCurveProvider.calculateBlockReward((await web3.eth.getBlockNumber()) + 1), communityFundAmount]
+                ];
+                const { logs } = await systemContract.rewardWithEvent(
+                    [accounts[4]],
+                    [0],
+                    { from: deployer }
+                ).should.be.fulfilled;
+                await checkRewarded(logs, expected);
+            }
+            await revertSnapshot(snapshotID, rpcId++);
+        });
+    });
 });
 
 async function checkRewarded(logs, _expected) {
@@ -619,4 +765,69 @@ async function checkRewarded(logs, _expected) {
     _expected[1] = _expected[1].map((x) => x.toString(10));
     logs[0].args.rewards[0].toString(10).should.be.equal(_expected[1][0]);
     logs[0].args.rewards[1].toString(10).should.be.equal(_expected[1][1]);
+}
+
+const send = (method, params = []) => {
+    return new Promise((resolve, reject) => web3.currentProvider.send({ id: 0, jsonrpc: '2.0', method, params }, (e, data) => {
+        if (e) {
+            reject(e);
+        } else {
+            resolve(data);
+        }
+    }));
+}
+
+const mineTill = async (_blockNumber) => {
+    const diff = _blockNumber - (await web3.eth.getBlockNumber());
+    if (diff <= 0) {
+        return;
+    }
+    let before = (await web3.eth.getBlockNumber());
+    for (let i = 0; i < diff; i++) {
+        await send('evm_mine');
+    }
+    (await web3.eth.getBlockNumber()).should.be.equal(_blockNumber);
+}
+
+const createSnapshot = () => {
+    return new Promise((resolve, reject) => {
+        web3.currentProvider.send(
+            {
+                jsonrpc: '2.0',
+                method: 'evm_snapshot',
+                params: [],
+                id: 1
+            },
+            (e, r) => {
+                if (e) reject(e);
+                else {
+                    resolve(r.result);
+                }
+            }
+        );
+    });
+}
+
+const revertSnapshot = (snapshotID, id) => {
+    return new Promise((resolve, reject) => {
+
+        web3.currentProvider.send(
+            {
+                jsonrpc: '2.0',
+                method: "evm_revert",
+                params: [snapshotID],
+                id: id
+            },
+            (e, r) => {
+                if (e) reject(e);
+                else {
+                    resolve(r.result);
+                }
+            }
+        );
+    });
+}
+
+function randomIntInc(low, high) {
+    return Math.floor(Math.random() * (high - low + 1) + low);
 }
