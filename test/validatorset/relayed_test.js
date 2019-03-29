@@ -1,5 +1,6 @@
 let Relayed = artifacts.require('./mockcontracts/MockValidatorSetRelayed.sol');
-let Relay = artifacts.require('./mockcontracts/MockValidatorSetRelay.sol');
+let Relay = artifacts.require('ValidatorSetRelay');
+let MockRelay = artifacts.require('./mockcontracts/MockValidatorSetRelay.sol');
 
 require('chai')
     .use(require('chai-as-promised'))
@@ -24,6 +25,7 @@ const NOT_VALIDATOR_ERROR = "Address is not an active validator";
 const NO_VALIDATORS_ERROR = "There are no validators to remove from";
 const FINALIZED_ERROR = "Validator set is finalized";
 const NOT_FINALIZED_ERROR = "Validator set is not finalized yet";
+const CALLBACK_ERROR = "Relay contract InitiateChange callback failed";
 const BLOCKNUM_NOT_VALID_ERROR = "Block number is not valid";
 
 let relayed;
@@ -38,9 +40,9 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
     async function newRelayedWithDummyRelay(_owner, _system) {
         owner = _owner;
         system = _system;
-        relay = await Relay.new(_owner, { from: _owner }).should.be.fulfilled;
+        relay = await Relay.new(_owner, _owner, { from: _owner }).should.be.fulfilled;
         relayAddress = relay.address;
-        relayed = await Relayed.new(relayAddress, [accounts[1]], { from: _owner }).should.be.fulfilled;
+        relayed = await Relayed.new(_owner, relayAddress, [accounts[1]], { from: _owner }).should.be.fulfilled;
 
         await relay.setRelayed(relayed.address, { from: _owner }).should.be.fulfilled;
         await relay.setSystem(_system, { from: _owner }).should.be.fulfilled;
@@ -58,37 +60,41 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
         });
 
         it('should not allow initialization with a 0x0 relay address.', async function () {
-            await Relayed.new(DEFAULT_ADDRESS, []).should.be.rejectedWith(RELAY_ADDRESS_ERROR);
+            await Relayed.new(owner, DEFAULT_ADDRESS, []).should.be.rejectedWith(RELAY_ADDRESS_ERROR);
         });
 
         it('should not allow initialization with an initial validator of address 0x0.', async function () {
-            await Relayed.new(owner, [accounts[1], DEFAULT_ADDRESS])
+            await Relayed.new(owner, owner, [accounts[1], DEFAULT_ADDRESS])
                 .should.be.rejectedWith(VALIDATOR_ADDRESS_ZERO_ERROR);
         });
 
-        it('should leave finalized value false by default', async function () {
+        it('should set owner correctly', async function () {
+            (await relayed.owner.call()).should.be.equal(owner);
+        });
+
+        it('should leave finalized value true by default', async function () {
             let validators = await relayed.getValidators.call();
             let finalized = await relayed.finalized.call();
             validators.should.be.deep.equal([accounts[1]]);
-            finalized.should.be.false;
+            finalized.should.be.true;
 
-            relayed = await Relayed.new(owner, []).should.be.fulfilled;
+            relayed = await Relayed.new(owner, owner, []).should.be.fulfilled;
             validators = await relayed.getValidators.call();
             finalized = await relayed.finalized.call();
             validators.should.be.deep.equal([]);
-            finalized.should.be.false;
+            finalized.should.be.true;
         });
 
         it('should set current list of validators correctly', async function () {
             const validatorsList = [accounts[2], accounts[3], accounts[4]];
-            let relayed = await Relayed.new(owner, validatorsList).should.be.fulfilled;
+            let relayed = await Relayed.new(owner, owner, validatorsList).should.be.fulfilled;
             let validators = await relayed.getValidators.call();
             validators.should.be.deep.equal(validatorsList);
         });
 
         it('should make validator and pending lists equal', async function () {
             const validatorsList = [accounts[2], accounts[3], accounts[4]];
-            let relayed = await Relayed.new(owner, validatorsList).should.be.fulfilled;
+            let relayed = await Relayed.new(owner, owner, validatorsList).should.be.fulfilled;
             let validators = await relayed.getValidators.call();
             let pending = await relayed.getPendingValidators.call();
             pending.should.be.deep.equal(validators);
@@ -96,7 +102,7 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
 
         it('should set validator address statuses correctly', async function () {
             const validatorsList = [accounts[2], accounts[3], accounts[4]];
-            let relayed = await Relayed.new(owner, validatorsList).should.be.fulfilled;
+            let relayed = await Relayed.new(owner, owner, validatorsList).should.be.fulfilled;
 
             let validators = await relayed.getValidators.call();
 
@@ -115,7 +121,7 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
         });
 
         it('should emit event', async function () {
-            relay = await Relayed.new(owner, []).should.be.fulfilled;
+            relay = await Relayed.new(owner, owner, []).should.be.fulfilled;
             const currentBlocknumber = (await web3.eth.getBlockNumber());
             const events = await relay.getPastEvents(
                 "NewRelay",
@@ -129,10 +135,22 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
         });
     });
 
+    describe('#_triggerChange', async function () {
+
+        it('should revert on false returned callback value', async function () {
+            const dummyRelay = await MockRelay.new(owner, relayed.address, { from: owner }).should.be.fulfilled;
+            await relayed.setRelay(dummyRelay.address, { from: owner }).should.be.fulfilled;
+            await dummyRelay.setCallbackRetval(false, { from: owner }).should.be.fulfilled;
+            for (let i = 2; i < accounts.length; i++) {
+                await relayed.addValidator(accounts[2], { from: owner }).should.be.rejectedWith(CALLBACK_ERROR);
+            }
+        });
+    });
+
     describe('#finalizeChange', async function () {
 
         beforeEach(async function () {
-
+            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
         });
 
         it('should only be callable by the relay address', async function () {
@@ -147,7 +165,7 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.rejectedWith(FINALIZED_ERROR);
 
-            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            await relayed.addValidator(accounts[3], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.rejectedWith(FINALIZED_ERROR);
 
@@ -181,58 +199,53 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
 
         it('should set currentValidators to pendingValidators after addValidator call', async function () {
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
-            await relayed.addValidator(accounts[2], { from: accounts[2] }).should.be.rejectedWith(REVERT_ERROR_MSG);
+            await relayed.addValidator(accounts[3], { from: accounts[2] }).should.be.rejectedWith(REVERT_ERROR_MSG);
 
-            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            await relayed.addValidator(accounts[3], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
             let currentValidators = await relayed.getValidators.call();
             let pendingValidators = await relayed.getPendingValidators.call();
             currentValidators.should.be.deep.equal(pendingValidators);
 
-            await relayed.addValidator(accounts[3], { from: owner }).should.be.fulfilled;
+            await relayed.addValidator(accounts[4], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
             currentValidators = await relayed.getValidators.call();
             pendingValidators = await relayed.getPendingValidators.call();
             currentValidators.should.be.deep.equal(pendingValidators);
 
-            const expected = [accounts[1], accounts[2], accounts[3]];
+            const expected = [accounts[1], accounts[2], accounts[3], accounts[4]];
             expected.should.be.deep.equal(pendingValidators);
             expected.should.be.deep.equal(currentValidators);
         });
 
         it('should set currentValidators to pendingValidators after removeValidator call', async function () {
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
-            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            await relayed.addValidator(accounts[3], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
-            await relayed.removeValidator(accounts[2], { from: accounts[2] }).should.be.rejectedWith(REVERT_ERROR_MSG);
+            await relayed.removeValidator(accounts[3], { from: accounts[2] }).should.be.rejectedWith(REVERT_ERROR_MSG);
 
-            await relayed.removeValidator(accounts[2], { from: owner }).should.be.fulfilled;
-            await relay.finalizeChange({ from: system }).should.be.fulfilled;
+            let currentValidators;
+            let pendingValidators;
+            for (let i = 1; i <= 3; i++) {
+                await relayed.removeValidator(accounts[i], { from: owner }).should.be.fulfilled;
+                await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
-            let currentValidators = await relayed.getValidators.call();
-            let pendingValidators = await relayed.getPendingValidators.call();
-            currentValidators.should.be.deep.equal(pendingValidators);
-
-            await relayed.removeValidator(accounts[1], { from: owner }).should.be.fulfilled;
-            await relay.finalizeChange({ from: system }).should.be.fulfilled;
-
-            currentValidators = await relayed.getValidators.call();
-            pendingValidators = await relayed.getPendingValidators.call();
-            currentValidators.should.be.deep.equal(pendingValidators);
-
+                currentValidators = await relayed.getValidators.call();
+                pendingValidators = await relayed.getPendingValidators.call();
+                currentValidators.should.be.deep.equal(pendingValidators);
+            }
             const expected = [];
-            expected.should.be.deep.equal(pendingValidators);
-            expected.should.be.deep.equal(currentValidators);
+            pendingValidators.should.be.deep.equal(expected);
+            currentValidators.should.be.deep.equal(expected);
         });
     });
 
     describe('#addValidator', async function () {
 
         beforeEach(async function () {
-            await relay.finalizeChange({ from: system }).should.be.fulfilled;
         });
 
         it('should only be callable by owner', async function () {
@@ -259,13 +272,25 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
             await relayed.addValidator(DEFAULT_ADDRESS, { from: owner }).should.be.rejectedWith(VALIDATOR_ADDRESS_ZERO_ERROR);
         });
 
-        it('should set addressStatus for new validator', async function () {
-            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
+        it('should set addressStatus for new validator correctly', async function () {
             let status = await relayed.addressStatus.call(accounts[2]);
-            let pendingValidators = await relayed.getPendingValidators.call();
+            status[0].should.be.false;
+            status[1].should.be.false;
+            status[2].should.be.bignumber.equal("0");
+
+            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
+
+            status = await relayed.addressStatus.call(accounts[2]);
             status[0].should.be.true;
             status[1].should.be.true;
-            status[2].toNumber(10).should.be.equal(pendingValidators.length - 1);
+            status[2].should.be.bignumber.equal("1");
+
+            await relay.finalizeChange({ from: system }).should.be.fulfilled;
+
+            status = await relayed.addressStatus.call(accounts[2]);
+            status[0].should.be.true;
+            status[1].should.be.false;
+            status[2].should.be.bignumber.equal("1");
         });
 
         it('should not be finalized before finalize call', async function () {
@@ -304,13 +329,12 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
 
             let finalized = await relayed.finalized.call();
             finalized.should.be.false;
-        })
+        });
     })
 
     describe('#removeValidator', async function () {
 
         beforeEach(async function () {
-            await relay.finalizeChange({ from: system }).should.be.fulfilled;
         });
 
         it('should remove validator', async function () {
@@ -427,14 +451,19 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
         });
 
         it('should change address status correctly', async function () {
+            let status = await relayed.addressStatus.call(accounts[2]);
+            status[0].should.be.false;
+            status[1].should.be.false;
+            status[2].should.be.bignumber.equal("0");
+
             await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
             await relayed.removeValidator(accounts[2], { from: owner }).should.be.fulfilled;
 
-            let status = await relayed.addressStatus.call(accounts[2]);
+            status = await relayed.addressStatus.call(accounts[2]);
             status[0].should.be.false;
             status[1].should.be.true;
-            status[2].should.be.bignumber.equal("0");
+            status[2].should.be.bignumber.equal("1");
 
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
@@ -451,6 +480,17 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
         });
     });
 
+    describe("#_removeValidator", async function () {
+
+        it('should not allow to remove if pending list is empty', async function () {
+            await relayed.removeValidator(accounts[1], { from: owner }).should.be.fulfilled;
+            await relay.finalizeChange({ from: system }).should.be.fulfilled;
+            for (let i = 0; i < accounts.length; i++) {
+                await relayed.triggerRemoveValidator(accounts[i], { from: owner }).should.be.rejectedWith(NO_VALIDATORS_ERROR);
+            }
+        });
+    });
+
     describe("#getValidatorsNum", async function () {
 
         it('should return the correct validators number', async function () {
@@ -458,7 +498,7 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
             let currentValidatorsLength = await relayed.getValidatorsNum.call();
             currentValidatorsLength.toNumber(10).should.equal(currentValidators.length);
 
-            relayed = await Relayed.new(accounts[9], [accounts[2], accounts[3], accounts[4]]).should.be.fulfilled;
+            relayed = await Relayed.new(owner, owner, [accounts[2], accounts[3], accounts[4]]).should.be.fulfilled;
             currentValidators = await relayed.getValidators.call();
             currentValidatorsLength = await relayed.getValidatorsNum.call();
             currentValidatorsLength.toNumber(10).should.equal(currentValidators.length);
@@ -468,8 +508,6 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
     describe('#isAddedValidator', async function () {
 
         it('should return true for added validators only', async function () {
-            await relay.finalizeChange({ from: system }).should.be.fulfilled;
-
             (await relayed.isAddedValidator.call(accounts[1])).should.be.true;
             (await relayed.isAddedValidator.call(accounts[2])).should.be.false;
 
@@ -488,7 +526,6 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
     describe('#isActiveValidator', async function () {
 
         it('should return true for active (sealing) validators only', async function () {
-            await relay.finalizeChange({ from: system }).should.be.fulfilled;
             (await relayed.isActiveValidator.call(accounts[1])).should.be.true;
             (await relayed.isActiveValidator.call(accounts[2])).should.be.false;
             await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
@@ -506,12 +543,6 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
     describe('#isPending', async function () {
 
         it('returns true for pending-to-be-added/removed validators only', async function () {
-
-            (await relayed.isPending.call(accounts[1])).should.be.false;
-            (await relayed.addressStatus.call(accounts[1]))[1].should.be.false;
-
-            await relay.finalizeChange({ from: system }).should.be.fulfilled;
-
             (await relayed.isPending.call(accounts[1])).should.be.false;
             (await relayed.addressStatus.call(accounts[1]))[1].should.be.false;
 
@@ -570,7 +601,6 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
     describe('#reportMalicious', async function () {
 
         beforeEach(async function () {
-            await relay.finalizeChange({ from: system }).should.be.fulfilled;
             await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
             await relayed.setRelay(owner, { from: owner }).should.be.fulfilled;
@@ -653,7 +683,6 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
     describe('#reportBenign', async function () {
 
         beforeEach(async function () {
-            await relay.finalizeChange({ from: system }).should.be.fulfilled;
             await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
             await relayed.setRelay(owner, { from: owner }).should.be.fulfilled;

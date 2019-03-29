@@ -21,9 +21,10 @@ contract ValidatorSetRelay is IValidatorSet, IValidatorSetRelay, Ownable {
     /// Address of the inner validator set contract
     IValidatorSetRelayed public relayedSet;
 
-    constructor(address _relayedSet)
+    constructor(address _owner, address _relayedSet)
         public
-    {
+    {   
+        _transferOwnership(_owner);
         _setRelayed(_relayedSet);
     }
 

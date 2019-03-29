@@ -10,8 +10,8 @@ contract MockValidatorSetRelayed is ValidatorSetRelayed {
     event RemoveFail();
     event CallbackSuccess();
 
-    constructor(address _relayedSet, address[] memory _initial)
-        ValidatorSetRelayed(_relayedSet, _initial)
+    constructor(address _owner, address _relayedSet, address[] memory _initial)
+        ValidatorSetRelayed(_owner, _relayedSet, _initial)
         public
     {
            
@@ -25,5 +25,12 @@ contract MockValidatorSetRelayed is ValidatorSetRelayed {
             emit CallbackSuccess();
             return;
         }
+    }
+
+    function triggerRemoveValidator(address _validator)
+        external
+        onlyOwner
+    {
+        _removeValidator(_validator);
     }
 }
