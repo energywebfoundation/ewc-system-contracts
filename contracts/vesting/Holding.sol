@@ -257,7 +257,7 @@ contract Holding {
         internal
     {
 
-        Holder storage holder = holders[address(investor)];
+        Holder storage holder = holders[address(holder)];
 
         require(
             holder.availableAmount == 0 && holder.lockedUntilBlocktimestamp == 0,
