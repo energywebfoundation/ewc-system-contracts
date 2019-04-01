@@ -253,7 +253,7 @@ contract Holding {
     /// @param investor owner of the holded funds
     /// @param amountToHold the amount that should be holded
     /// @param lockUntil the timestamp of the date until the funds should be locked up
-    function addHolding(address investor, uint256 amountToHold, uint256 lockUntil) 
+    function addHolding(address holder, uint256 amountToHold, uint256 lockUntil) 
         internal
     {
 
