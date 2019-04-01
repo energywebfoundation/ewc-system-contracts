@@ -31,7 +31,6 @@ contract('Holding', function (accounts) {
             snapshotId =  await Utils.createSnapshot();
         });
         
-
         beforeEach(async function() {
             await Utils.revertSnapshot(snapshotId, rpcId++);
             snapshotId =  await Utils.createSnapshot();
@@ -67,11 +66,9 @@ contract('Holding', function (accounts) {
         let holding;
         let snapshotId;
 
-
         before(async () => {
             snapshotId =  await Utils.createSnapshot();
         });
-        
 
         beforeEach(async function() {
             await Utils.revertSnapshot(snapshotId, rpcId++);
@@ -111,7 +108,6 @@ contract('Holding', function (accounts) {
             await holding.releaseFunds(ACCOUNT_WITH_FUNDS)
             const balanceOfAccountAfterRelease = new web3.utils.BN(await web3.eth.getBalance(ACCOUNT_WITH_FUNDS))
             balanceOfAccountAfterRelease.should.be.bignumber.equal(balanceOfAccountBeforeRelease.add(new web3.utils.BN(ACCOUNT_FUNDING)))
-
         });
 
         it('It should only be possible to release funds once', async function() {
@@ -120,7 +116,6 @@ contract('Holding', function (accounts) {
             await holding.releaseFunds(ACCOUNT_WITH_FUNDS)
             await holding.releaseFunds(ACCOUNT_WITH_FUNDS)
                 .should.be.rejectedWith('Available amount is 0.'); 
-
         });
 
     });
