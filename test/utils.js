@@ -10,7 +10,6 @@ const send = (method, params = []) => {
         } else {
             resolve(data)
         }
-   
     }));
 }
 
@@ -31,16 +30,15 @@ const createSnapshot = () => {
             (e, r) => {
                 if (e) reject(e)
                 else {
-
                     resolve(r.result)
                 }
-            })
+            }
+        )
     })
 }
 
 const revertSnapshot = (snapshotID, id) => {
     return new Promise((resolve, reject) => {
-        
         web3.currentProvider.send(
             {
                 jsonrpc: '2.0',
@@ -53,11 +51,9 @@ const revertSnapshot = (snapshotID, id) => {
                 else {
                     resolve(r.result)
                 }
-            })
-    
-
+            }
+        )
     })
-
 }
 
 async function assertThrowsAsync(fn, msg) {
