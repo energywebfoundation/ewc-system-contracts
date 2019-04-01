@@ -66,7 +66,8 @@ contract NodeControlSimple is NodeControlInterface {
             sha256(bytes(_dockerName)) && sha256(bytes(nodeControlDb.getChainSpecSha(_targetValidator))) == 
             sha256(bytes(_chainSpecSha)) && sha256(bytes(nodeControlDb.getChainSpecUrl(_targetValidator))) == 
             sha256(bytes(_chainSpecUrl)) && nodeControlDb.getIsSigning(_targetValidator) == _isSigning), 
-            "Error: No changes in the passed State");
+            "Error: No changes in the passed State"
+        );
         
         nodeControlDb.setState(
             _targetValidator, 
