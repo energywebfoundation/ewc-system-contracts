@@ -35,7 +35,6 @@ contract('Holding', function (accounts) {
             await Utils.revertSnapshot(snapshotId, rpcId++);
             snapshotId =  await Utils.createSnapshot();
             deployer = accounts[0];
-         
         });
 
         it('Should throw if contract balance is less than expected', async function() {
@@ -74,7 +73,6 @@ contract('Holding', function (accounts) {
             await Utils.revertSnapshot(snapshotId, rpcId++);
             snapshotId =  await Utils.createSnapshot();
             deployer = accounts[0];
-         
         });
 
         it('Test holder amount should be set correctly', async function() {
@@ -117,6 +115,5 @@ contract('Holding', function (accounts) {
             await holding.releaseFunds(ACCOUNT_WITH_FUNDS)
                 .should.be.rejectedWith('Available amount is 0.'); 
         });
-
     });
 });
