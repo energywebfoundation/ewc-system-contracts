@@ -75,7 +75,8 @@ contract NodeControlSimple is NodeControlInterface {
             _dockerName, 
             _chainSpecSha, 
             _chainSpecUrl, 
-            _isSigning);
+            _isSigning
+        );
 
         emit UpdateAvailable(_targetValidator);
     }
