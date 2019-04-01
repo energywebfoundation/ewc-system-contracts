@@ -14,20 +14,60 @@ require('chai')
 
 
 contract('Holding', function (accounts) {
-    
 
-    describe('Holding', async function() {
+    const ACCOUNT_WITH_FUNDS = '0x2526AeE4A3b281a5F17324E1F306a051bb4607Ae';
+    const ACCOUNT_FUNDING = web3.utils.toWei('99', 'ether').toString(10);
+    const ACCOUNT_WITH_NO_FUNDS = '0xaf9DdE98b6aeB2225bf87C2cB91c58833fbab2Ab';
+    
+    const TARGET_AMOUNT_BN = web3.utils.toBN(web3.utils.toWei('80000000', 'ether'))
+    const TARGET_AMOUNT = TARGET_AMOUNT_BN.toString(10);
+    
+    describe('Sanity tests regarding the holded amount', async function() {
 
         let holding;
         let snapshotId;
 
-        const ACCOUNT_WITH_FUNDS = '0x2526AeE4A3b281a5F17324E1F306a051bb4607Ae';
-        const ACCOUNT_FUNDING = web3.utils.toWei('99', 'ether').toString(10);
-        const ACCOUNT_WITH_NO_FUNDS = '0xaf9DdE98b6aeB2225bf87C2cB91c58833fbab2Ab';
+        before(async () => {
+            snapshotId =  await Utils.createSnapshot();
+        });
         
-        const TARGET_AMOUNT_BN = web3.utils.toBN(web3.utils.toWei('80000000', 'ether'))
-        const TARGET_AMOUNT = TARGET_AMOUNT_BN.toString(10);
-        
+
+        beforeEach(async function() {
+            await Utils.revertSnapshot(snapshotId, rpcId++);
+            snapshotId =  await Utils.createSnapshot();
+            deployer = accounts[0];
+         
+        });
+
+        it('Should throw if contract balance is less than expected', async function() {
+            holding = await Holding.new({from: deployer, value: TARGET_AMOUNT_BN.sub(web3.utils.toBN('1')).toString(10)}).should.be
+                .rejectedWith('Balance should equal target amount.');
+
+        });
+
+        it('Should throw if contract balance is higher than expected', async function() {
+            holding = await Holding.new({from: deployer, value:  TARGET_AMOUNT_BN.add(web3.utils.toBN('1')).toString(10)}).should.be
+                .rejectedWith('Balance should equal target amount.');
+
+        });
+
+        it('Should throw if inital locked up amount does not equal target amount', async function() {
+            holding = await HoldingMock.new({from: deployer, value: TARGET_AMOUNT}).should.be.fulfilled
+                .rejectedWith('Target amount should equal actual amount.');
+        });
+
+        it('Should throw if the vesting data set conatains two times the same address', async function() {
+            holding = await HoldingMockB.new({from: deployer, value: TARGET_AMOUNT}).should.be.fulfilled
+                .rejectedWith('Holding for this address was already set.');
+        });
+    });
+
+    describe('Holding dataset tests', async function() {
+
+        let holding;
+        let snapshotId;
+
+
         before(async () => {
             snapshotId =  await Utils.createSnapshot();
         });
@@ -83,26 +123,5 @@ contract('Holding', function (accounts) {
 
         });
 
-        it('Should throw if contract balance is less than expected', async function() {
-            holding = await Holding.new({from: deployer, value: TARGET_AMOUNT_BN.sub(web3.utils.toBN('1')).toString(10)}).should.be
-                .rejectedWith('Balance should equal target amount.');
-
-        });
-
-        it('Should throw if contract balance is higher than expected', async function() {
-            holding = await Holding.new({from: deployer, value:  TARGET_AMOUNT_BN.add(web3.utils.toBN('1')).toString(10)}).should.be
-                .rejectedWith('Balance should equal target amount.');
-
-        });
-
-        it('Should throw if inital locked up amount does not equal target amount', async function() {
-            holding = await HoldingMock.new({from: deployer, value: TARGET_AMOUNT}).should.be.fulfilled
-                .rejectedWith('Target amount should equal actual amount.');
-        });
-
-        it('Should throw if the vesting data set conatains two times the same address', async function() {
-            holding = await HoldingMockB.new({from: deployer, value: TARGET_AMOUNT}).should.be.fulfilled
-                .rejectedWith('Holding for this address was already set.');
-        });
     });
 });

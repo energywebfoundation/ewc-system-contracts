@@ -5,7 +5,7 @@ pragma solidity ^0.5.4;
 contract Holding {
     mapping (address => Holder) public holders;
     uint256 public initialLockedUpAmount = 0;
-    uint256 constant TARGET_AMOUNT = 80000000 ether;
+    uint256 public constant TARGET_AMOUNT = 80000000 ether;
 
     struct Holder {
         uint256 availableAmount;
@@ -32,7 +32,7 @@ contract Holding {
         Holder storage holder = holders[holderAddress];
         
         require(holder.availableAmount > 0, "Available amount is 0");
-        require(now > holder.lockedUntilBlocktimestamp, "Holding period is not over");
+        require(block.timestamp > holder.lockedUntilBlocktimestamp, "Holding period is not over");
         
         uint256 amountToTransfer = holder.availableAmount;
         holder.availableAmount = 0;

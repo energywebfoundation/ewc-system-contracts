@@ -6,7 +6,6 @@ const data = {
         availableAmount: "0x09",
         time: "0x01"
     }
-
 }
 
 const addressToSlot = (address) => {
@@ -17,10 +16,4 @@ Object.keys(data).forEach(address => {
     const slot = addressToSlot(address)
     console.log('"' + slot + '": "' + data[address].availableAmount + '",')
     console.log('"0x' + (new web3.utils.BN(slot.replace('0x', ''), 16)).add(new web3.utils.BN('1', 16)).toString(16) + '": "' + data[address].time + '",')
-    
-
-    
 });
-
-
-
