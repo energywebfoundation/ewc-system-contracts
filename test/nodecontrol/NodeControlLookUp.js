@@ -25,5 +25,4 @@ contract('NodeControlLookUp', (accounts) => {
     }
     assert(!isFailed, "Should have thrown exception")
   })
-
 })

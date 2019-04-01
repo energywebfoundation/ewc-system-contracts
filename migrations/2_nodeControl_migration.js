@@ -1,6 +1,6 @@
 const NodeControl = artifacts.require("nodecontrol/NodeControlSimple");
 const NodeControlDb = artifacts.require("nodecontrol/NodeControlDb");
-const NodeControlLookUp = artifacts.require("nodecontrol/NodeControlLookUp")
+const NodeControlLookUp = artifacts.require("nodecontrol/NodeControlLookUp");
 
 module.exports = function(deployer) {
   deployer.deploy(NodeControlDb).then(function() {
@@ -9,4 +9,3 @@ module.exports = function(deployer) {
     return deployer.deploy(NodeControlLookUp);
   });
 };
-

@@ -379,5 +379,4 @@ contract('NodeControlSimple', (accounts) => {
 
     assert(NodeControlOwner == accounts[0], "Should have set the owner according to function parameter")
   });
-
 });
