@@ -16,7 +16,6 @@ contract NodeControlSimple is NodeControlInterface {
     }
 
     ///@notice Constructor
-    ///@dev Change 'msg.sender' to an actual admin address since this contract will be deployed via chainspec
     ///@param _nodeControlDb The db contract that should be used
     constructor(NodeControlDb _nodeControlDb) public {
         owner = msg.sender;
