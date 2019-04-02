@@ -20,19 +20,19 @@ contract NodeControlDb {
         _;
     }
 
-    ///@notice constructor that sets the owner of the database
+    ///@notice Constructor that sets the owner of the database
     constructor() public {
         owner = msg.sender;
     }
 
-    ///@notice changes the logic contract (can only be called by the owner of the database)
+    ///@notice Changes the logic contract (can only be called by the owner of the database)
     ///@param _newLogic the new logic that is allowed to write data
     function changeLogicContract(address _newLogic) external onlyOwner {
         require(_newLogic != address(0x0), "Error: newLogic is not allowed to be 0x0");
         nodeControlLogic = _newLogic;
     }
 
-    ///@notice sets the state for a validator
+    ///@notice Sets the state for a validator
     ///@param _targetValidator The validator whos state needs to be updated
     ///@param _dockerSha The sha of the dockerfile
     ///@param _dockerName The name of the dockerfile
@@ -58,14 +58,14 @@ contract NodeControlDb {
         currentState[_targetValidator].updateIntroduced = block.number;
     }
 
-    ///@notice sets the confirm
-    ///@param _targetValidator the validator that confirms the update
+    ///@notice Sets the confirm
+    ///@param _targetValidator The validator that confirms the update
     function setUpdateConfirmed(address _targetValidator) external onlyLogic {
         currentState[_targetValidator].updateConfirmed = block.number;
     }
 
-    ///@notice sets a new owner
-    ///@param _newOwner the new owner
+    ///@notice Sets a new owner
+    ///@param _newOwner The new owner
     function setOwner(address _newOwner) external onlyOwner {
         require(_newOwner != address(0x0), "Error: Owner is not allowed to be 0x0");
         owner = _newOwner;
@@ -77,7 +77,7 @@ contract NodeControlDb {
         return (currentState[_targetValidator].updateIntroduced < currentState[_targetValidator].updateConfirmed);
     }
 
-    ///@notice gets the state for a validator
+    ///@notice Gets the state for a validator
     ///@param _targetValidator The validator whos state you want
     function getState(address _targetValidator) 
         external 
@@ -88,31 +88,31 @@ contract NodeControlDb {
         return currentState[_targetValidator];
     }
 
-    ///@notice gets the dockerSha
+    ///@notice Gets the dockerSha
     ///@param _targetValidator The validator whos dockerSha you want
     function getDockerSha(address _targetValidator) external view onlyLogic returns(bytes memory) {
         return currentState[_targetValidator].dockerSha;
     }
 
-    ///@notice gets the dockerName
+    ///@notice Gets the dockerName
     ///@param _targetValidator The validator whos dockerName you want
     function getDockerName(address _targetValidator) external view onlyLogic returns(string memory) {
         return currentState[_targetValidator].dockerName;
     }
 
-    ///@notice gets the chainSpecSha
+    ///@notice Gets the chainSpecSha
     ///@param _targetValidator The validator whos chainSpecSha you want
     function getChainSpecSha(address _targetValidator) external view onlyLogic returns(bytes memory) {
         return currentState[_targetValidator].chainSpecSha;
     }
 
-    ///@notice gets the chainSpecUrl
+    ///@notice Gets the chainSpecUrl
     ///@param _targetValidator The validator whos chainSpecUrl you want
     function getChainSpecUrl(address _targetValidator) external view onlyLogic returns(string memory) {
         return currentState[_targetValidator].chainSpecUrl;
     }
 
-    ///@notice gets the isSigning
+    ///@notice Gets the isSigning
     ///@param _targetValidator The validator you want to know of if they are signing
     function getIsSigning(address _targetValidator) external view onlyLogic returns(bool) {
         return currentState[_targetValidator].isSigning;

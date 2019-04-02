@@ -42,7 +42,7 @@ contract NodeControlSimple is NodeControlInterface {
         return nodeControlDb.isUpdateConfirmed(_targetValidator);
     }
 
-    ///@notice sets the state for a validator and emits update event
+    ///@notice Sets the state for a validator and emits update event
     ///@param _targetValidator The validator whos state needs to be updated
     ///@param _dockerSha The sha of the dockerfile
     ///@param _dockerName The name of the dockerfile
