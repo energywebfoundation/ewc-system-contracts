@@ -245,9 +245,6 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
 
     describe('#addValidator', async function () {
 
-        beforeEach(async function () {
-        });
-
         it('should only be callable by owner', async function () {
             await relayed.addValidator(accounts[2], { from: accounts[1] }).should.be.rejectedWith(NOT_OWNER_ERROR);
             await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
@@ -283,7 +280,7 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
             status = await relayed.addressStatus.call(accounts[2]);
             status[0].should.be.true;
             status[1].should.be.true;
-            status[2].should.be.bignumber.equal("1");
+            status[2].should.be.bignumber.equal("0");
 
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
@@ -333,9 +330,6 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
     })
 
     describe('#removeValidator', async function () {
-
-        beforeEach(async function () {
-        });
 
         it('should remove validator', async function () {
             await relayed.removeValidator(accounts[1], { from: owner }).should.be.fulfilled;
@@ -520,6 +514,30 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
 
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
             (await relayed.isAddedValidator.call(accounts[2])).should.be.false;
+        });
+    });
+
+    describe('#isRemovedValidator', async function () {
+
+        it('should return true for added validators only', async function () {
+            (await relayed.isRemovedValidator.call(accounts[1])).should.be.false;
+            (await relayed.isRemovedValidator.call(accounts[2])).should.be.true;
+
+            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            await relay.finalizeChange({ from: system }).should.be.fulfilled;
+
+            await relayed.removeValidator(accounts[1], { from: owner }).should.be.fulfilled;
+            (await relayed.isRemovedValidator.call(accounts[1])).should.be.true;
+            (await relayed.isRemovedValidator.call(accounts[2])).should.be.false;
+
+            await relay.finalizeChange({ from: system }).should.be.fulfilled;
+            await relayed.removeValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            (await relayed.isRemovedValidator.call(accounts[2])).should.be.true;
+            (await relayed.isRemovedValidator.call(accounts[1])).should.be.true;
+
+            await relay.finalizeChange({ from: system }).should.be.fulfilled;
+            (await relayed.isRemovedValidator.call(accounts[2])).should.be.true;
+            (await relayed.isRemovedValidator.call(accounts[1])).should.be.true;
         });
     });
 

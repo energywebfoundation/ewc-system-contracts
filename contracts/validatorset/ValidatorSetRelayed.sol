@@ -11,12 +11,24 @@ import "../misc/Ownable.sol";
 contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
 
     /// Holds address validator status information
+    /// Addresses can have 4 states:
+    /// 1. Non-validators: must have both flags false
+    /// 2. Active-validators: validators in the currentValidators
+    /// list. They are actively sealing blocks. If a validator is removed, but
+    /// this removal is not finalized yet, it is still active. Either `isAddedValidator` == true
+    /// and `isPendingToBeFinalized` == false, or `isAddedValidator` == false and
+    /// `isPendingToBeFinalized` == true
+    /// 3. Added-validators: both flags true. They are about-to-be added but not sealing yet, not active
+    /// 4. Removed-validators: `isAddedValidator` == false and `isPendingToBeFinalized` == true. They are
+    /// about to be removed, but still sealing blocks, thus active
     struct AddressStatus {
         /// Is this address an added validator
         bool isAddedValidator;
         /// Is this validator pending to be added or removed
         bool isPendingToBeFinalized;
-        /// Index in currentValidators list
+        /// Index in currentValidators list. This index
+        /// is only relevant if the validator is active.
+        /// Should be ignored otherwise
         uint256 index;
     }
 
@@ -150,6 +162,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
             AddressStatus storage vstatus = addressStatus[pendingValidators[i]];
             if (vstatus.isPendingToBeFinalized) {
                 vstatus.isPendingToBeFinalized = false;
+                vstatus.index = i;
             }
         }
 
@@ -230,7 +243,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     /// validators who are added but not active yet and for validators 
     /// who are active and not pending-to-be-removed. Returns false
     /// for still active but pending-to-be-removed validators and
-    /// non-validators.
+    /// non-validators
     /// @return True or false, depending on the check
     function isAddedValidator(address _somebody)
         external
@@ -238,6 +251,19 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         returns (bool)
     {
         return addressStatus[_somebody].isAddedValidator;
+    }
+
+    /// @notice Checks whether the address is a "removed validator".
+    /// Returns true for validators who are about to be removed but still active and
+    /// for non-validators who are not pending-to-be-added. Returns false
+    /// for non-active but pending-to-be-added validators and validators
+    /// @return True or false, depending on the check
+    function isRemovedValidator(address _somebody)
+        external
+        view
+        returns (bool)
+    {
+        return !addressStatus[_somebody].isAddedValidator;
     }
 
     /// @notice Checks whether the address is a pending-to-be-added or a pending-to-be-removed validator.
@@ -283,7 +309,6 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     {
         addressStatus[_validator].isAddedValidator = true;
         addressStatus[_validator].isPendingToBeFinalized = true;
-        addressStatus[_validator].index = pendingValidators.length;
         
         pendingValidators.push(_validator);
         _triggerChange();
