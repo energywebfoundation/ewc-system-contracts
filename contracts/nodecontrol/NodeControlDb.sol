@@ -4,6 +4,7 @@ pragma experimental ABIEncoderV2;
 import "./NodeControlInterface.sol";
 import "./NodeControlLookUp.sol";
 
+
 contract NodeControlDb {
     mapping (address => NodeControlInterface.ValidatorState) public currentState;
 
