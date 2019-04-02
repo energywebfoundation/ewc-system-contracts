@@ -2,6 +2,6 @@
 
 const SimpleRegistry = artifacts.require("./registry/SimpleRegistry.sol");
 
-module.exports = deployer => {
-  deployer.deploy(SimpleRegistry);
+module.exports = function(deployer, network, accounts) {
+  deployer.deploy(SimpleRegistry, accounts[0]);
 };

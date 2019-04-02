@@ -20,7 +20,7 @@ pragma solidity ^0.5.0;
 contract Owned {
     event NewOwner(address indexed old, address indexed current);
 
-    address public owner = msg.sender;
+    address public owner;
 
     modifier onlyOwner {
         require(msg.sender == owner, "Error: You are not the owner!");

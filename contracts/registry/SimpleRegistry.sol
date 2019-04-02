@@ -67,6 +67,10 @@ contract SimpleRegistry is Owned, MetadataRegistry, OwnerRegistry, ReverseRegist
         _;
     }
 
+    constructor(address _owner) public {
+        owner = _owner;
+    }
+
     // Reservation functions
     function reserve(bytes32 _name)
         external
