@@ -22,14 +22,19 @@ contract NodeControlDb {
     }
 
     ///@notice Constructor that sets the owner of the database
-    constructor(NodeControlLookUp _lookUpContract) public {
+    constructor(NodeControlLookUp _lookUpContract) 
+        public 
+    {
         owner = msg.sender;
         nodeControlLookUp = _lookUpContract;
     }
 
     ///@notice Changes the logic contract (can only be called by the owner of the database)
     ///@param _newLookUp the new logic that is allowed to write data
-    function changeLookUpContract(address _newLookUp) external onlyOwner {
+    function changeLookUpContract(address _newLookUp) 
+        external 
+        onlyOwner 
+    {
         require(_newLookUp != address(0x0), "Error: newLookUp is not allowed to be 0x0");
         nodeControlLookUp = NodeControlLookUp(_newLookUp);
     }
@@ -62,20 +67,30 @@ contract NodeControlDb {
 
     ///@notice Sets the confirm
     ///@param _targetValidator The validator that confirms the update
-    function setUpdateConfirmed(address _targetValidator) external onlyLogic {
+    function setUpdateConfirmed(address _targetValidator) 
+        external 
+        onlyLogic 
+    {
         currentState[_targetValidator].updateConfirmed = block.number;
     }
 
     ///@notice Sets a new owner
     ///@param _newOwner The new owner
-    function setOwner(address _newOwner) external onlyOwner {
+    function setOwner(address _newOwner) 
+        external 
+        onlyOwner 
+    {
         require(_newOwner != address(0x0), "Error: Owner is not allowed to be 0x0");
         owner = _newOwner;
     }
 
     ///@notice View method to check if an update was confirmed by the validator
     ///@param _targetValidator The validator that is supposed to be checked
-    function isUpdateConfirmed(address _targetValidator) external view returns(bool) {
+    function isUpdateConfirmed(address _targetValidator) 
+        external 
+        view 
+        returns(bool) 
+    {
         return (currentState[_targetValidator].updateIntroduced < currentState[_targetValidator].updateConfirmed);
     }
 
@@ -92,31 +107,56 @@ contract NodeControlDb {
 
     ///@notice Gets the dockerSha
     ///@param _targetValidator The validator whos dockerSha you want
-    function getDockerSha(address _targetValidator) external view onlyLogic returns(bytes memory) {
+    function getDockerSha(address _targetValidator) 
+        external 
+        view 
+        onlyLogic 
+        returns(bytes memory) 
+    {
         return currentState[_targetValidator].dockerSha;
     }
 
     ///@notice Gets the dockerName
     ///@param _targetValidator The validator whos dockerName you want
-    function getDockerName(address _targetValidator) external view onlyLogic returns(string memory) {
+    function getDockerName(address _targetValidator) 
+        external 
+        view 
+        onlyLogic 
+        returns(string memory) 
+    {
         return currentState[_targetValidator].dockerName;
     }
 
     ///@notice Gets the chainSpecSha
     ///@param _targetValidator The validator whos chainSpecSha you want
-    function getChainSpecSha(address _targetValidator) external view onlyLogic returns(bytes memory) {
+    function getChainSpecSha(address _targetValidator) 
+        external 
+        view 
+        onlyLogic 
+        returns(bytes memory) 
+    {
         return currentState[_targetValidator].chainSpecSha;
     }
 
     ///@notice Gets the chainSpecUrl
     ///@param _targetValidator The validator whos chainSpecUrl you want
-    function getChainSpecUrl(address _targetValidator) external view onlyLogic returns(string memory) {
+    function getChainSpecUrl(address _targetValidator) 
+        external 
+        view 
+        onlyLogic 
+        returns(string memory) 
+    {
         return currentState[_targetValidator].chainSpecUrl;
     }
 
     ///@notice Gets the isSigning
     ///@param _targetValidator The validator you want to know of if they are signing
-    function getIsSigning(address _targetValidator) external view onlyLogic returns(bool) {
+    function getIsSigning(address _targetValidator) 
+        external 
+        view 
+        onlyLogic 
+        returns(bool) 
+    {
         return currentState[_targetValidator].isSigning;
     }
 }

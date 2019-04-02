@@ -17,13 +17,17 @@ contract NodeControlSimple is NodeControlInterface {
 
     ///@notice Constructor
     ///@param _nodeControlDb The db contract that should be used
-    constructor(NodeControlDb _nodeControlDb) public {
+    constructor(NodeControlDb _nodeControlDb) 
+        public 
+    {
         owner = msg.sender;
         nodeControlDb = _nodeControlDb;
     }
 
     ///@notice Lets the validator confirm the update
-    function confirmUpdate() external {
+    function confirmUpdate() 
+        external 
+    {
         require(nodeControlDb.getDockerSha(msg.sender).length != 0, "Error: You are not a validator!");
         nodeControlDb.setUpdateConfirmed(msg.sender);
     }
@@ -31,14 +35,22 @@ contract NodeControlSimple is NodeControlInterface {
     ///@notice Returns the expected state of a validator
     ///@param _targetValidator The validator whos state you want
     ///@return The state of the validator
-    function retrieveExpectedState(address _targetValidator) external view returns (ValidatorState memory) {
+    function retrieveExpectedState(address _targetValidator) 
+        external 
+        view 
+        returns (ValidatorState memory) 
+    {
         ValidatorState memory vs = nodeControlDb.getState(_targetValidator);
         return vs;
     }
 
     ///@notice View method to check if an update was confirmed by the validator
     ///@param _targetValidator The validator that is supposed to be checked
-    function isUpdateConfirmed(address _targetValidator) external view returns(bool) {
+    function isUpdateConfirmed(address _targetValidator) 
+        external 
+        view 
+        returns(bool) 
+    {
         return nodeControlDb.isUpdateConfirmed(_targetValidator);
     }
 
@@ -83,7 +95,10 @@ contract NodeControlSimple is NodeControlInterface {
 
     ///@notice Changes the owner of the NodeControlContract
     ///@param _newOwner The new owner of the contract. Can not be null.
-    function setOwner(address _newOwner) public onlyOwner {
+    function setOwner(address _newOwner) 
+        public 
+        onlyOwner 
+    {
         require(_newOwner != address(0x0), "Error: New owner can not be null");
         owner = _newOwner;
     }

@@ -13,13 +13,18 @@ contract NodeControlLookUp {
         _;
     }
 
-    constructor() public {
+    constructor() 
+        public 
+    {
         owner = msg.sender;
     }
 
     ///@notice Sets a address at the given index
     ///@param _nodeControlAddress The address that is written at the index
-    function changeAddress(address _nodeControlAddress) external onlyOwner {
+    function changeAddress(address _nodeControlAddress) 
+        external 
+        onlyOwner 
+    {
         nodeControlContract = _nodeControlAddress;
     }
 }
