@@ -15,7 +15,7 @@ contract('NodeControlSimple', (accounts) => {
   it('must emit UpdateAvailable event when a new update is triggered on a specific validator', async () => {
     const NodeControlSimpleInstance = await NodeControlSimple.deployed();
 
-    await NodeControlSimpleInstance.updateValidator(accounts[1], '0xe0d81206592a85a612a3bdb4300f538f67f9229ef7ae0fc0c1a098eefa467727', "parity/parity:v2.3.3", '0xfda42852939fef61daccd00d20ef07e2316de2e023de48c861701bfa73cfca47', "https://raw.githubusercontent.com/energywebfoundation/ewf-chainspec/99fa89b92b35219ddf38c886a75623c85bc9c696/Volta.json", true, {
+    await NodeControlSimpleInstance.updateValidator(accounts[1], '0x01', "dockerName123", '0x02', "chainSpecUrl123", true, {
       from: accounts[0]
     });
 
