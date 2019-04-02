@@ -1,13 +1,14 @@
 const NodeControlSimple = artifacts.require("NodeControlSimple");
 const NodeControlDb = artifacts.require("NodeControlDb");
+const NodeControlLookUp = artifacts.require("NodeControlLookUp");
 
 contract('NodeControlSimple', (accounts) => {
 
   it('must set the logic contract in the db', async () => {
-    const NodeControlDbInstance = await NodeControlDb.deployed();
+    const NodeControlLookUpInstance = await NodeControlLookUp.deployed();
     const NodeControlSimpleInstance = await NodeControlSimple.deployed();
 
-    await NodeControlDbInstance.changeLogicContract(NodeControlSimpleInstance.address)
+    await NodeControlLookUpInstance.changeAddress(NodeControlSimpleInstance.address)
   })
 
   //** Functional requirements tests */

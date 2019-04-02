@@ -2,16 +2,16 @@ pragma solidity ^0.5.0;
 pragma experimental ABIEncoderV2;
 
 import "./NodeControlInterface.sol";
-
+import "./NodeControlLookUp.sol";
 
 contract NodeControlDb {
     mapping (address => NodeControlInterface.ValidatorState) public currentState;
 
-    address public nodeControlLogic;
+    NodeControlLookUp public nodeControlLookUp;
     address public owner;
 
     modifier onlyLogic {
-        require(msg.sender == nodeControlLogic, "Error: onlyLogic Db");
+        require(msg.sender == nodeControlLookUp.nodeControlContract(), "Error: onlyLogic Db");
         _;
     }
 
@@ -21,15 +21,16 @@ contract NodeControlDb {
     }
 
     ///@notice Constructor that sets the owner of the database
-    constructor() public {
+    constructor(NodeControlLookUp _lookUpContract) public {
         owner = msg.sender;
+        nodeControlLookUp = _lookUpContract;
     }
 
     ///@notice Changes the logic contract (can only be called by the owner of the database)
-    ///@param _newLogic the new logic that is allowed to write data
-    function changeLogicContract(address _newLogic) external onlyOwner {
-        require(_newLogic != address(0x0), "Error: newLogic is not allowed to be 0x0");
-        nodeControlLogic = _newLogic;
+    ///@param _newLookUp the new logic that is allowed to write data
+    function changeLookUpContract(address _newLookUp) external onlyOwner {
+        require(_newLookUp != address(0x0), "Error: newLookUp is not allowed to be 0x0");
+        nodeControlLookUp = NodeControlLookUp(_newLookUp);
     }
 
     ///@notice Sets the state for a validator

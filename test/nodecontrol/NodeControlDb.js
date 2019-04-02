@@ -1,40 +1,34 @@
 const NodeControlSimple = artifacts.require("nodecontrol/NodeControlSimple");
 const NodeControlDb = artifacts.require("nodecontrol/NodeControlDb");
+const NodeControlLookUp = artifacts.require("nodecontrol/NodeControlLookUp");
 
 contract('NodeControlDb', (accounts) => {
 
-  it('must set the logic contract in the db', async () => {
-    const NodeControlDbInstance = await NodeControlDb.deployed();
-    const NodeControlSimpleInstance = await NodeControlSimple.deployed();
-
-    await NodeControlDbInstance.changeLogicContract(NodeControlSimpleInstance.address)
-  })
-
-  it('must set the new logic contract correctly', async () => {
+  it('must set the new lookup contract correctly', async () => {
     const NodeControlDbInstance = await NodeControlDb.deployed();
 
-    await NodeControlDbInstance.changeLogicContract(accounts[1]);
-    postState = await NodeControlDbInstance.nodeControlLogic();
+    await NodeControlDbInstance.changeLookUpContract(accounts[1]);
+    postState = await NodeControlDbInstance.nodeControlLookUp();
 
     assert(postState == accounts[1], "Should be the accounts from the parameter");
 
-    await NodeControlDbInstance.changeLogicContract(NodeControlSimple.address);
-    postState = await NodeControlDbInstance.nodeControlLogic();
+    await NodeControlDbInstance.changeLookUpContract(NodeControlLookUp.address);
+    postState = await NodeControlDbInstance.nodeControlLookUp();
 
-    assert(postState == NodeControlSimple.address, "Should be the logic instance address")
+    assert(postState == NodeControlLookUp.address, "Should be the logic instance address")
   })
 
   it("must not allow 0x0 as address for new logic contract", async () => {
     const NodeControlDbInstance = await NodeControlDb.deployed();
     isFailed = false;
     try {
-      await NodeControlDbInstance.changeLogicContract('0x0000000000000000000000000000000000000000', {
+      await NodeControlDbInstance.changeLookUpContract('0x0000000000000000000000000000000000000000', {
         from: accounts[0]
       });
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
-      assert(e.toString().includes("Error: newLogic is not allowed to be 0x0"), "Should have thrown the right exception")
+      assert(e.toString().includes("Error: newLookUp is not allowed to be 0x0"), "Should have thrown the right exception")
     }
     assert(!isFailed, "Should have thrown exception")
   })
@@ -43,7 +37,7 @@ contract('NodeControlDb', (accounts) => {
     const NodeControlDbInstance = await NodeControlDb.deployed();
     isFailed = false;
     try {
-      await NodeControlDbInstance.changeLogicContract('0x0000000000000000000000000000000000000001', {
+      await NodeControlDbInstance.changeLookUpContract('0x0000000000000000000000000000000000000001', {
         from: accounts[1]
       });
       isFailed = true;
