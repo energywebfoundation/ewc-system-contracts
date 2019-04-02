@@ -15,16 +15,17 @@ import "../libs/SafeMath.sol";
 contract BlockReward is SCurveProvider, IBlockReward {
     using SafeMath for uint256;
 
-    /// These constants are used for logging reward amounts by category
-    bytes32 internal constant MINTED_TOTALLY = keccak256("mintedTotally");
-    bytes32 internal constant MINTED_FOR_COMMUNITY = keccak256("mintedForCommunity");
-    bytes32 internal constant MINTED_FOR_COMMUNITY_FOR_ACCOUNT = "mintedForCommunityForAccount";
-    bytes32 internal constant MINTED_FOR_ACCOUNT = "mintedForAccount";
-    bytes32 internal constant MINTED_FOR_ACCOUNT_IN_BLOCK = "mintedForAccountInBlock";
-    bytes32 internal constant MINTED_IN_BLOCK = "mintedInBlock";
+    // storage variables for logging reward statistics
+    uint256 public mintedTotally;
+    uint256 public mintedForCommunity;
+    mapping(address => uint256) public mintedForCommunityForAccount;
+    mapping(address => uint256) public mintedForAccount;
+    mapping(uint256 => uint256) public mintedInBlock;
+    mapping(address => mapping(uint256 => uint256)) public mintedForAccountInBlock;
 
     // solhint-disable var-name-mixedcase
     /// Parity client SYSTEM_ADDRESS: 2^160 - 2
+    /// This is a constant, but changed only for tests
     address internal SYSTEM_ADDRESS = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
     /// The constant amount that gets sent to the
     /// community fund with each new block
@@ -36,22 +37,6 @@ contract BlockReward is SCurveProvider, IBlockReward {
     /// Stores reward amounts
     mapping(bytes32 => uint256) private uintStorage;
     // solhint-enable var-name-mixedcase
-
-    modifier onlySystem {
-        require(
-            msg.sender == SYSTEM_ADDRESS,
-            "Caller is not the system"
-        );
-        _;
-    }
-
-    modifier onlyCommunityFund {
-        require(
-            msg.sender == communityFund,
-            "Caller is not the community fund"
-        );
-        _;
-    }
 
     constructor(address _communityFundAddress, uint256 _communityFundAmount)
         public
@@ -65,8 +50,11 @@ contract BlockReward is SCurveProvider, IBlockReward {
     /// @param _newFund New community fund address
     function setCommunityFund(address _newFund)
         external
-        onlyCommunityFund
     {
+        require(
+            msg.sender == communityFund,
+            "Caller is not the community fund"
+        );
         communityFund = _newFund;
     }
 
@@ -100,9 +88,9 @@ contract BlockReward is SCurveProvider, IBlockReward {
     /// @return List of addreses to be rewarded, and list of corresponding reward amounts in wei
     function reward(address[] calldata benefactors, uint16[] calldata kind)
         external
-        onlySystem
         returns (address[] memory, uint256[] memory)
     {
+        require(msg.sender == SYSTEM_ADDRESS, "Caller is not the system");
         require(benefactors.length == kind.length, "Benefactors/types list length differs");
         require(benefactors.length == 1, "Benefactors list length is not 1");
         require(kind[0] == 0, "Benefactor is not the block author");
@@ -124,86 +112,6 @@ contract BlockReward is SCurveProvider, IBlockReward {
         _logCommunityMinted(receivers[1], rewards[1]);
     
         return (receivers, rewards);
-    }
-
-    /// @notice Stat of how much was minted
-    /// for the community fund so far
-    /// @return The amount in wei
-    function mintedForCommunity()
-        public
-        view
-        returns(uint256)
-    {
-        return uintStorage[MINTED_FOR_COMMUNITY];
-    
-    }
-
-    /// @notice Stat of how much was minted
-    /// for the community fund for a certain address so far
-    /// @param _account The account address to "query"
-    /// @return The amount in wei
-    function mintedForCommunityForAccount(address _account)
-        public
-        view
-        returns(uint256)
-    {
-        return uintStorage[
-            keccak256(abi.encode(MINTED_FOR_COMMUNITY_FOR_ACCOUNT, _account))
-        ];
-    }
-
-    /// @notice Stat of how much was minted
-    /// for a certain account
-    /// @param _account The account address to "query"
-    /// @return The amount in wei
-    function mintedForAccount(address _account)
-        public
-        view
-        returns(uint256)
-    {
-        return uintStorage[
-            keccak256(abi.encode(MINTED_FOR_ACCOUNT, _account))
-        ];
-    }
-
-    /// @notice Stat of how much was minted
-    /// for a certain account in a certain block
-    /// @param _account The account address to "query"
-    /// @param _blockNumber The block number to "query"
-    /// @return The amount in wei
-    function mintedForAccountInBlock(address _account, uint256 _blockNumber)
-        public
-        view
-        returns(uint256)
-    {
-        return uintStorage[
-            keccak256(abi.encode(MINTED_FOR_ACCOUNT_IN_BLOCK, _account, _blockNumber))
-        ];
-    }
-
-    /// @notice Stat of how much was minted
-    /// in total in a certain block
-    /// @param _blockNumber The block number to "query"
-    /// @return The amount in wei
-    function mintedInBlock(uint256 _blockNumber)
-        public
-        view
-        returns(uint256)
-    {
-        return uintStorage[
-            keccak256(abi.encode(MINTED_IN_BLOCK, _blockNumber))
-        ];
-    }
-
-    /// @notice Stat of how much was minted
-    /// totally so far
-    /// @return The amount in wei
-    function mintedTotally()
-        public
-        view
-        returns(uint256)
-    {
-        return uintStorage[MINTED_TOTALLY];
     }
 
     /// @dev Retrieves the payout address of an account if there is any. If not specified 
@@ -229,13 +137,9 @@ contract BlockReward is SCurveProvider, IBlockReward {
     function _logCommunityMinted(address _account, uint256 _amount)
         private
     {
-        bytes32 _hash;
-        
-        _hash = MINTED_FOR_COMMUNITY;
-        uintStorage[_hash] = uintStorage[_hash].add(_amount);
+        mintedForCommunity = mintedForCommunity.add(_amount);
 
-        _hash = keccak256(abi.encode(MINTED_FOR_COMMUNITY_FOR_ACCOUNT, _account));
-        uintStorage[_hash] = uintStorage[_hash].add(_amount);
+        mintedForCommunityForAccount[_account] = mintedForCommunityForAccount[_account].add(_amount);
         
         _logMinted(_account, _amount);
     }
@@ -246,18 +150,12 @@ contract BlockReward is SCurveProvider, IBlockReward {
     function _logMinted(address _account, uint256 _amount)
         private
     {
-        bytes32 _hash;
+        mintedForAccountInBlock[_account][block.number] = mintedForAccountInBlock[_account][block.number].add(_amount);
 
-        _hash = keccak256(abi.encode(MINTED_FOR_ACCOUNT_IN_BLOCK, _account, block.number));
-        uintStorage[_hash] = uintStorage[_hash].add(_amount);
+        mintedForAccount[_account] = mintedForAccount[_account].add(_amount);
 
-        _hash = keccak256(abi.encode(MINTED_FOR_ACCOUNT, _account));
-        uintStorage[_hash] = uintStorage[_hash].add(_amount);
+        mintedInBlock[block.number] = mintedInBlock[block.number].add(_amount);
 
-        _hash = keccak256(abi.encode(MINTED_IN_BLOCK, block.number));
-        uintStorage[_hash] = uintStorage[_hash].add(_amount);
-
-        _hash = MINTED_TOTALLY;
-        uintStorage[_hash] = uintStorage[_hash].add(_amount);
+        mintedTotally = mintedTotally.add(_amount);
     }
 }
