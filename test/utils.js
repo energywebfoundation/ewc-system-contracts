@@ -3,19 +3,26 @@ const DEFAULT_ADDRESS = "0x0000000000000000000000000000000000000000";
 const SYSTEM_ADDRESS = "0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE";
 const EMPTY_BYTES32 = "0x0000000000000000000000000000000000000000000000000000000000000000";
 
+const ValidatorState = {
+    NonValidator: "0",
+    FinalizedValidator: "1",
+    PendingToBeAdded: "2",
+    PendingToBeRemoved: "3"
+};
+
 const send = (method, params = []) => {
     return new Promise((resolve, reject) => web3.currentProvider.send({id: 0, jsonrpc: '2.0', method, params }, (e, data) => {
         if (e) {
-            reject(e)
+            reject(e);
         } else {
-            resolve(data)
+            resolve(data);
         }
     }));
 }
 
 const timeTravel = async seconds => {
-  await send('evm_increaseTime', [seconds])
-  await send('evm_mine')
+    await send('evm_increaseTime', [seconds]);
+    await send('evm_mine');
 }
 
 const createSnapshot = () => {
@@ -28,13 +35,13 @@ const createSnapshot = () => {
                 id: 1
             },
             (e, r) => {
-                if (e) reject(e)
+                if (e) reject(e);
                 else {
-                    resolve(r.result)
+                    resolve(r.result);
                 }
             }
-        )
-    })
+        );
+    });
 }
 
 const revertSnapshot = (snapshotID, id) => {
@@ -47,20 +54,19 @@ const revertSnapshot = (snapshotID, id) => {
                 id: id
             },
             (e, r) => {
-                if (e) reject(e)
+                if (e) reject(e);
                 else {
-                    resolve(r.result)
+                    resolve(r.result);
                 }
             }
-        )
-    })
+        );
+    });
 }
 
 async function assertThrowsAsync(fn, msg) {
     try {
         await fn();
     } catch (err) {
-        console.log("caught")
         assert(err.message.includes(msg), "Expected error to include: " + msg);
         return;
     }
@@ -76,4 +82,5 @@ module.exports = {
     DEFAULT_ADDRESS,
     SYSTEM_ADDRESS,
     EMPTY_BYTES32,
+    ValidatorState
 };

@@ -12,7 +12,8 @@ const {
     REVERT_ERROR_MSG,
     DEFAULT_ADDRESS,
     SYSTEM_ADDRESS,
-    EMPTY_BYTES32
+    EMPTY_BYTES32,
+    ValidatorState
 } = require(__dirname + "/../utils.js");
 
 const NOT_OWNER_ERROR = "Sender is not owner";
@@ -109,9 +110,8 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
             let i;
             for (i = 0; i < validators.length; i++) {
                 let currentStatus = await relayed.addressStatus.call(validators[i]);
-                currentStatus[0].should.be.true;
-                currentStatus[1].should.be.false;
-                currentStatus[2].toNumber(10).should.equal(i);
+                currentStatus[0].should.be.bignumber.equal(ValidatorState.FinalizedValidator);
+                currentStatus[1].toNumber(10).should.equal(i);
             };
         });
 
@@ -271,23 +271,20 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
 
         it('should set addressStatus for new validator correctly', async function () {
             let status = await relayed.addressStatus.call(accounts[2]);
-            status[0].should.be.false;
-            status[1].should.be.false;
-            status[2].should.be.bignumber.equal("0");
+            status[0].should.be.bignumber.equal(ValidatorState.NonValidator);
+            status[1].should.be.bignumber.equal("0");
 
             await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
 
             status = await relayed.addressStatus.call(accounts[2]);
-            status[0].should.be.true;
-            status[1].should.be.true;
-            status[2].should.be.bignumber.equal("0");
+            status[0].should.be.bignumber.equal(ValidatorState.PendingToBeAdded);
+            status[1].should.be.bignumber.equal("0");
 
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
             status = await relayed.addressStatus.call(accounts[2]);
-            status[0].should.be.true;
-            status[1].should.be.false;
-            status[2].should.be.bignumber.equal("1");
+            status[0].should.be.bignumber.equal(ValidatorState.FinalizedValidator);
+            status[1].should.be.bignumber.equal("1");
         });
 
         it('should not be finalized before finalize call', async function () {
@@ -446,25 +443,22 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
 
         it('should change address status correctly', async function () {
             let status = await relayed.addressStatus.call(accounts[2]);
-            status[0].should.be.false;
-            status[1].should.be.false;
-            status[2].should.be.bignumber.equal("0");
+            status[0].should.be.bignumber.equal(ValidatorState.NonValidator);
+            status[1].should.be.bignumber.equal("0");
 
             await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
             await relayed.removeValidator(accounts[2], { from: owner }).should.be.fulfilled;
 
             status = await relayed.addressStatus.call(accounts[2]);
-            status[0].should.be.false;
-            status[1].should.be.true;
-            status[2].should.be.bignumber.equal("1");
+            status[0].should.be.bignumber.equal(ValidatorState.PendingToBeRemoved);
+            status[1].should.be.bignumber.equal("1");
 
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
             status = await relayed.addressStatus.call(accounts[2]);
-            status[0].should.be.false;
-            status[1].should.be.false;
-            status[2].should.be.bignumber.equal("0");
+            status[0].should.be.bignumber.equal(ValidatorState.NonValidator);
+            status[1].should.be.bignumber.equal("0");
         });
 
         it('should set finalized to false', async function () {
@@ -499,45 +493,59 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
         });
     });
 
-    describe('#isAddedValidator', async function () {
+    describe('#isPendingToBeAdded', async function () {
 
-        it('should return true for added validators only', async function () {
-            (await relayed.isAddedValidator.call(accounts[1])).should.be.true;
-            (await relayed.isAddedValidator.call(accounts[2])).should.be.false;
+        it('should return true only if address is pending to be added', async function () {
+            (await relayed.isPendingToBeAdded.call(accounts[1])).should.be.false;
+            (await relayed.isPendingToBeAdded.call(accounts[2])).should.be.false;
 
             await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
-            (await relayed.isAddedValidator.call(accounts[2])).should.be.true;
+            (await relayed.isPendingToBeAdded.call(accounts[1])).should.be.false;
+            (await relayed.isPendingToBeAdded.call(accounts[2])).should.be.true;
 
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
+            (await relayed.isPendingToBeAdded.call(accounts[1])).should.be.false;
+            (await relayed.isPendingToBeAdded.call(accounts[2])).should.be.false;
+
             await relayed.removeValidator(accounts[2], { from: owner }).should.be.fulfilled;
-            (await relayed.isAddedValidator.call(accounts[2])).should.be.false;
+            (await relayed.isPendingToBeAdded.call(accounts[1])).should.be.false;
+            (await relayed.isPendingToBeAdded.call(accounts[2])).should.be.false;
 
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
-            (await relayed.isAddedValidator.call(accounts[2])).should.be.false;
+            (await relayed.isPendingToBeAdded.call(accounts[1])).should.be.false;
+            (await relayed.isPendingToBeAdded.call(accounts[2])).should.be.false;
         });
     });
 
-    describe('#isRemovedValidator', async function () {
+    describe('#isPendingToBeRemoved', async function () {
 
-        it('should return true for added validators only', async function () {
-            (await relayed.isRemovedValidator.call(accounts[1])).should.be.false;
-            (await relayed.isRemovedValidator.call(accounts[2])).should.be.true;
+        it('should return true only if address is pending to be removed', async function () {
+            (await relayed.isPendingToBeRemoved.call(accounts[1])).should.be.false;
+            (await relayed.isPendingToBeRemoved.call(accounts[2])).should.be.false;
 
             await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            (await relayed.isPendingToBeRemoved.call(accounts[1])).should.be.false;
+            (await relayed.isPendingToBeRemoved.call(accounts[2])).should.be.false;
+
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
+            (await relayed.isPendingToBeRemoved.call(accounts[1])).should.be.false;
+            (await relayed.isPendingToBeRemoved.call(accounts[2])).should.be.false;
 
             await relayed.removeValidator(accounts[1], { from: owner }).should.be.fulfilled;
-            (await relayed.isRemovedValidator.call(accounts[1])).should.be.true;
-            (await relayed.isRemovedValidator.call(accounts[2])).should.be.false;
+            (await relayed.isPendingToBeRemoved.call(accounts[1])).should.be.true;
+            (await relayed.isPendingToBeRemoved.call(accounts[2])).should.be.false;
 
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
+            (await relayed.isPendingToBeRemoved.call(accounts[1])).should.be.false;
+            (await relayed.isPendingToBeRemoved.call(accounts[2])).should.be.false;
+
             await relayed.removeValidator(accounts[2], { from: owner }).should.be.fulfilled;
-            (await relayed.isRemovedValidator.call(accounts[2])).should.be.true;
-            (await relayed.isRemovedValidator.call(accounts[1])).should.be.true;
+            (await relayed.isPendingToBeRemoved.call(accounts[1])).should.be.false;
+            (await relayed.isPendingToBeRemoved.call(accounts[2])).should.be.true;
 
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
-            (await relayed.isRemovedValidator.call(accounts[2])).should.be.true;
-            (await relayed.isRemovedValidator.call(accounts[1])).should.be.true;
+            (await relayed.isPendingToBeRemoved.call(accounts[1])).should.be.false;
+            (await relayed.isPendingToBeRemoved.call(accounts[2])).should.be.false;
         });
     });
 
@@ -558,11 +566,36 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
         });
     });
 
+    describe('#isFinalizedValidator', async function () {
+
+        it('should return true for finaized validators only', async function () {
+            (await relayed.isFinalizedValidator.call(accounts[1])).should.be.true;
+            (await relayed.isFinalizedValidator.call(accounts[2])).should.be.false;
+
+            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            (await relayed.isFinalizedValidator.call(accounts[1])).should.be.true;
+            (await relayed.isFinalizedValidator.call(accounts[2])).should.be.false;
+
+            await relay.finalizeChange({ from: system }).should.be.fulfilled;
+            (await relayed.isFinalizedValidator.call(accounts[1])).should.be.true;
+            (await relayed.isFinalizedValidator.call(accounts[2])).should.be.true;
+
+            await relayed.removeValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            (await relayed.isFinalizedValidator.call(accounts[1])).should.be.true;
+            (await relayed.isFinalizedValidator.call(accounts[2])).should.be.false;
+
+            await relay.finalizeChange({ from: system }).should.be.fulfilled;
+            (await relayed.isFinalizedValidator.call(accounts[1])).should.be.true;
+            (await relayed.isFinalizedValidator.call(accounts[2])).should.be.false;
+        });
+    });
+
     describe('#isPending', async function () {
 
         it('returns true for pending-to-be-added/removed validators only', async function () {
             (await relayed.isPending.call(accounts[1])).should.be.false;
-            (await relayed.addressStatus.call(accounts[1]))[1].should.be.false;
+            (await relayed.addressStatus.call(accounts[1]))[0]
+                .should.be.bignumber.equals(ValidatorState.FinalizedValidator);
 
             await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
             (await relayed.isPending.call(accounts[2])).should.be.true;
