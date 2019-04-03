@@ -10,22 +10,27 @@ import "../misc/Ownable.sol";
 /// relays the function calls to this contract and they communicate through well defined interfaces.
 contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
 
+    /// Enum for the 4 possible state of validators
+    enum ValidatorState {
+        /// 1. Non-validator: the default enum option
+        NonValidator,
+        /// 2. Finalized-validator: validators in the currentValidators list who
+        /// are not pending to be removed either. They are active validators,
+        /// so they seal blocks
+        Finalized,
+        /// 3. Pending-to-be-added-validator: about to be added to the
+        /// currentValidators list, but not partake in sealing yet, thus not active
+        PendingToBeAdded,
+        /// 4. Pending-to-be-removed-validators: They are
+        /// about to be removed, but still in the currentValidators
+        /// list sealing blocks, thus active. They can still be
+        /// reported or submit reports
+        PendingToBeRemoved
+    }
+
     /// Holds address validator status information
-    /// Addresses can have 4 states:
-    /// 1. Non-validators: must have both flags false
-    /// 2. Active-validators: validators in the currentValidators
-    /// list. They are actively sealing blocks. If a validator is removed, but
-    /// this removal is not finalized yet, it is still active. Either `isAddedValidator` == true
-    /// and `isPendingToBeFinalized` == false, or `isAddedValidator` == false and
-    /// `isPendingToBeFinalized` == true
-    /// 3. Added-validators: both flags true. They are about-to-be added but not sealing yet, not active
-    /// 4. Removed-validators: `isAddedValidator` == false and `isPendingToBeFinalized` == true. They are
-    /// about to be removed, but still sealing blocks, thus active
     struct AddressStatus {
-        /// Is this address an added validator
-        bool isAddedValidator;
-        /// Is this validator pending to be added or removed
-        bool isPendingToBeFinalized;
+        ValidatorState state;
         /// Index in currentValidators list. This index
         /// is only relevant if the validator is active.
         /// Should be ignored otherwise
@@ -87,8 +92,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         for (uint i = 0; i < _initial.length; i++) {
             require(_initial[i] != address(0), "Validator address cannot be 0x0");
             
-            addressStatus[_initial[i]].isAddedValidator = true;
-            addressStatus[_initial[i]].isPendingToBeFinalized = false;
+            addressStatus[_initial[i]].state = ValidatorState.Finalized;
             addressStatus[_initial[i]].index = i;
         }
         pendingValidators = _initial;
@@ -160,14 +164,12 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         
         for (uint256 i = 0; i < pendingValidators.length; i++) {
             AddressStatus storage vstatus = addressStatus[pendingValidators[i]];
-            if (vstatus.isPendingToBeFinalized) {
-                vstatus.isPendingToBeFinalized = false;
-                vstatus.index = i;
-            }
+            vstatus.state = ValidatorState.Finalized;
+            vstatus.index = i;
         }
 
         if (toBeRemoved != address(0)) {
-            addressStatus[toBeRemoved].isPendingToBeFinalized = false;
+            addressStatus[toBeRemoved].state = ValidatorState.NonValidator;
             addressStatus[toBeRemoved].index = 0;
             toBeRemoved = address(0);
         }  
@@ -192,12 +194,13 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         _addValidator(_validator);
     }
 
-    /// @notice Removes a validator from the pending list and initiates a change.
-    /// Can only be called if the validator is in the active list, or
-    /// there are no changes to be finalized. Until the validator removal is finalized, it is still
-    /// active.
-    /// @dev First removes the validator from `pendingValidators`, then calls the `callbackInitiateChange`
-    /// of the Relay contract which emits the `InitiateChange` event
+    /// @notice Removes a validator from the pending list and initiates a
+    /// change. Can only be called if the validator is in the current list, or
+    /// there are no changes to be finalized. Until the validator removal
+    /// is finalized, it is still active
+    /// @dev First removes the validator from `pendingValidators`, then
+    /// calls the `callbackInitiateChange` of the Relay contract which
+    /// emits the `InitiateChange` event
     /// @param _validator The address to be removed
     function removeValidator(address _validator)
         external
@@ -218,7 +221,11 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         return currentValidators;
     }
 
-    /// @notice Returns pending validators list
+    /// @notice Returns pending validators list. If there are
+    /// no changes in progress, the pending list is the same
+    /// as the current list. If there are changes to the set, the
+    /// pending validators list is the new active validators
+    /// list that awaits finalization
     /// @return The list of addresses of pending validators
     function getPendingValidators()
         external
@@ -229,7 +236,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     }
 
     /// @notice Returns the count of currently active validators
-    /// @return The number of currently active validators. Uint256 type.
+    /// @return The number of currently active validators
     function getValidatorsNum()
         external
         view
@@ -238,57 +245,77 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         return currentValidators.length;
     }
 
-    /// @notice Checks whether the address is an added validator.
-    /// Not the same as `isActiveValidator`! Returns true for 
-    /// validators who are added but not active yet and for validators 
-    /// who are active and not pending-to-be-removed. Returns false
-    /// for still active but pending-to-be-removed validators and
-    /// non-validators
-    /// @return True or false, depending on the check
-    function isAddedValidator(address _somebody)
+    /// @notice Checks whether the address is pending to
+    /// be added to the active validators list
+    /// @param _somebody The address to be queried
+    /// @return True if address is pending to be added, false otherwise
+    function isPendingToBeAdded(address _somebody)
         external
         view
         returns (bool)
     {
-        return addressStatus[_somebody].isAddedValidator;
+        return (
+            addressStatus[_somebody].state == ValidatorState.PendingToBeAdded
+        );
     }
 
-    /// @notice Checks whether the address is a "removed validator".
-    /// Returns true for validators who are about to be removed but still active and
-    /// for non-validators who are not pending-to-be-added. Returns false
-    /// for non-active but pending-to-be-added validators and validators
-    /// @return True or false, depending on the check
-    function isRemovedValidator(address _somebody)
+    /// @notice Checks whether the address is pending to
+    /// be removed from the active validators list
+    /// @param _somebody The address to be queried
+    /// @return True if address is pending to be removed, false otherwise
+    function isPendingToBeRemoved(address _somebody)
         external
         view
         returns (bool)
     {
-        return !addressStatus[_somebody].isAddedValidator;
+        return (
+            addressStatus[_somebody].state == ValidatorState.PendingToBeRemoved
+        );
     }
 
-    /// @notice Checks whether the address is a pending-to-be-added or a pending-to-be-removed validator.
-    /// @return True or false, depending on the check
+    /// @notice Checks whether the address is a pending-to-be-added or a pending-to-be-removed validator
+    /// @param _somebody The address to be queried
+    /// @return True if address is pending, false otherwise
     function isPending(address _somebody)
         external
         view
         returns (bool)
     {
-        return addressStatus[_somebody].isPendingToBeFinalized;
+        return (
+            addressStatus[_somebody].state == ValidatorState.PendingToBeAdded
+            || addressStatus[_somebody].state == ValidatorState.PendingToBeRemoved
+        );
     }
 
-    /// @notice Checks whether the address is a currently active (sealing) validator
-    /// @dev Checks whether validator is active based on its status flags.
-    /// @return True or false, depending on the check
+    /// @notice Checks whether the address is a currently active (sealing) validator.
+    /// Note that it is not the same as `isFinalizedValidator`, because an unfinalized,
+    /// pending-to-be-removed validator is still an active one
+    /// @param _somebody The address to be queried
+    /// @return True if address is an active validator, false otherwise
     function isActiveValidator(address _somebody)
         public
         view
         returns(bool)
     {
-        bool isV = addressStatus[_somebody].isAddedValidator;
-        bool isP = addressStatus[_somebody].isPendingToBeFinalized;
+        return (
+            addressStatus[_somebody].state == ValidatorState.Finalized
+            || addressStatus[_somebody].state == ValidatorState.PendingToBeRemoved
+        );
+    }
 
-        // already in the active set, or in the active set but about to be removed
-        return ((isV && !isP) || (!isV && isP));
+    /// @notice Checks whether the address is a currently active finalized validator.
+    /// Note that it is not the same as `isActiveValidator`. This returns false if the
+    /// validator is still active but pending to be removed
+    /// @param _somebody The address to be queried
+    /// @return True if adress is a finalized validator, false otherwise
+    function isFinalizedValidator(address _somebody)
+        public
+        view
+        returns(bool)
+    {
+        return (
+            addressStatus[_somebody].state == ValidatorState.Finalized
+        );
     }
 
     /// @dev Sets `finalized` to false and initiates a change
@@ -304,11 +331,11 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     }
 
     /// @dev Adds validator to pending, sets status flags and triggers change
+    /// @param _validator The address to add
     function _addValidator(address _validator)
         internal
     {
-        addressStatus[_validator].isAddedValidator = true;
-        addressStatus[_validator].isPendingToBeFinalized = true;
+        addressStatus[_validator].state = ValidatorState.PendingToBeAdded;
         
         pendingValidators.push(_validator);
         _triggerChange();
@@ -317,6 +344,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     /// @dev Removes validator from pending, sets status flags and triggers change.
     /// Replaces the removed element with the last element. Must not be called with
     /// an empty pending validators list
+    /// @param _validator The address to remove
     function _removeValidator(address _validator)
         internal
     {
@@ -330,8 +358,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         addressStatus[lastValidator].index = removedIndex;
         pendingValidators.length--;
 
-        addressStatus[_validator].isAddedValidator = false;
-        addressStatus[_validator].isPendingToBeFinalized = true;
+        addressStatus[_validator].state = ValidatorState.PendingToBeRemoved;
 
         toBeRemoved = _validator;
 
@@ -339,6 +366,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     }
 
     /// @dev Sets the relay address and emits the `NewRelay` event
+    /// @param _relaySet The address of the new relay contract
     function _setRelay(address _relaySet)
         private
     {

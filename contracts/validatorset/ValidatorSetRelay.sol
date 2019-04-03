@@ -8,7 +8,7 @@ import "../interfaces/IValidatorSetRelayed.sol";
 
 /// @title Validator Set Relay contract
 /// @notice This owned contract is present in the chainspec file. The Relay contract
-/// relays the function calls to a logic contract called Relayed for upgradeability.
+/// relays the function calls to a logic contract called Relayed for upgradeability
 contract ValidatorSetRelay is IValidatorSet, IValidatorSetRelay, Ownable {
 
     /// Emitted in case a new Relayed contract is set
