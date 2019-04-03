@@ -1,28 +1,29 @@
 const NodeControlLookUp = artifacts.require("nodeControl/NodeControlLookUp");
 
 contract('NodeControlLookUp', (accounts) => {
+  describe('#changeAddress', () => {
+    it('must set the address at the correct index', async () => {
+      const NodeControlLookUpInstance = await NodeControlLookUp.deployed();
 
-  it('must set the address at the correct index', async () => {
-    const NodeControlLookUpInstance = await NodeControlLookUp.deployed();
-
-    await NodeControlLookUpInstance.changeAddress(accounts[0], {
-      from: accounts[0]
-    })
-    entry = await NodeControlLookUpInstance.nodeControlContract()
-    assert(entry == accounts[0], "Should be the same")
-  })
-
-  it('must only be callable by the owner', async () => {
-    const NodeControlLookUpInstance = await NodeControlLookUp.deployed();
-    isFailed = false;
-    try {
       await NodeControlLookUpInstance.changeAddress(accounts[0], {
-        from: accounts[1]
-      });
-      isFailed = true;
-    } catch (e) {
-      assert(true, "Should have thrown an exception")
-    }
-    assert(!isFailed, "Should have thrown exception")
-  })
+        from: accounts[0]
+      })
+      entry = await NodeControlLookUpInstance.nodeControlContract()
+      assert(entry == accounts[0], "Should be the same")
+    })
+
+    it('must only be callable by the owner', async () => {
+      const NodeControlLookUpInstance = await NodeControlLookUp.deployed();
+      isFailed = false;
+      try {
+        await NodeControlLookUpInstance.changeAddress(accounts[0], {
+          from: accounts[1]
+        });
+        isFailed = true;
+      } catch (e) {
+        assert(true, "Should have thrown an exception")
+      }
+      assert(!isFailed, "Should have thrown exception")
+    })
+  });
 })

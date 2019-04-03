@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.4;
 pragma experimental ABIEncoderV2;
 
 import "./NodeControlInterface.sol";
@@ -22,10 +22,10 @@ contract NodeControlDb {
     }
 
     ///@notice Constructor that sets the owner of the database
-    constructor(NodeControlLookUp _lookUpContract) 
+    constructor(NodeControlLookUp _lookUpContract, address _owner) 
         public 
     {
-        owner = msg.sender;
+        owner = _owner;
         nodeControlLookUp = _lookUpContract;
     }
 

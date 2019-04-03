@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.4;
 pragma experimental ABIEncoderV2;
 
 import "./NodeControlInterface.sol";
@@ -17,10 +17,10 @@ contract NodeControlSimple is NodeControlInterface {
 
     ///@notice Constructor
     ///@param _nodeControlDb The db contract that should be used
-    constructor(NodeControlDb _nodeControlDb) 
+    constructor(NodeControlDb _nodeControlDb, address _owner) 
         public 
     {
-        owner = msg.sender;
+        owner = _owner;
         nodeControlDb = _nodeControlDb;
     }
 

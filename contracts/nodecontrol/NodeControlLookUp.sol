@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.4;
 pragma experimental ABIEncoderV2;
 
 
@@ -13,10 +13,10 @@ contract NodeControlLookUp {
         _;
     }
 
-    constructor() 
+    constructor(address _owner) 
         public 
     {
-        owner = msg.sender;
+        owner = _owner;
     }
 
     ///@notice Sets a address at the given index
