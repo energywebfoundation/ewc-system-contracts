@@ -1,15 +1,19 @@
 "use strict";
 
-const SimpleRegistry = artifacts.require("./SimpleRegistry.sol");
+const SimpleRegistry = artifacts.require("../../contracts/registry/SimpleRegistry.sol");
 
 contract("SimpleRegistry", accounts => {
 
   const address = accounts[0];
   const nameEntry = "awesome";
   const name = web3.utils.sha3(nameEntry);
+  let simpleReg;
+
+  before(async () => {
+    simpleReg = await SimpleRegistry.new(accounts[0], { from: accounts[0] })
+  });
 
   it("should only allow owner to reserve a new name", async () => {
-    const simpleReg = await SimpleRegistry.deployed();
     let isFailed = false
     try {
       await simpleReg.reserve(name, {
@@ -25,7 +29,6 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should only allow to reserve a new name when fee is available", async () => {
-    const simpleReg = await SimpleRegistry.deployed();
     let isFailed = false
     try {
       await simpleReg.reserve(name, {
@@ -41,8 +44,6 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should allow reserving a new name", async () => {
-    const simpleReg = await SimpleRegistry.deployed();
-
     // reservation requires a fee of 1 ETH
     let txReturn = await simpleReg.reserve(name, {
       value: web3.utils.toWei("1", "ether")
@@ -56,8 +57,6 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should allow name owner to set new metadata for the name", async () => {
-    const simpleReg = await SimpleRegistry.deployed();
-
     let isFailed = false
     try {
       await simpleReg.setData(name, "A", web3.utils.asciiToHex("dummy"), {
@@ -119,7 +118,6 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should allow owner to propose new reverse address", async () => {
-    const simpleReg = await SimpleRegistry.deployed();
     let isFailed = false
 
     try {
@@ -167,8 +165,6 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should allow re-registration of reverse address and owner forced confirmation", async () => {
-    const simpleReg = await SimpleRegistry.deployed();
-
     await simpleReg.proposeReverse(nameEntry, address, {
       from: address
     });
@@ -185,7 +181,6 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should abort reservation if name is already reserved", async () => {
-    const simpleReg = await SimpleRegistry.deployed();
     let isFailed = false
 
     try {
@@ -200,7 +195,6 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should abort reservation if the fee is not paid", async () => {
-    const simpleReg = await SimpleRegistry.deployed();
     let isFailed = false
 
     try {
@@ -215,7 +209,6 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should allow the owner of the contract to transfer ownership", async () => {
-    const simpleReg = await SimpleRegistry.deployed();
     let isFailed = false
 
     try {
@@ -253,7 +246,6 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should allow the contract owner to set the registration fee", async () => {
-    const simpleReg = await SimpleRegistry.deployed();
     let isFailed = false
     // only the contract owner can set a new fee
     try {
@@ -275,7 +267,6 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should allow the contract owner to drop a name", async () => {
-    const simpleReg = await SimpleRegistry.deployed();
     let isFailed = false
     // only the contract owner can unregister badges
     // at this moment, `name` is transferred to `accounts[1]`
@@ -299,7 +290,6 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should allow the contract owner to drain all the ether from the contract", async () => {
-    const simpleReg = await SimpleRegistry.deployed();
     let isFailed = false
     // only the contract owner can drain the contract
     try {
@@ -325,7 +315,6 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should not allow interactions with dropped names", async () => {
-    const simpleReg = await SimpleRegistry.deployed();
     let isFailed = false
 
     try {
@@ -410,7 +399,6 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should set a new owner", async () => {
-    const simpleReg = await SimpleRegistry.deployed();
     let isFailed = false
 
     let txReturn = await simpleReg.transferOwnership(accounts[1], {
