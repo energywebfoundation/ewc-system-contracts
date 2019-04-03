@@ -1,4 +1,4 @@
-pragma solidity ^0.5.4;
+pragma solidity 0.5.7;
 
 import "../interfaces/IValidatorSetRelay.sol";
 import "../interfaces/IValidatorSetRelayed.sol";
