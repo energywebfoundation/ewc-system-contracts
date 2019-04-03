@@ -27,3 +27,19 @@ and code away.
    - **JS style (tests)**:
      - use ;
      - await/async is easier to read than callbacks
+
+## Contracts
+
+### Validator set
+
+#### Relay
+Implements the Parity reporting validator set interface. Relays all function calls to a worker "Relayed" contract for upgradeability.
+
+**Deployment notice**: ```constructor(address _relayedSet)```.
+It expects the Relayed address in the constructor, and the `msg.sender` will become the contract owner.
+
+#### Relay
+Implements the actual validator set logic and storage.
+
+**Deployment notice**: ```constructor(address _relaySet, address[] memory _initial)```.
+It expects the Relay address and the initial validator addresses in the constructor, and the `msg.sender` will become the contract owner.
