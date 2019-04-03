@@ -366,6 +366,7 @@ contract('NodeControlSimple', (accounts) => {
       assert(postTransactionNodeControlOwner == accounts[1], "The new owner should be set")
 
     });
+    
     it('must not accept the parameter 0x0', async () => {
       const NodeControlSimpleInstance = await NodeControlSimple.deployed();
 
@@ -381,6 +382,7 @@ contract('NodeControlSimple', (accounts) => {
       }
       assert(!isFailed, "Should have thrown exception")
     });
+
     it('must set the owner to the new owner passed as parameter', async () => {
       const NodeControlSimpleInstance = await NodeControlSimple.deployed();
 
