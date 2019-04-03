@@ -5,6 +5,7 @@ import "./NodeControlInterface.sol";
 import "./NodeControlDb.sol";
 import "../misc/Ownable.sol";
 
+
 contract NodeControlSimple is NodeControlInterface, Ownable {
 
     NodeControlDb public nodeControlDb;

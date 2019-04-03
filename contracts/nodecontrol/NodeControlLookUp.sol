@@ -3,6 +3,7 @@ pragma experimental ABIEncoderV2;
 
 import "../misc/Ownable.sol";
 
+
 ///@notice Serves as a lookup table. Currently used for the NodeControlContract
 contract NodeControlLookUp is Ownable {
     

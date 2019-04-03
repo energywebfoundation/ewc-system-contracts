@@ -5,6 +5,7 @@ import "./NodeControlInterface.sol";
 import "./NodeControlLookUp.sol";
 import "../misc/Ownable.sol";
 
+
 contract NodeControlDb is Ownable {
     mapping (address => NodeControlInterface.ValidatorState) public currentState;
 
