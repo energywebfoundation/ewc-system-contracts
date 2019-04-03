@@ -113,7 +113,7 @@ contract('NodeControlSimple', (accounts) => {
         });
         isFailed = true;
       } catch (e) {
-        assert(e.toString().includes("New owner address cannot be 0x."), "Should have thrown the right exception")
+        assert(e.toString().includes("New owner address cannot be 0x0"), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
     });
@@ -366,7 +366,7 @@ contract('NodeControlSimple', (accounts) => {
       assert(postTransactionNodeControlOwner == accounts[1], "The new owner should be set")
 
     });
-    
+
     it('must not accept the parameter 0x0', async () => {
       const NodeControlSimpleInstance = await NodeControlSimple.deployed();
 
@@ -378,7 +378,7 @@ contract('NodeControlSimple', (accounts) => {
         isFailed = true
       } catch (e) {
         
-        assert(e.toString().includes("New owner address cannot be 0x."), "Should have thrown the right exception")
+        assert(e.toString().includes("New owner address cannot be 0x0"), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
     });

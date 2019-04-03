@@ -73,7 +73,7 @@ contract('NodeControlDb', (accounts) => {
         });
         isFailed = true;
       } catch (e) {
-        assert(e.toString().includes("New owner address cannot be 0x."), "Should have thrown the right exception")
+        assert(e.toString().includes("New owner address cannot be 0x0"), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
     })
