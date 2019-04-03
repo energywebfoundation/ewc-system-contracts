@@ -1,10 +1,10 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.4;
 
 
 /// @title Reporting validator set interface
 /// @dev This interface is used by Aura PoA validator contracts to manage active validators and
 /// send reports on misbehaving validators.
-interface IReportingValidatorSet {
+interface IValidatorSet {
 
     /// @notice Issue this log event to signal a desired change in validator set.
     /// This will not lead to a change in active validator set until
