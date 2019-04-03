@@ -413,12 +413,12 @@ contract("SimpleRegistry", accounts => {
     const simpleReg = await SimpleRegistry.deployed();
     let isFailed = false
 
-    let txReturn = await simpleReg.setOwner(accounts[1], {
+    let txReturn = await simpleReg.transferOwnership(accounts[1], {
       from: accounts[0]
     });
 
-    assert(txReturn.logs[0].event == "NewOwner", "Should have thrown the event")
-    assert(txReturn.logs[0].args.old === accounts[0], "Should have the old owner");
-    assert(txReturn.logs[0].args.current === accounts[1], "Should have a new owner");
+    assert(txReturn.logs[0].event == "OwnershipTransferred", "Should have thrown the event")
+    assert(txReturn.logs[0].args.previousOwner === accounts[0], "Should have the old owner");
+    assert(txReturn.logs[0].args.newOwner === accounts[1], "Should have a new owner");
   });
 });

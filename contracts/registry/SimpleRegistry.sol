@@ -14,13 +14,13 @@
 //! See the License for the specific language governing permissions and
 //! limitations under the License.
 
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.4;
 
-import "./Owned.sol";
+import "../misc/Ownable.sol";
 import "./Registry.sol";
 
 
-contract SimpleRegistry is Owned, MetadataRegistry, OwnerRegistry, ReverseRegistry {
+contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegistry {
     struct Entry {
         address owner;
         address reverse;
@@ -68,7 +68,7 @@ contract SimpleRegistry is Owned, MetadataRegistry, OwnerRegistry, ReverseRegist
     }
 
     constructor(address _owner) public {
-        owner = _owner;
+        _transferOwnership(_owner);
     }
 
     // Reservation functions
