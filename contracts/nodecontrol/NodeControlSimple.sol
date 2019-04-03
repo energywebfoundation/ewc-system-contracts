@@ -3,24 +3,18 @@ pragma experimental ABIEncoderV2;
 
 import "./NodeControlInterface.sol";
 import "./NodeControlDb.sol";
+import "../misc/Ownable.sol";
 
-
-contract NodeControlSimple is NodeControlInterface {
+contract NodeControlSimple is NodeControlInterface, Ownable {
 
     NodeControlDb public nodeControlDb;
-    address public owner;
-
-    modifier onlyOwner {
-        require(msg.sender == owner, "Error: Not owner");
-        _;
-    }
 
     ///@notice Constructor
     ///@param _nodeControlDb The db contract that should be used
     constructor(NodeControlDb _nodeControlDb, address _owner) 
         public 
     {
-        owner = _owner;
+        _transferOwnership(_owner);
         nodeControlDb = _nodeControlDb;
     }
 
@@ -91,15 +85,5 @@ contract NodeControlSimple is NodeControlInterface {
         );
 
         emit UpdateAvailable(_targetValidator);
-    }
-
-    ///@notice Changes the owner of the NodeControlContract
-    ///@param _newOwner The new owner of the contract. Can not be null.
-    function setOwner(address _newOwner) 
-        public 
-        onlyOwner 
-    {
-        require(_newOwner != address(0x0), "Error: New owner can not be null");
-        owner = _newOwner;
     }
 }

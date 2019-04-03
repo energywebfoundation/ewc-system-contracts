@@ -71,35 +71,33 @@ contract('NodeControlSimple', (accounts) => {
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception")
-        assert(e.toString().includes("Error: Not owner"), "Should have thrown the right exception")
-
+        assert(e.toString().includes("Sender is not owner."), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
     });
 
     it('must only allow the owner to change the owner', async () => {
       const NodeControlSimpleInstance = await NodeControlSimple.deployed();
-      await NodeControlSimpleInstance.setOwner(accounts[1], {
+      await NodeControlSimpleInstance.transferOwnership(accounts[1], {
         from: accounts[0]
       })
       newOwner = await NodeControlSimpleInstance.owner()
       assert(newOwner == accounts[1], "Should have changed the owner")
       isFailed = false;
       try {
-        await NodeControlSimpleInstance.setOwner(accounts[2], {
+        await NodeControlSimpleInstance.transferOwnership(accounts[2], {
           from: accounts[0]
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception: wrong owner")
-        assert(e.toString().includes("Error: Not owner"), "Should have thrown the right exception")
+       
+        assert(e.toString().includes("Sender is not owner."), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
       assert(newOwner == accounts[1], "Should still be the previous owner")
 
       //change back to old owner
-      await NodeControlSimpleInstance.setOwner(accounts[0], {
+      await NodeControlSimpleInstance.transferOwnership(accounts[0], {
         from: accounts[1]
       })
       newOwner = await NodeControlSimpleInstance.owner()
@@ -110,13 +108,12 @@ contract('NodeControlSimple', (accounts) => {
       const NodeControlSimpleInstance = await NodeControlSimple.deployed();
       isFailed = false;
       try {
-        await NodeControlSimpleInstance.setOwner('0x0000000000000000000000000000000000000000', {
+        await NodeControlSimpleInstance.transferOwnership('0x0000000000000000000000000000000000000000', {
           from: accounts[0]
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception: No 0x0 address")
-        assert(e.toString().includes("Error: New owner can not be null"), "Should have thrown the right exception")
+        assert(e.toString().includes("New owner address cannot be 0x."), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
     });
@@ -136,7 +133,6 @@ contract('NodeControlSimple', (accounts) => {
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception")
         assert(e.toString().includes("Error: No changes in the passed State"), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
@@ -265,8 +261,8 @@ contract('NodeControlSimple', (accounts) => {
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception")
-        assert(e.toString().includes("Error: Not owner"), "Should have thrown the right exception")
+        
+        assert(e.toString().includes("Sender is not owner."), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
       postTransactionNodeControl = await NodeControlSimpleInstance.retrieveExpectedState(accounts[2])
@@ -290,7 +286,7 @@ contract('NodeControlSimple', (accounts) => {
         })
         isFailed = true
       } catch (e) {
-        assert(true, "Should have thrown an exception")
+        
         assert(e.toString().includes("Error: You are not a validator!"), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
@@ -335,32 +331,32 @@ contract('NodeControlSimple', (accounts) => {
         })
         isFailed = true
       } catch (e) {
-        assert(true, "Should have thrown an exception")
+        
         assert(e.toString().includes("Error: You are not a validator!"), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
     });
   });
 
-  describe('#setOwner', () => {
+  describe('#transferOwnership', () => {
     it('must only be callable by the owner', async () => {
       const NodeControlSimpleInstance = await NodeControlSimple.deployed();
 
       isFailed = false
       try {
-        await NodeControlSimpleInstance.setOwner(accounts[1], {
+        await NodeControlSimpleInstance.transferOwnership(accounts[1], {
           from: accounts[5]
         })
         isFailed = true
       } catch (e) {
-        assert(true, "Should have thrown an exception")
-        assert(e.toString().includes("Error: Not owner"), "Should have thrown the right exception")
+        
+        assert(e.toString().includes("Sender is not owner."), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
 
       preTransactionNodeControlOwner = await NodeControlSimpleInstance.owner()
 
-      await NodeControlSimpleInstance.setOwner(accounts[1], {
+      await NodeControlSimpleInstance.transferOwnership(accounts[1], {
         from: accounts[0]
       })
 
@@ -375,20 +371,20 @@ contract('NodeControlSimple', (accounts) => {
 
       isFailed = false
       try {
-        await NodeControlSimpleInstance.setOwner('0x0000000000000000000000000000000000000000', {
+        await NodeControlSimpleInstance.transferOwnership('0x0000000000000000000000000000000000000000', {
           from: accounts[1]
         })
         isFailed = true
       } catch (e) {
-        assert(true, "Should have thrown an exception")
-        assert(e.toString().includes("Error: New owner can not be null"), "Should have thrown the right exception")
+        
+        assert(e.toString().includes("New owner address cannot be 0x."), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
     });
     it('must set the owner to the new owner passed as parameter', async () => {
       const NodeControlSimpleInstance = await NodeControlSimple.deployed();
 
-      await NodeControlSimpleInstance.setOwner(accounts[0], {
+      await NodeControlSimpleInstance.transferOwnership(accounts[0], {
         from: accounts[1]
       })
 

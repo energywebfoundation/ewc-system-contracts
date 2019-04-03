@@ -27,7 +27,6 @@ contract('NodeControlDb', (accounts) => {
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception")
         assert(e.toString().includes("Error: newLookUp is not allowed to be 0x0"), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
@@ -42,23 +41,22 @@ contract('NodeControlDb', (accounts) => {
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception")
-        assert(e.toString().includes("Error: onlyOwner Db"), "Should have thrown the right exception")
+        assert(e.toString().includes("Sender is not owner."), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
     })
   });
 
-  describe('#setState', () => {
+  describe('#transferOwnership', () => {
     it('must set the new owner correctly', async () => {
       const NodeControlDbInstance = await NodeControlDb.deployed();
 
-      await NodeControlDbInstance.setOwner(accounts[1]);
+      await NodeControlDbInstance.transferOwnership(accounts[1]);
       postState = await NodeControlDbInstance.owner();
 
       assert(postState == accounts[1], "Should be the accounts from the parameter");
 
-      await NodeControlDbInstance.setOwner(accounts[0], {
+      await NodeControlDbInstance.transferOwnership(accounts[0], {
         from: accounts[1]
       });
       postState = await NodeControlDbInstance.owner();
@@ -70,13 +68,12 @@ contract('NodeControlDb', (accounts) => {
       const NodeControlDbInstance = await NodeControlDb.deployed();
       isFailed = false;
       try {
-        await NodeControlDbInstance.setOwner('0x0000000000000000000000000000000000000000', {
+        await NodeControlDbInstance.transferOwnership('0x0000000000000000000000000000000000000000', {
           from: accounts[0]
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception")
-        assert(e.toString().includes("Error: Owner is not allowed to be 0x0"), "Should have thrown the right exception")
+        assert(e.toString().includes("New owner address cannot be 0x."), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
     })
@@ -85,13 +82,12 @@ contract('NodeControlDb', (accounts) => {
       const NodeControlDbInstance = await NodeControlDb.deployed();
       isFailed = false;
       try {
-        await NodeControlDbInstance.setOwner('0x0000000000000000000000000000000000000001', {
+        await NodeControlDbInstance.transferOwnership('0x0000000000000000000000000000000000000001', {
           from: accounts[1]
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception")
-        assert(e.toString().includes("Error: onlyOwner Db"), "Should have thrown the right exception")
+        assert(e.toString().includes("Sender is not owner."), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
     })
@@ -107,7 +103,6 @@ contract('NodeControlDb', (accounts) => {
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception")
         assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
@@ -124,7 +119,6 @@ contract('NodeControlDb', (accounts) => {
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception")
         assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
@@ -141,7 +135,6 @@ contract('NodeControlDb', (accounts) => {
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception")
         assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
@@ -156,7 +149,6 @@ contract('NodeControlDb', (accounts) => {
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception")
         assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
@@ -171,7 +163,6 @@ contract('NodeControlDb', (accounts) => {
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception")
         assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
@@ -186,7 +177,6 @@ contract('NodeControlDb', (accounts) => {
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception")
         assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
@@ -202,7 +192,6 @@ contract('NodeControlDb', (accounts) => {
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception")
         assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
@@ -217,7 +206,6 @@ contract('NodeControlDb', (accounts) => {
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception")
         assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")

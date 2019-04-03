@@ -1,22 +1,17 @@
 pragma solidity ^0.5.4;
 pragma experimental ABIEncoderV2;
 
+import "../misc/Ownable.sol";
 
 ///@notice Serves as a lookup table. Currently used for the NodeControlContract
-contract NodeControlLookUp {
+contract NodeControlLookUp is Ownable {
     
     address public nodeControlContract;
-    address public owner;
-
-    modifier onlyOwner {
-        require(msg.sender == owner, "Error: You are not the owner");
-        _;
-    }
 
     constructor(address _owner) 
         public 
     {
-        owner = _owner;
+        _transferOwnership(_owner);
     }
 
     ///@notice Sets a address at the given index

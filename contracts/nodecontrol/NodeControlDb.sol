@@ -3,29 +3,23 @@ pragma experimental ABIEncoderV2;
 
 import "./NodeControlInterface.sol";
 import "./NodeControlLookUp.sol";
+import "../misc/Ownable.sol";
 
-
-contract NodeControlDb {
+contract NodeControlDb is Ownable {
     mapping (address => NodeControlInterface.ValidatorState) public currentState;
 
     NodeControlLookUp public nodeControlLookUp;
-    address public owner;
 
     modifier onlyLogic {
         require(msg.sender == nodeControlLookUp.nodeControlContract(), "Error: onlyLogic Db");
         _;
     }
 
-    modifier onlyOwner {
-        require(msg.sender == owner, "Error: onlyOwner Db");
-        _;
-    }
-
     ///@notice Constructor that sets the owner of the database
-    constructor(NodeControlLookUp _lookUpContract, address _owner) 
+    constructor(NodeControlLookUp _lookUpContract, address _initialOwner) 
         public 
     {
-        owner = _owner;
+        _transferOwnership(_initialOwner);
         nodeControlLookUp = _lookUpContract;
     }
 
@@ -72,16 +66,6 @@ contract NodeControlDb {
         onlyLogic 
     {
         currentState[_targetValidator].updateConfirmed = block.number;
-    }
-
-    ///@notice Sets a new owner
-    ///@param _newOwner The new owner
-    function setOwner(address _newOwner) 
-        external 
-        onlyOwner 
-    {
-        require(_newOwner != address(0x0), "Error: Owner is not allowed to be 0x0");
-        owner = _newOwner;
     }
 
     ///@notice View method to check if an update was confirmed by the validator

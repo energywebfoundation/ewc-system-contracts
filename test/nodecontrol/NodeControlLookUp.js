@@ -21,7 +21,7 @@ contract('NodeControlLookUp', (accounts) => {
         });
         isFailed = true;
       } catch (e) {
-        assert(true, "Should have thrown an exception")
+        assert(e.toString().includes("Sender is not owner."), "Should have thrown the right exception")
       }
       assert(!isFailed, "Should have thrown exception")
     })
