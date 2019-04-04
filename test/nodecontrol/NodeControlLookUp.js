@@ -1,29 +1,61 @@
-const NodeControlLookUp = artifacts.require("nodeControl/NodeControlLookUp");
+const NodeControlSimple = artifacts.require("NodeControlSimple");
+const NodeControlDb = artifacts.require("NodeControlDb");
+const NodeControlLookUp = artifacts.require("NodeControlLookUp");
 
-contract('NodeControlLookUp', (accounts) => {
-  describe('#changeAddress', () => {
-    it('must set the address at the correct index', async () => {
-      const NodeControlLookUpInstance = await NodeControlLookUp.deployed();
+require('chai')
+    .use(require('chai-as-promised'))
+    .should();
 
-      await NodeControlLookUpInstance.changeAddress(accounts[0], {
-        from: accounts[0]
-      })
-      entry = await NodeControlLookUpInstance.nodeControlContract()
-      assert(entry == accounts[0], "Should be the same")
-    })
+const {
+    DEFAULT_ADDRESS
+} = require(__dirname + "/../utils.js");
 
-    it('must only be callable by the owner', async () => {
-      const NodeControlLookUpInstance = await NodeControlLookUp.deployed();
-      isFailed = false;
-      try {
-        await NodeControlLookUpInstance.changeAddress(accounts[0], {
-          from: accounts[1]
+contract('NodeControlLookUp', function (accounts) {
+
+    let nodeControlDb;
+    let nodeControlLookUp;
+    let nodeControlSimple;
+    let owner;
+    let deployer;
+
+    beforeEach(async function () {
+        owner = accounts[0];
+        deployer = accounts[9];
+
+        nodeControlLookUp = await NodeControlLookUp.new(DEFAULT_ADDRESS, owner, { from: deployer })
+            .should.be.fulfilled;
+
+        nodeControlDb = await NodeControlDb.new(nodeControlLookUp.address, owner, { from: deployer })
+            .should.be.fulfilled;
+
+        nodeControlSimple = await NodeControlSimple.new(nodeControlDb.address, owner, { from: deployer })
+            .should.be.fulfilled;
+
+        await nodeControlLookUp.changeAddress(nodeControlSimple.address, { from: owner })
+            .should.be.fulfilled;
+    });
+
+    describe('#constructor', function () {
+
+        it('should set owner correctly', async function () {
+            (await nodeControlLookUp.owner.call()).should.be.equal(owner);
         });
-        isFailed = true;
-      } catch (e) {
-        assert(e.toString().includes("Sender is not owner."), "Should have thrown the right exception")
-      }
-      assert(!isFailed, "Should have thrown exception")
-    })
-  });
-})
+
+        it('should set node-control address correctly', async function () {
+            (await nodeControlLookUp.nodeControlContract.call()).should.be.equal(nodeControlSimple.address);
+        });
+    });
+
+    describe('#changeAddress', function () {
+
+        it('must set the address correctly', async function () {
+            await nodeControlLookUp.changeAddress(owner, { from: owner }).should.be.fulfilled;
+            (await nodeControlLookUp.nodeControlContract()).should.be.equal(owner);
+        });
+
+        it('must only be callable by the owner', async function () {
+            await nodeControlLookUp.changeAddress(accounts[6], { from: accounts[1] }).should.be.rejectedWith("Sender is not owner");
+            await nodeControlLookUp.changeAddress(accounts[6], { from: owner }).should.be.fulfilled;
+        });
+    });
+});

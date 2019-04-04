@@ -17,11 +17,11 @@ contract NodeControlDb is Ownable {
     }
 
     ///@notice Constructor that sets the owner of the database
-    constructor(NodeControlLookUp _lookUpContract, address _initialOwner) 
+    constructor(NodeControlLookUp _lookUpContract, address _owner)
         public 
     {
-        _transferOwnership(_initialOwner);
         nodeControlLookUp = _lookUpContract;
+        _transferOwnership(_owner);
     }
 
     ///@notice Changes the logic contract (can only be called by the owner of the database)

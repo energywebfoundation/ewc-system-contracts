@@ -9,9 +9,10 @@ contract NodeControlLookUp is Ownable {
     
     address public nodeControlContract;
 
-    constructor(address _owner) 
+    constructor(address _nodeControlAddress, address _owner)
         public 
     {
+        nodeControlContract = _nodeControlAddress;
         _transferOwnership(_owner);
     }
 
