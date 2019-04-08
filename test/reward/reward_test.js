@@ -2,11 +2,12 @@ let RewardContract = artifacts.require('./mockcontracts/MockReward.sol');
 let MockSystem = artifacts.require('./mockcontracts/MockSystem.sol');
 
 const {
-    assertThrowsAsync,
     REVERT_ERROR_MSG,
     DEFAULT_ADDRESS,
     SYSTEM_ADDRESS,
-    EMPTY_BYTES32
+    createSnapshot,
+    revertSnapshot,
+    send
 } = require(__dirname + "/../utils.js");
 
 const NOT_SYS_ERR = "Caller is not the system";
@@ -767,65 +768,15 @@ async function checkRewarded(logs, _expected) {
     logs[0].args.rewards[1].toString(10).should.be.equal(_expected[1][1]);
 }
 
-const send = (method, params = []) => {
-    return new Promise((resolve, reject) => web3.currentProvider.send({ id: 0, jsonrpc: '2.0', method, params }, (e, data) => {
-        if (e) {
-            reject(e);
-        } else {
-            resolve(data);
-        }
-    }));
-}
-
 const mineTill = async (_blockNumber) => {
     const diff = _blockNumber - (await web3.eth.getBlockNumber());
     if (diff <= 0) {
         return;
     }
-    let before = (await web3.eth.getBlockNumber());
     for (let i = 0; i < diff; i++) {
         await send('evm_mine');
     }
     (await web3.eth.getBlockNumber()).should.be.equal(_blockNumber);
-}
-
-const createSnapshot = () => {
-    return new Promise((resolve, reject) => {
-        web3.currentProvider.send(
-            {
-                jsonrpc: '2.0',
-                method: 'evm_snapshot',
-                params: [],
-                id: 1
-            },
-            (e, r) => {
-                if (e) reject(e);
-                else {
-                    resolve(r.result);
-                }
-            }
-        );
-    });
-}
-
-const revertSnapshot = (snapshotID, id) => {
-    return new Promise((resolve, reject) => {
-
-        web3.currentProvider.send(
-            {
-                jsonrpc: '2.0',
-                method: "evm_revert",
-                params: [snapshotID],
-                id: id
-            },
-            (e, r) => {
-                if (e) reject(e);
-                else {
-                    resolve(r.result);
-                }
-            }
-        );
-    });
 }
 
 function randomIntInc(low, high) {

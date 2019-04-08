@@ -74,6 +74,7 @@ async function assertThrowsAsync(fn, msg) {
 }
 
 module.exports = {
+    send,
     revertSnapshot,
     createSnapshot,
     timeTravel,
