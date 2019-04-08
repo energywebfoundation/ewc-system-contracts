@@ -5,8 +5,6 @@ const Utils = require('../utils.js');
 
 let rpcId = 1;
 
-console.log("Web3 version: " + web3.version);
-
 require('chai')
   .use(require('chai-as-promised'))
   .use(require('chai-bn')(web3.utils.BN))
@@ -19,7 +17,7 @@ contract('Holding', function (accounts) {
     const ACCOUNT_FUNDING = web3.utils.toWei('99', 'ether').toString(10);
     const ACCOUNT_WITH_NO_FUNDS = '0xaf9DdE98b6aeB2225bf87C2cB91c58833fbab2Ab';
     
-    const TARGET_AMOUNT_BN = web3.utils.toBN(web3.utils.toWei('80000000', 'ether'))
+    const TARGET_AMOUNT_BN = web3.utils.toBN(web3.utils.toWei('80000000', 'ether'));
     const TARGET_AMOUNT = TARGET_AMOUNT_BN.toString(10);
     
     describe('Sanity tests regarding the holded amount', async function() {
@@ -101,17 +99,17 @@ contract('Holding', function (accounts) {
 
         it('It should be possible to release funds after time', async function() {
             holding = await Holding.new({from: deployer, value: TARGET_AMOUNT}).should.be.fulfilled;
-            await Utils.timeTravel(2000000000)
-            const balanceOfAccountBeforeRelease = new web3.utils.BN(await web3.eth.getBalance(ACCOUNT_WITH_FUNDS))
-            await holding.releaseFunds(ACCOUNT_WITH_FUNDS)
-            const balanceOfAccountAfterRelease = new web3.utils.BN(await web3.eth.getBalance(ACCOUNT_WITH_FUNDS))
-            balanceOfAccountAfterRelease.should.be.bignumber.equal(balanceOfAccountBeforeRelease.add(new web3.utils.BN(ACCOUNT_FUNDING)))
+            await Utils.timeTravel(2000000000);
+            const balanceOfAccountBeforeRelease = new web3.utils.BN(await web3.eth.getBalance(ACCOUNT_WITH_FUNDS));
+            await holding.releaseFunds(ACCOUNT_WITH_FUNDS);
+            const balanceOfAccountAfterRelease = new web3.utils.BN(await web3.eth.getBalance(ACCOUNT_WITH_FUNDS));
+            balanceOfAccountAfterRelease.should.be.bignumber.equal(balanceOfAccountBeforeRelease.add(new web3.utils.BN(ACCOUNT_FUNDING)));
         });
 
         it('It should only be possible to release funds once', async function() {
             holding = await Holding.new({from: deployer, value: TARGET_AMOUNT}).should.be.fulfilled;
-            await Utils.timeTravel(2000000000)
-            await holding.releaseFunds(ACCOUNT_WITH_FUNDS)
+            await Utils.timeTravel(2000000000);
+            await holding.releaseFunds(ACCOUNT_WITH_FUNDS);
             await holding.releaseFunds(ACCOUNT_WITH_FUNDS)
                 .should.be.rejectedWith('Available amount is 0.'); 
         });

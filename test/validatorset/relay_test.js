@@ -267,7 +267,7 @@ contract('ValidatorSetRELAY [all features]', function (accounts) {
         });
 
         it('should emit event correctly', async function () {
-            const expected = [EMPTY_BYTES32, []]
+            const expected = [EMPTY_BYTES32, []];
             await callBackWithEvent(expected[0], expected[1], { from: owner }).should.be.fulfilled;
 
             const currentBlocknumber = (await web3.eth.getBlockNumber());
