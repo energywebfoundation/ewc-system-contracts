@@ -1,4 +1,4 @@
-pragma solidity ^0.5.4;
+pragma solidity 0.5.7;
 pragma experimental ABIEncoderV2;
 
 import "../misc/Ownable.sol";
@@ -9,9 +9,10 @@ contract NodeControlLookUp is Ownable {
     
     address public nodeControlContract;
 
-    constructor(address _owner) 
+    constructor(address _nodeControlAddress, address _owner)
         public 
     {
+        nodeControlContract = _nodeControlAddress;
         _transferOwnership(_owner);
     }
 

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.4;
+pragma solidity 0.5.7;
 pragma experimental ABIEncoderV2;
 
 import "./NodeControlInterface.sol";
@@ -12,11 +12,11 @@ contract NodeControlSimple is NodeControlInterface, Ownable {
 
     ///@notice Constructor
     ///@param _nodeControlDb The db contract that should be used
-    constructor(NodeControlDb _nodeControlDb, address _owner) 
+    constructor(NodeControlDb _nodeControlDb, address _owner)
         public 
     {
-        _transferOwnership(_owner);
         nodeControlDb = _nodeControlDb;
+        _transferOwnership(_owner);
     }
 
     ///@notice Lets the validator confirm the update
