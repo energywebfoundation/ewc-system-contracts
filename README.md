@@ -109,6 +109,17 @@ On-chain node control logic. Can issue update commands to nodes.
 
   Constructor expects the address of the db and the owner.
 
+## Compiling the contracts
+
+With the locally installed truffle:
+```
+npx truffle compile
+```
+
+Expected warnings:
+ - ValidatorSetRelayed.sol:128:9: `Warning: Unused function parameter`. This function is according to Parity spec. but we are not using tthe `_proof` param for anything right now.
+ - NodeControl contracts -> `Warning: Experimental features are turned on.` Expected because of `ABIEncoderV2`.
+
 ## Running the tests
 
 ```
@@ -154,7 +165,7 @@ npm run coverage
      pip3 install slither-analyzer
      ```
 
-   3. Then run
+   1. Then run
      ```
      npm run security
      ```
