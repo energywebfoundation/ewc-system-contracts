@@ -2,7 +2,7 @@ pragma solidity 0.5.7;
 pragma experimental ABIEncoderV2;
 
 
-interface NodeControlInterface {
+interface INodeControl {
     struct ValidatorState {
         bytes dockerSha;
         string dockerName;

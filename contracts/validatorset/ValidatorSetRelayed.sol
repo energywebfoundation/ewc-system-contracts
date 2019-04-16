@@ -37,13 +37,13 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         uint256 index;
     }
 
-    /// Was the last validator change finalized. Implies currentValidators == pendingValidators
+    /// Was the last validator change finalized. Implies currentValidators == migrationValidators
     bool public finalized;
 
-    /// Current list of addresses entitled to participate in the consensus. Active validators.
+    /// Current list of addresses entitled to participate in the consensus. Active validators
     address[] private currentValidators;
-    /// New list of validators pending to be approved
-    address[] private pendingValidators;
+    /// Validators in the migration set. This contains the new list of validators
+    address[] private migrationValidators;
     mapping(address => AddressStatus) public addressStatus;
     // address of validator pending to be removed
     address private toBeRemoved;
@@ -95,8 +95,8 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
             addressStatus[_initial[i]].state = ValidatorState.Finalized;
             addressStatus[_initial[i]].index = i;
         }
-        pendingValidators = _initial;
-        currentValidators = pendingValidators;
+        migrationValidators = _initial;
+        currentValidators = migrationValidators;
         // the initial validator set is finalized by default
         finalized = true;
     }
@@ -115,6 +115,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         emit ReportedBenign(_reporter, _reported, _blockNumber);
     }
 
+    // solhint-disable no-unused-vars
     /// @notice called to log a malicious report event
     /// @param _reporter the reporting validator
     /// @param _reported the validator who is reported
@@ -134,6 +135,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     {
         emit ReportedMalicious(_reporter, _reported, _blockNumber);
     }
+    // solhint-enable no-unused-vars
 
     /// @notice Sets the Relay contract address
     /// @dev The contract is assumed to implement the `IValidatorSetRelay` interface.
@@ -162,8 +164,8 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     {
         finalized = true;
         
-        for (uint256 i = 0; i < pendingValidators.length; i++) {
-            AddressStatus storage vstatus = addressStatus[pendingValidators[i]];
+        for (uint256 i = 0; i < migrationValidators.length; i++) {
+            AddressStatus storage vstatus = addressStatus[migrationValidators[i]];
             vstatus.state = ValidatorState.Finalized;
             vstatus.index = i;
         }
@@ -174,7 +176,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
             toBeRemoved = address(0);
         }  
 
-        currentValidators = pendingValidators;
+        currentValidators = migrationValidators;
         emit ChangeFinalized(currentValidators);
     }
 
@@ -198,7 +200,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     /// change. Can only be called if the validator is in the current list, or
     /// there are no changes to be finalized. Until the validator removal
     /// is finalized, it is still active
-    /// @dev First removes the validator from `pendingValidators`, then
+    /// @dev First removes the validator from `migrationValidators`, then
     /// calls the `callbackInitiateChange` of the Relay contract which
     /// emits the `InitiateChange` event
     /// @param _validator The address to be removed
@@ -221,18 +223,34 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         return currentValidators;
     }
 
-    /// @notice Returns pending validators list. If there are
-    /// no changes in progress, the pending list is the same
+    /// @notice Returns the migration validator set. If there are
+    /// no changes in progress, the migration list is the same
     /// as the current list. If there are changes to the set, the
-    /// pending validators list is the new active validators
+    /// migration validators list is the new active validators
     /// list that awaits finalization
-    /// @return The list of addresses of pending validators
-    function getPendingValidators()
+    /// @return The list of addresses of the migration validators
+    function getMigrationValidators()
         external
         view
         returns (address[] memory)
     {
-        return pendingValidators;
+        return migrationValidators;
+    }
+
+    /// @notice Returns the union of current set and migration set.
+    /// Useful for tracking the statuses of all affected validators
+    /// in case of a change
+    /// @dev Returns the longer of the `current` and `migration` arrays
+    /// @return The list of addresses
+    function getUnion()
+        external
+        view
+        returns (address[] memory)
+    {
+        if (migrationValidators.length > currentValidators.length) {
+            return migrationValidators;
+        }
+        return currentValidators;
     }
 
     /// @notice Returns the count of currently active validators
@@ -273,8 +291,9 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         );
     }
 
-    /// @notice Checks whether the address is a pending-to-be-added or a pending-to-be-removed validator
-    /// @param _somebody The address to be queried
+    /// @notice Checks whether the address is a pending-to-be-added
+    /// or a pending-to-be-removed validator
+    /// @param _somebody The address to check
     /// @return True if address is pending, false otherwise
     function isPending(address _somebody)
         external
@@ -290,7 +309,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     /// @notice Checks whether the address is a currently active (sealing) validator.
     /// Note that it is not the same as `isFinalizedValidator`, because an unfinalized,
     /// pending-to-be-removed validator is still an active one
-    /// @param _somebody The address to be queried
+    /// @param _somebody The address to check
     /// @return True if address is an active validator, false otherwise
     function isActiveValidator(address _somebody)
         public
@@ -325,38 +344,38 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     {
         finalized = false;
         require(
-            relaySet.callbackInitiateChange(blockhash(block.number - 1), pendingValidators),
+            relaySet.callbackInitiateChange(blockhash(block.number - 1), migrationValidators),
             "Relay contract InitiateChange callback failed"
         );
     }
 
-    /// @dev Adds validator to pending, sets status flags and triggers change
+    /// @dev Adds validator to the migration set, sets status flags and triggers change
     /// @param _validator The address to add
     function _addValidator(address _validator)
         internal
     {
         addressStatus[_validator].state = ValidatorState.PendingToBeAdded;
         
-        pendingValidators.push(_validator);
+        migrationValidators.push(_validator);
         _triggerChange();
     }
 
-    /// @dev Removes validator from pending, sets status flags and triggers change.
+    /// @dev Removes validator from migration, sets status flags and triggers change.
     /// Replaces the removed element with the last element. Must not be called with
-    /// an empty pending validators list
+    /// an empty migration validators list
     /// @param _validator The address to remove
     function _removeValidator(address _validator)
         internal
     {
-        require(pendingValidators.length != 0, "There are no validators to remove from");
+        require(migrationValidators.length != 0, "There are no validators to remove from");
 
         uint256 removedIndex = addressStatus[_validator].index;
-        uint256 lastIndex = pendingValidators.length - 1;
-        address lastValidator = pendingValidators[lastIndex];
+        uint256 lastIndex = migrationValidators.length - 1;
+        address lastValidator = migrationValidators[lastIndex];
         // Override the removed validator with the last one.
-        pendingValidators[removedIndex] = lastValidator;
+        migrationValidators[removedIndex] = lastValidator;
         addressStatus[lastValidator].index = removedIndex;
-        pendingValidators.length--;
+        migrationValidators.length--;
 
         addressStatus[_validator].state = ValidatorState.PendingToBeRemoved;
 

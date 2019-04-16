@@ -15,8 +15,7 @@ contract ValidatorSetRelay is IValidatorSet, IValidatorSetRelay, Ownable {
     event NewRelayed(address indexed old, address indexed current);
 
     /// System address, used by the block sealer
-    // solhint-disable-next-line var-name-mixedcase
-    address public SYSTEM_ADDRESS = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
+    address public systemAddress = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
     
     /// Address of the inner validator set contract
     IValidatorSetRelayed public relayedSet;
@@ -34,7 +33,7 @@ contract ValidatorSetRelay is IValidatorSet, IValidatorSetRelay, Ownable {
     }
 
     modifier onlySystem() {
-        require(msg.sender == SYSTEM_ADDRESS, "Sender is not system");
+        require(msg.sender == systemAddress, "Sender is not system");
         _;
     }
 
@@ -51,8 +50,8 @@ contract ValidatorSetRelay is IValidatorSet, IValidatorSetRelay, Ownable {
         onlyOwner
         nonDefaultAddress(_systemAddress)
     {
-        require(_systemAddress != SYSTEM_ADDRESS, "New system address cannot be the same as the old one");
-        SYSTEM_ADDRESS = _systemAddress;
+        require(_systemAddress != systemAddress, "New system address cannot be the same as the old one");
+        systemAddress = _systemAddress;
     }
 
     /// @notice This function is used by the Relayed logic contract

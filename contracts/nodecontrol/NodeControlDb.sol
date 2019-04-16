@@ -1,13 +1,13 @@
 pragma solidity 0.5.7;
 pragma experimental ABIEncoderV2;
 
-import "./NodeControlInterface.sol";
+import "../interfaces/INodeControl.sol";
 import "./NodeControlLookUp.sol";
 import "../misc/Ownable.sol";
 
 
 contract NodeControlDb is Ownable {
-    mapping (address => NodeControlInterface.ValidatorState) public currentState;
+    mapping (address => INodeControl.ValidatorState) public currentState;
 
     NodeControlLookUp public nodeControlLookUp;
 
@@ -85,7 +85,7 @@ contract NodeControlDb is Ownable {
         external 
         view 
         onlyLogic 
-        returns (NodeControlInterface.ValidatorState memory) 
+        returns (INodeControl.ValidatorState memory)
     {
         return currentState[_targetValidator];
     }

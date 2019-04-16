@@ -9,7 +9,7 @@ interface IValidatorSetRelayed {
     /// @notice Called when an initiated change reaches finality and is activated
     /// It is also called when the contract is first enabled for consensus. In this case,
     /// the "change" finalized is the activation of the initial set
-    /// @dev Only valid when msg.sender == SYSTEM (EIP96, 2**160 - 2)
+    /// @dev Should only be valid when msg.sender == SYSTEM (EIP96, 2**160 - 2)
     function finalizeChange()
         external;
 

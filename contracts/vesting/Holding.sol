@@ -32,6 +32,7 @@ contract Holding {
         Holder storage holder = holders[holderAddress];
         
         require(holder.availableAmount > 0, "Available amount is 0");
+        // solhint-disable-next-line not-rely-on-time
         require(block.timestamp > holder.lockedUntilBlocktimestamp, "Holding period is not over");
         
         uint256 amountToTransfer = holder.availableAmount;
