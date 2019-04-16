@@ -1,45 +1,182 @@
-# genome-system-contracts
-Infrastructure contracts for Genome live launch
+# EWC system contracts
+Infrastructure contracts for EnergyWebChain and Volta live launch.
 
 ## Maintainers
 **Primary**: Adam Nagy (@ngyam)
+
+Heiko Burkhardt (@hai-ko), Jonas Bentke (@jbentke)
+
+## Pre-requisites
+- node 8
+- npm
+- Optional: python 3.6 environment for Slither
 
 ## Quickstart
 ```
 npm install -D
 ```
-and code away.
-
-## Guidelines
- - **Development**: check out our guidelines repo: https://github.com/energywebfoundation/docs-and-guidelines
-   - **Commit style**: [Angular](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commits)
-   - **PRs**: 2 reviews are needed + build pass on travis. Review according to: https://github.com/energywebfoundation/docs-and-guidelines/blob/master/review.md
-     - When opening the PR, request 2 reviewers, ping them and set yourself as Assignee.
-   - **Flow**: use feature branches, do the original [GitHub flow](https://guides.github.com/introduction/flow/).
-   - **Comments**: NatSpec + 1 docstring above state variables + above structs + events + modifier. If something is super self-explanatory then comments would be redundant, so no need to overkill it. But, every reader should be able to clearly understand what is what, without ambiguity
-   - **Solidity**:
-     - Style: [original guidelines](https://solidity.readthedocs.io/en/v0.5.7/style-guide.html) + function modifiers below function names. ```npm run lint:solhint``` must pass, which means no error. Warnings pass, but make sure it really doesn't make sense to correct them. You can also run ```npm run lint:solium``` which also checks other things.
-     - Coverage report: ```npm run coverage```
-     - Security analysis: install [slither (a pip package, not npm)](https://github.com/trailofbits/slither#how-to-install) and do ```npm run security```. It is not used for checks by Travis. Run it and see if there are some security flaws and suggestions that would make sense to apply.
-       1. Make sure a python 3.6 env is active
-       2. run: ```pip install slither-analyzer``` (or sometimes ```pip3 install slither-analyzer```)
-     - Security analysis 2: `npm run verify` to run MythX security checker (truffle security plugin by ConsenSys)
-   - **JS style (tests)**:
-     - use ;
-     - await/async is easier to read than callbacks
+and code away. Dependencies are installed locally.
 
 ## Contracts
 
+**Important**: all contracts go to the chainspec, deployed at the same time with their addresses known beforehans, so no deployment/migration scripts are written. The contracts are compiled and put into the chainspec by our Genesis/Chainspec generator: https://github.com/energywebfoundation/ewf-genesis-generator
+
+Compiler version: 0.5.7 ([reason](https://blog.ethereum.org/2019/03/26/solidity-optimizer-and-abiencoderv2-bug/))
+
 ### Validator set
 
-#### Relay
-Implements the Parity reporting validator set interface. Relays all function calls to a worker "Relayed" contract for upgradeability.
+#### # Relay
+Implements the [Parity's reporting validator set interface](https://wiki.parity.io/Validator-Set#reporting-contract). Relays all function calls to a worker "Relayed" contract. This pattern is chosen for upgradeability.
 
-**Deployment notice**: ```constructor(address _relayedSet)```.
-It expects the Relayed address in the constructor, and the `msg.sender` will become the contract owner.
+- **Deployment**:
 
-#### Relay
+  ```
+  constructor(address _owner, address _relayedSet)
+  ```
+
+  It expects the Relayed address and contract owner address in the constructor.
+
+#### # Relayed
 Implements the actual validator set logic and storage.
 
-**Deployment notice**: ```constructor(address _relaySet, address[] memory _initial)```.
-It expects the Relay address and the initial validator addresses in the constructor, and the `msg.sender` will become the contract owner.
+- **Deployment**:
+
+  ```
+  constructor(address _owner, address _relaySet, address[] memory _initial)
+  ```
+
+  It expects the Relay address, contract owner and the initial validator addresses in the constructor.
+
+### Reward contract
+
+Contains the reward logic. Rewards are issued upon new blocks. The contract implements [Parity's BlockReward interface](https://wiki.parity.io/Block-Reward-Contract).
+
+Rewarded entities:
+ 1. Block authors: rewarded for a total of 10 years with ~10 mil tokens based on a discrete S curve distribution. The S curve calculator can be found [here](https://github.com/energywebfoundation/discrete-scurve-calculator).
+ 2. Community fund: A multisig wallet controlled by the community. Rewarded for a total of 10 years with ~10 mil tokens. A constant amount is paid out with each new block.
+
+ - **Deployment**:
+
+   ```
+   constructor(address _communityFundAddress, uint256 _communityFundAmount)
+   ```
+
+   Expects the address of the community fund (ideally a mutltisig wallet) and the constant amount that is paid to the fund with each new block in wei.
+
+### Holding contract
+Holds investor funds, which are available to withdraw after a certain time period has passed.
+
+
+ - **Deployment**:
+
+   ```
+   constructor()
+   ```
+
+   No params needed. The initial holding records are hardcoded into the constructor.
+
+### Node control
+EWF's node control system contracts. Consists of 3 contracts for upgradeability.
+
+#### # NodeControlLookUp
+Serves as a lookup contract for the node control logic.
+
+- **Deployment**:
+
+  ```
+  constructor(NodeControlDb _nodeControlDb, address _owner)
+  ```
+
+  Constructor expects the address of the db and the owner.
+
+#### # NodeControlDb
+Stores validator node state information.
+
+- **Deployment**:
+  ```
+  constructor(NodeControlLookUp _lookUpContract, address _owner)
+  ```
+
+  Constructor expects the address of the lookup contract and the owner.
+
+#### # NodeControSimple
+On-chain node control logic. Can issue update commands to nodes.
+
+- **Deployment**:
+  ```
+  constructor(NodeControlDb _nodeControlDb, address _owner)
+  ```
+
+  Constructor expects the address of the db and the owner.
+
+## Running the tests
+
+```
+npm test
+```
+
+The test script starts a ganache instance and stops it afterwards.
+
+## Linting
+
+2 linters are set up:
+- Solhint:
+  ```
+  npm run lint:solhint
+  ```
+- Solium
+  ```
+  npm run lint:solium
+  ```
+
+## Coverage report
+Solidity coverage
+
+```
+npm run coverage
+```
+
+## Security analysis
+
+- [Slither by Trail of bits]((https://github.com/trailofbits/slither#how-to-install)):
+  
+  1. Make sure a python 3.6 env is active.
+
+  2. Install
+
+     ```
+     pip install slither-analyzer
+     ```
+
+     or sometimes
+
+     ```
+     pip3 install slither-analyzer
+     ```
+
+   3. Then run
+     ```
+     npm run security
+     ```
+
+- MythX security checker (truffle security plugin by ConsenSys):
+  
+  Already installed with the other local deps.
+   
+  ```
+  npm run verify
+  ```
+
+## Contributing
+
+Please read our [CONTRIBUTING guide](./CONTRIBUTING.md) for our code of conduct and for the process of submitting pull requests to us.
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+
+## License
+
+This project is licensed under the GPLv3 License - see the [LICENSE](./LICENSE) file for details.
+
+## FAQ
