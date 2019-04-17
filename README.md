@@ -170,7 +170,7 @@ npm run coverage
      npm run security
      ```
 
-- MythX security checker (truffle security plugin by ConsenSys):
+- [MythX security checker](https://mythx.io/) (truffle security plugin by ConsenSys):
   
   Already installed with the other local deps.
    
@@ -184,7 +184,7 @@ Please read our [CONTRIBUTING guide](./CONTRIBUTING.md) for our code of conduct 
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+We use [SemVer](http://semver.org/) for versioning. 
 
 ## License
 
