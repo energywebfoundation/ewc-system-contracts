@@ -23,10 +23,8 @@ contract BlockReward is SCurveProvider, IBlockReward {
     mapping(uint256 => uint256) public mintedInBlock;
     mapping(address => mapping(uint256 => uint256)) public mintedForAccountInBlock;
 
-    // solhint-disable var-name-mixedcase
     /// Parity client SYSTEM_ADDRESS: 2^160 - 2
-    /// This is a constant, but changed only for tests
-    address internal SYSTEM_ADDRESS = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
+    address internal systemAddress = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
     /// The constant amount that gets sent to the
     /// community fund with each new block
     uint256 public communityFundAmount;
@@ -36,7 +34,6 @@ contract BlockReward is SCurveProvider, IBlockReward {
     mapping(address => address) public payoutAddresses;
     /// Stores reward amounts
     mapping(bytes32 => uint256) private uintStorage;
-    // solhint-enable var-name-mixedcase
 
     constructor(address _communityFundAddress, uint256 _communityFundAmount)
         public
@@ -90,7 +87,7 @@ contract BlockReward is SCurveProvider, IBlockReward {
         external
         returns (address[] memory, uint256[] memory)
     {
-        require(msg.sender == SYSTEM_ADDRESS, "Caller is not the system");
+        require(msg.sender == systemAddress, "Caller is not the system");
         require(benefactors.length == kind.length, "Benefactors/types list length differs");
         require(benefactors.length == 1, "Benefactors list length is not 1");
         require(kind[0] == 0, "Benefactor is not the block author");

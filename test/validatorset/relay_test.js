@@ -7,7 +7,6 @@ require('chai')
     .should();
 
 const {
-    assertThrowsAsync,
     REVERT_ERROR_MSG,
     DEFAULT_ADDRESS,
     SYSTEM_ADDRESS,
@@ -190,12 +189,12 @@ contract('ValidatorSetRELAY [all features]', function (accounts) {
             finalized.should.be.true;
         });
 
-        it('should set currentValidators to pendingValidators in relayed', async function () {
+        it('should set currentValidators to migrationValidators in relayed', async function () {
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
             let currentValidators = await relayed.getValidators.call();
-            let pendingValidators = await relayed.getPendingValidators.call();
-            currentValidators.should.be.deep.equal(pendingValidators);
+            let migrationValidators = await relayed.getMigrationValidators.call();
+            currentValidators.should.be.deep.equal(migrationValidators);
 
             const currentBlocknumber = (await web3.eth.getBlockNumber());
             const events = await relayed.getPastEvents(
@@ -209,7 +208,7 @@ contract('ValidatorSetRELAY [all features]', function (accounts) {
             events[0].args.validatorSet.should.be.deep.equal(currentValidators);
         });
 
-        it('should set currentValidators to pendingValidators after addValidator call', async function () {
+        it('should set currentValidators to migrationValidators after addValidator call', async function () {
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
             await relayed.addValidator(accounts[3], { from: accounts[3] }).should.be.rejectedWith(REVERT_ERROR_MSG);
@@ -217,22 +216,22 @@ contract('ValidatorSetRELAY [all features]', function (accounts) {
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
             let currentValidators = await relayed.getValidators.call();
-            let pendingValidators = await relayed.getPendingValidators.call();
-            currentValidators.should.be.deep.equal(pendingValidators);
+            let migrationValidators = await relayed.getMigrationValidators.call();
+            currentValidators.should.be.deep.equal(migrationValidators);
 
             await relayed.addValidator(accounts[4], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
             currentValidators = await relayed.getValidators.call();
-            pendingValidators = await relayed.getPendingValidators.call();
-            currentValidators.should.be.deep.equal(pendingValidators);
+            migrationValidators = await relayed.getMigrationValidators.call();
+            currentValidators.should.be.deep.equal(migrationValidators);
 
             const expected = [accounts[1], accounts[2], accounts[3], accounts[4]];
-            expected.should.be.deep.equal(pendingValidators);
+            expected.should.be.deep.equal(migrationValidators);
             expected.should.be.deep.equal(currentValidators);
         });
 
-        it('should set currentValidators to pendingValidators after removeValidator call', async function () {
+        it('should set currentValidators to migrationValidators after removeValidator call', async function () {
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
             await relayed.addValidator(accounts[3], { from: owner }).should.be.fulfilled;
@@ -241,17 +240,17 @@ contract('ValidatorSetRELAY [all features]', function (accounts) {
             await relayed.removeValidator(accounts[2], { from: accounts[3] }).should.be.rejectedWith(REVERT_ERROR_MSG);
             
             let currentValidators;
-            let pendingValidators;
+            let migrationValidators;
             for(let i = 1; i <= 3; i++) {
                 await relayed.removeValidator(accounts[i], { from: owner }).should.be.fulfilled;
                 await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
                 currentValidators = await relayed.getValidators.call();
-                pendingValidators = await relayed.getPendingValidators.call();
-                currentValidators.should.be.deep.equal(pendingValidators);
+                migrationValidators = await relayed.getMigrationValidators.call();
+                currentValidators.should.be.deep.equal(migrationValidators);
             }
             const expected = [];
-            pendingValidators.should.be.deep.equal(expected);
+            migrationValidators.should.be.deep.equal(expected);
             currentValidators.should.be.deep.equal(expected);
         });
     });

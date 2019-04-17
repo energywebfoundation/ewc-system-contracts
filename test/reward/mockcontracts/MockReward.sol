@@ -17,7 +17,7 @@ contract MockReward is BlockReward {
         public
     {
         require(_tester == msg.sender, "Not the tester");
-        SYSTEM_ADDRESS = _address;
+        systemAddress = _address;
     }
 
     function calcBlockReward(uint256 _blockNumber)

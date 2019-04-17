@@ -8,9 +8,9 @@ interface IBlockReward {
 
     /// @notice Produces rewards for the given benefactors,
     /// with corresponding reward codes
-    /// @dev Only callable by `SYSTEM_ADDRESS`
+    /// @dev Should only be callable by `SYSTEM_ADDRESS`
     /// @param benefactors The list of addresses who can be rewarded
-    /// @param kind The corresponding list of reward types for the benefactors
+    /// @param kind The corresponding list of benefactor types
     /// @return The list of addresses to be rewarded and the corresponding list of reward amounts
     function reward(address[] calldata benefactors, uint16[] calldata kind)
         external
