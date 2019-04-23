@@ -241,7 +241,7 @@ contract('ValidatorSetRELAY [all features]', function (accounts) {
             
             let currentValidators;
             let migrationValidators;
-            for(let i = 1; i <= 3; i++) {
+            for(let i = 1; i <= 2; i++) {
                 await relayed.removeValidator(accounts[i], { from: owner }).should.be.fulfilled;
                 await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
@@ -249,7 +249,7 @@ contract('ValidatorSetRELAY [all features]', function (accounts) {
                 migrationValidators = await relayed.getMigrationValidators.call();
                 currentValidators.should.be.deep.equal(migrationValidators);
             }
-            const expected = [];
+            const expected = [accounts[3]];
             migrationValidators.should.be.deep.equal(expected);
             currentValidators.should.be.deep.equal(expected);
         });

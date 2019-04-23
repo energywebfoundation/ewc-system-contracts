@@ -86,6 +86,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         public
     {
         require(_relaySet != address(0), "Relay contract address cannot be 0x0");
+        require(_initial.length >= 1, "There must be at least 1 validator initially");
         _transferOwnership(_owner);
         _setRelay(_relaySet);
 
@@ -367,7 +368,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     function _removeValidator(address _validator)
         internal
     {
-        require(migrationValidators.length != 0, "There are no validators to remove from");
+        require(migrationValidators.length > 1, "There must be at least 1 validator left");
 
         uint256 removedIndex = addressStatus[_validator].index;
         uint256 lastIndex = migrationValidators.length - 1;
