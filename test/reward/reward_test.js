@@ -467,11 +467,6 @@ contract('BlockReward [all features]', function (accounts) {
                 }
             }
         });
-
-        // TODO waiting for finalized figures
-        it("should return empty arrays after reaching the 10 year limit for both the fund and authors", async function () {
-
-        });
     });
 
     describe("logging reward statistics", async function () {

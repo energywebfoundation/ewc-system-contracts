@@ -28,6 +28,9 @@ const NOT_FINALIZED_ERROR = "Validator set is not finalized yet";
 const CALLBACK_ERROR = "Relay contract InitiateChange callback failed";
 const BLOCKNUM_NOT_VALID_ERROR = "Block number is not valid";
 
+const INITIAL_VALIDATORSNUM_ERROR = "There must be at least 1 validator initially";
+const MIN_VALIDATORSNUM_ERROR = "There must be at least 1 validator left";
+
 let relayed;
 let relay;
 
@@ -60,7 +63,11 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
         });
 
         it('should not allow initialization with a 0x0 relay address.', async function () {
-            await Relayed.new(owner, DEFAULT_ADDRESS, []).should.be.rejectedWith(RELAY_ADDRESS_ERROR);
+            await Relayed.new(owner, DEFAULT_ADDRESS, [accounts[1]]).should.be.rejectedWith(RELAY_ADDRESS_ERROR);
+        });
+
+        it('should not allow initialization with no validators.', async function () {
+            await Relayed.new(owner, relayAddress, []).should.be.rejectedWith(INITIAL_VALIDATORSNUM_ERROR);
         });
 
         it('should not allow initialization with an initial validator of address 0x0.', async function () {
@@ -78,10 +85,10 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
             validators.should.be.deep.equal([accounts[1]]);
             finalized.should.be.true;
 
-            relayed = await Relayed.new(owner, owner, []).should.be.fulfilled;
+            relayed = await Relayed.new(owner, owner, [accounts[3]]).should.be.fulfilled;
             validators = await relayed.getValidators.call();
             finalized = await relayed.finalized.call();
-            validators.should.be.deep.equal([]);
+            validators.should.be.deep.equal([accounts[3]]);
             finalized.should.be.true;
         });
 
@@ -120,7 +127,7 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
         });
 
         it('should emit event', async function () {
-            relay = await Relayed.new(owner, owner, []).should.be.fulfilled;
+            relay = await Relayed.new(owner, owner, [accounts[1]]).should.be.fulfilled;
             const currentBlocknumber = (await web3.eth.getBlockNumber());
             const events = await relay.getPastEvents(
                 "NewRelay",
@@ -223,6 +230,8 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
             await relayed.addValidator(accounts[3], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
+            await relayed.addValidator(accounts[4], { from: owner }).should.be.fulfilled;
+            await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
             await relayed.removeValidator(accounts[3], { from: accounts[2] }).should.be.rejectedWith(REVERT_ERROR_MSG);
 
@@ -236,7 +245,7 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
                 migrationValidators = await relayed.getMigrationValidators.call();
                 currentValidators.should.be.deep.equal(migrationValidators);
             }
-            const expected = [];
+            const expected = [accounts[4]];
             migrationValidators.should.be.deep.equal(expected);
             currentValidators.should.be.deep.equal(expected);
         });
@@ -327,68 +336,80 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
 
     describe('#removeValidator', async function () {
 
-        it('should remove validator', async function () {
-            await relayed.removeValidator(accounts[1], { from: owner }).should.be.fulfilled;
-            await checkMigrationValidators([]);
+        beforeEach(async function () {
+            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
-            await checkCurrentValidators([]);
         });
 
-        it('should not try to remove from empty migration list', async function () {
+        it('should remove validator', async function () {
             await relayed.removeValidator(accounts[1], { from: owner }).should.be.fulfilled;
-            await checkMigrationValidators([]);
+            await checkMigrationValidators([accounts[2]]);
+            await relay.finalizeChange({ from: system }).should.be.fulfilled;
+            await checkCurrentValidators([accounts[2]]);
+        });
+
+        it('should not try to remove from migration list with size 1', async function () {
+            await relayed.removeValidator(accounts[1], { from: owner }).should.be.fulfilled;
+            await checkMigrationValidators([accounts[2]]);
             await relayed.removeValidator(accounts[1], { from: owner }).should.be.rejectedWith(NOT_FINALIZED_ERROR);
             await relayed.removeValidator(accounts[2], { from: owner }).should.be.rejectedWith(NOT_FINALIZED_ERROR);
+            
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
+            await relayed.removeValidator(accounts[2], { from: owner }).should.be.rejectedWith(MIN_VALIDATORSNUM_ERROR);
             await relayed.removeValidator(accounts[1], { from: owner }).should.be.rejectedWith(NOT_VALIDATOR_ERROR);
-            await relayed.removeValidator(accounts[2], { from: owner }).should.be.rejectedWith(NOT_VALIDATOR_ERROR);
         });
 
         it('should only be callable by owner', async function () {
-            await relayed.removeValidator(accounts[1], { from: accounts[2] }).should.be.rejectedWith(NOT_OWNER_ERROR);
-            await relayed.removeValidator(accounts[1], { from: owner }).should.be.fulfilled;
-            await relay.finalizeChange({ from: system }).should.be.fulfilled;
-            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
-            await relay.finalizeChange({ from: system }).should.be.fulfilled;
             await relayed.removeValidator(accounts[2], { from: accounts[1] }).should.be.rejectedWith(NOT_OWNER_ERROR);
             await relayed.removeValidator(accounts[2], { from: owner }).should.be.fulfilled;
-            await checkMigrationValidators([]);
-            await checkCurrentValidators([accounts[2]])
+            await relay.finalizeChange({ from: system }).should.be.fulfilled;
+            
+            await relayed.addValidator(accounts[3], { from: owner }).should.be.fulfilled;
+            await relay.finalizeChange({ from: system }).should.be.fulfilled;
+            
+            await relayed.removeValidator(accounts[3], { from: accounts[2] }).should.be.rejectedWith(NOT_OWNER_ERROR);
+            await relayed.removeValidator(accounts[3], { from: owner }).should.be.fulfilled;
+            await checkMigrationValidators([accounts[1]]);
+            await checkCurrentValidators([accounts[1], accounts[3]])
         });
 
         it('should only be allowed to remove from existing set of validators', async function () {
             await relayed.removeValidator(accounts[6], { from: owner }).should.be.rejectedWith(NOT_VALIDATOR_ERROR);
             await relayed.removeValidator(DEFAULT_ADDRESS, { from: owner }).should.be.rejectedWith(NOT_VALIDATOR_ERROR);
+            
             await relayed.removeValidator(accounts[1], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
-            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
-            await relayed.removeValidator(accounts[2], { from: owner }).should.be.rejectedWith(REVERT_ERROR_MSG);
+            
+            await relayed.addValidator(accounts[3], { from: owner }).should.be.fulfilled;
+            await relayed.removeValidator(accounts[3], { from: owner }).should.be.rejectedWith(REVERT_ERROR_MSG);
+            
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
-            await relayed.removeValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            await relayed.removeValidator(accounts[3], { from: owner }).should.be.fulfilled;
         });
 
         it('should not allow to remove if not finalized', async function () {
-            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            await relayed.addValidator(accounts[3], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
-            await relayed.removeValidator(accounts[2], { from: owner }).should.be.fulfilled;
-            await relayed.removeValidator(accounts[2], { from: owner }).should.be.rejectedWith(NOT_FINALIZED_ERROR);
+            await relayed.removeValidator(accounts[3], { from: owner }).should.be.fulfilled;
+            await relayed.removeValidator(accounts[3], { from: owner }).should.be.rejectedWith(NOT_FINALIZED_ERROR);
         });
 
         it('should allow remove after a failed remove', async function () {
-            await relayed.removeValidator(accounts[1], { from: accounts[2] }).should.be.rejectedWith(REVERT_ERROR_MSG);
-            await relayed.removeValidator(accounts[2], { from: owner }).should.be.rejectedWith(REVERT_ERROR_MSG);
-            await relayed.removeValidator(accounts[1], { from: owner }).should.be.fulfilled;
-            await checkMigrationValidators([]);
+            await relayed.removeValidator(accounts[2], { from: accounts[3] }).should.be.rejectedWith(REVERT_ERROR_MSG);
+            await relayed.removeValidator(accounts[3], { from: owner }).should.be.rejectedWith(REVERT_ERROR_MSG);
+            await relayed.removeValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            
+            await checkMigrationValidators([accounts[1]]);
             await relayed.removeValidator(accounts[1], { from: owner }).should.be.rejectedWith(REVERT_ERROR_MSG);
+            await relayed.removeValidator(accounts[2], { from: owner }).should.be.rejectedWith(REVERT_ERROR_MSG);
+            
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
-            await checkCurrentValidators([]);
-            await checkMigrationValidators([]);
+            await checkCurrentValidators([accounts[1]]);
+            await checkMigrationValidators([accounts[1]]);
         });
 
         it('should change migration set correctly', async function () {
-            await checkMigrationValidators([accounts[1]]);
-            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
-            await relay.finalizeChange({ from: system }).should.be.fulfilled;
+            await checkMigrationValidators([accounts[1], accounts[2]]);
             await relayed.addValidator(accounts[3], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
             await checkMigrationValidators([accounts[1], accounts[2], accounts[3]]);
@@ -413,10 +434,8 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
         });
 
         it('should change current set correctly', async function () {
-            await checkCurrentValidators([accounts[1]]);
+            await checkCurrentValidators([accounts[1], accounts[2]]);
 
-            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
-            await relay.finalizeChange({ from: system }).should.be.fulfilled;
             await relayed.addValidator(accounts[3], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
@@ -441,21 +460,21 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
         });
 
         it('should change address status correctly', async function () {
-            let status = await relayed.addressStatus.call(accounts[2]);
+            let status = await relayed.addressStatus.call(accounts[3]);
             status[0].should.be.bignumber.equal(ValidatorState.NonValidator);
             status[1].should.be.bignumber.equal("0");
 
-            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            await relayed.addValidator(accounts[3], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
-            await relayed.removeValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            await relayed.removeValidator(accounts[3], { from: owner }).should.be.fulfilled;
 
-            status = await relayed.addressStatus.call(accounts[2]);
+            status = await relayed.addressStatus.call(accounts[3]);
             status[0].should.be.bignumber.equal(ValidatorState.PendingToBeRemoved);
-            status[1].should.be.bignumber.equal("1");
+            status[1].should.be.bignumber.equal("2");
 
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
-            status = await relayed.addressStatus.call(accounts[2]);
+            status = await relayed.addressStatus.call(accounts[3]);
             status[0].should.be.bignumber.equal(ValidatorState.NonValidator);
             status[1].should.be.bignumber.equal("0");
         });
@@ -469,11 +488,15 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
 
     describe("#_removeValidator", async function () {
 
-        it('should not allow to remove if migration list is empty', async function () {
-            await relayed.removeValidator(accounts[1], { from: owner }).should.be.fulfilled;
+        it('should not allow to remove if migration list is 1', async function () {
+            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
-            for (let i = 0; i < accounts.length; i++) {
-                await relayed.triggerRemoveValidator(accounts[i], { from: owner }).should.be.rejectedWith(NO_VALIDATORS_ERROR);
+
+            await relayed.removeValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            await relay.finalizeChange({ from: system }).should.be.fulfilled;
+
+            for (let i = 1; i < accounts.length; i++) {
+                await relayed.triggerRemoveValidator(accounts[i], { from: owner }).should.be.rejectedWith(MIN_VALIDATORSNUM_ERROR);
             }
         });
     });
@@ -561,33 +584,45 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
 
     describe('#isPendingToBeRemoved', async function () {
 
+        beforeEach(async function() {
+            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            await relay.finalizeChange({ from: system }).should.be.fulfilled;
+        });
+
         it('should return true only if address is migration to be removed', async function () {
             (await relayed.isPendingToBeRemoved.call(accounts[1])).should.be.false;
             (await relayed.isPendingToBeRemoved.call(accounts[2])).should.be.false;
+            (await relayed.isPendingToBeRemoved.call(accounts[3])).should.be.false;
 
-            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            await relayed.addValidator(accounts[3], { from: owner }).should.be.fulfilled;
             (await relayed.isPendingToBeRemoved.call(accounts[1])).should.be.false;
             (await relayed.isPendingToBeRemoved.call(accounts[2])).should.be.false;
+            (await relayed.isPendingToBeRemoved.call(accounts[3])).should.be.false;
 
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
             (await relayed.isPendingToBeRemoved.call(accounts[1])).should.be.false;
             (await relayed.isPendingToBeRemoved.call(accounts[2])).should.be.false;
+            (await relayed.isPendingToBeRemoved.call(accounts[3])).should.be.false;
 
             await relayed.removeValidator(accounts[1], { from: owner }).should.be.fulfilled;
             (await relayed.isPendingToBeRemoved.call(accounts[1])).should.be.true;
             (await relayed.isPendingToBeRemoved.call(accounts[2])).should.be.false;
+            (await relayed.isPendingToBeRemoved.call(accounts[3])).should.be.false;
 
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
             (await relayed.isPendingToBeRemoved.call(accounts[1])).should.be.false;
             (await relayed.isPendingToBeRemoved.call(accounts[2])).should.be.false;
+            (await relayed.isPendingToBeRemoved.call(accounts[3])).should.be.false;
 
-            await relayed.removeValidator(accounts[2], { from: owner }).should.be.fulfilled;
+            await relayed.removeValidator(accounts[3], { from: owner }).should.be.fulfilled;
             (await relayed.isPendingToBeRemoved.call(accounts[1])).should.be.false;
-            (await relayed.isPendingToBeRemoved.call(accounts[2])).should.be.true;
+            (await relayed.isPendingToBeRemoved.call(accounts[2])).should.be.false;
+            (await relayed.isPendingToBeRemoved.call(accounts[3])).should.be.true;
 
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
             (await relayed.isPendingToBeRemoved.call(accounts[1])).should.be.false;
             (await relayed.isPendingToBeRemoved.call(accounts[2])).should.be.false;
+            (await relayed.isPendingToBeRemoved.call(accounts[3])).should.be.false;
         });
     });
 
