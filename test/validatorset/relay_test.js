@@ -1,5 +1,5 @@
 let Relayed = artifacts.require('./mockcontracts/MockValidatorSetRelayed.sol');
-let Relay = artifacts.require('ValidatorSetRelay');
+let Relay = artifacts.require('./mockcontracts/MockValidatorSetRelay.sol');
 
 require('chai')
     .use(require('chai-as-promised'))
@@ -63,6 +63,11 @@ contract('ValidatorSetRELAY [all features]', function (accounts) {
             (await relay.owner.call()).should.be.equal(owner);
         });
 
+        it('should set system address correctly', async function () {
+            relay = await Relay.new(owner, relayedAddress, { from: owner }).should.be.fulfilled;
+            (await relay.systemAddress.call()).should.be.equal(SYSTEM_ADDRESS);
+        });
+
         it('should emit event', async function () {
             relay = await Relay.new(owner, relayedAddress, { from: owner }).should.be.fulfilled;
             const currentBlocknumber = (await web3.eth.getBlockNumber());
@@ -112,24 +117,6 @@ contract('ValidatorSetRELAY [all features]', function (accounts) {
             logs[0].event.should.be.equal('NewRelayed');
             logs[0].args.old.should.be.deep.equal(accounts[2]);
             logs[0].args.current.should.be.deep.equal(accounts[3]);
-        });
-    });
-
-    describe("#setSystem", async function () {
-
-        it('should allow only the owner to set system address', async function () {
-            await relay.setSystem(accounts[2], { from: system }).should.be.rejectedWith(NOT_OWNER_ERROR);
-            await relay.setSystem(accounts[2], { from: accounts[2] }).should.be.rejectedWith(NOT_OWNER_ERROR);
-            await relay.setSystem(accounts[2], { from: owner }).should.be.fulfilled;
-        });
-
-        it('should not allow to set the system address to 0x0', async function () {
-            await relay.setSystem(DEFAULT_ADDRESS, { from: owner }).should.be.rejectedWith(ADDRESS_ZERO_ERROR);
-            await relay.setSystem(accounts[2], { from: owner }).should.be.fulfilled;
-        });
-
-        it('should not allow to set the system address to the already existing one', async function () {
-            await relay.setSystem(system, { from: owner }).should.be.rejectedWith(SYSTEM_SAME_ERROR);
         });
     });
 

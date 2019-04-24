@@ -1,6 +1,6 @@
 let Relayed = artifacts.require('./mockcontracts/MockValidatorSetRelayed.sol');
-let Relay = artifacts.require('ValidatorSetRelay');
-let MockRelay = artifacts.require('./mockcontracts/MockValidatorSetRelay.sol');
+let Relay = artifacts.require('./mockcontracts/MockValidatorSetRelay.sol');
+let RelayWCallback = artifacts.require('./mockcontracts/MockValidatorSetRelayWithCallback.sol');
 
 require('chai')
     .use(require('chai-as-promised'))
@@ -144,7 +144,7 @@ contract('ValidatorSetRELAYED [all features]', function (accounts) {
     describe('#_triggerChange', async function () {
 
         it('should revert on false returned callback value', async function () {
-            const dummyRelay = await MockRelay.new(owner, relayed.address, { from: owner }).should.be.fulfilled;
+            const dummyRelay = await RelayWCallback.new(owner, relayed.address, { from: owner }).should.be.fulfilled;
             await relayed.setRelay(dummyRelay.address, { from: owner }).should.be.fulfilled;
             await dummyRelay.setCallbackRetval(false, { from: owner }).should.be.fulfilled;
             for (let i = 2; i < accounts.length; i++) {
