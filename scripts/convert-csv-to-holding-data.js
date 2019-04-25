@@ -3,8 +3,6 @@ const csv = require('csv-parser');
 const Web3 = require('web3');
 const BN = require('bn.js');
 
-
-
 const main = async () => {
     const result = await new Promise((resolve, reject) => {
         const tempResults = [];
