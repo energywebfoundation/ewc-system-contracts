@@ -362,8 +362,8 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     }
 
     /// @dev Removes validator from migration, sets status flags and triggers change.
-    /// Replaces the removed element with the last element. Must not be called with
-    /// an empty migration validators list
+    /// Replaces the removed element with the last element. There must be at least 1
+    /// remaining validator at all times
     /// @param _validator The address to remove
     function _removeValidator(address _validator)
         internal
