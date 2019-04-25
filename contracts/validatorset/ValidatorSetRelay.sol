@@ -42,18 +42,6 @@ contract ValidatorSetRelay is IValidatorSet, IValidatorSetRelay, Ownable {
         _;
     }
 
-    /// @notice Sets the SYSTEM address. Call this
-    /// function only if you really know what you are doing
-    /// @param _systemAddress The new SYSTEM address
-    function setSystem(address _systemAddress)
-        external
-        onlyOwner
-        nonDefaultAddress(_systemAddress)
-    {
-        require(_systemAddress != systemAddress, "New system address cannot be the same as the old one");
-        systemAddress = _systemAddress;
-    }
-
     /// @notice This function is used by the Relayed logic contract
     /// to iniate a change in the active validator set
     /// @dev emits `InitiateChange` which is listened by the Parity client
