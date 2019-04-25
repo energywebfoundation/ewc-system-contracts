@@ -10,8 +10,8 @@ contract NodeControlSimple is INodeControl, Ownable {
 
     NodeControlDb public nodeControlDb;
 
-    ///@notice Constructor
-    ///@param _nodeControlDb The db contract that should be used
+    /// @notice Constructor
+    /// @param _nodeControlDb The db contract that should be used
     constructor(NodeControlDb _nodeControlDb, address _owner)
         public 
     {
@@ -19,7 +19,7 @@ contract NodeControlSimple is INodeControl, Ownable {
         _transferOwnership(_owner);
     }
 
-    ///@notice Lets the validator confirm the update
+    /// @notice Lets the validator confirm the update
     function confirmUpdate() 
         external 
     {
@@ -27,9 +27,9 @@ contract NodeControlSimple is INodeControl, Ownable {
         nodeControlDb.setUpdateConfirmed(msg.sender);
     }
 
-    ///@notice Returns the expected state of a validator
-    ///@param _targetValidator The validator whos state you want
-    ///@return The state of the validator
+    /// @notice Returns the expected state of a validator
+    /// @param _targetValidator The validator whos state you want
+    /// @return The state of the validator
     function retrieveExpectedState(address _targetValidator) 
         external 
         view 
@@ -39,8 +39,8 @@ contract NodeControlSimple is INodeControl, Ownable {
         return vs;
     }
 
-    ///@notice View method to check if an update was confirmed by the validator
-    ///@param _targetValidator The validator that is supposed to be checked
+    /// @notice View method to check if an update was confirmed by the validator
+    /// @param _targetValidator The validator that is supposed to be checked
     function isUpdateConfirmed(address _targetValidator) 
         external 
         view 
@@ -49,13 +49,13 @@ contract NodeControlSimple is INodeControl, Ownable {
         return nodeControlDb.isUpdateConfirmed(_targetValidator);
     }
 
-    ///@notice Sets the state for a validator and emits update event
-    ///@param _targetValidator The validator whos state needs to be updated
-    ///@param _dockerSha The sha of the dockerfile
-    ///@param _dockerName The name of the dockerfile
-    ///@param _chainSpecSha The sha of the chainSpecFile
-    ///@param _chainSpecUrl The url where the chainSpecFile can be found
-    ///@param _isSigning Indicates if the validator shall sign blocks
+    /// @notice Sets the state for a validator and emits update event
+    /// @param _targetValidator The validator whos state needs to be updated
+    /// @param _dockerSha The sha of the dockerfile
+    /// @param _dockerName The name of the dockerfile
+    /// @param _chainSpecSha The sha of the chainSpecFile
+    /// @param _chainSpecUrl The url where the chainSpecFile can be found
+    /// @param _isSigning Indicates if the validator shall sign blocks
     function updateValidator(
         address _targetValidator, 
         bytes memory _dockerSha, 
