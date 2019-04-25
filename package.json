@@ -1,6 +1,6 @@
 {
   "name": "ewc-system-contracts",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "EWF's EWC system contracts",
   "main": "truffle-config.js",
   "directories": {
