@@ -1,28 +1,28 @@
 {
-  "name": "genome-system-contracts",
-  "version": "0.0.0",
-  "description": "EWF's Genome chain system contracts.",
+  "name": "ewc-system-contracts",
+  "version": "1.0.0",
+  "description": "EWF's EWC system contracts",
   "main": "truffle-config.js",
   "directories": {
     "test": "test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/energywebfoundation/genome-system-contracts.git"
+    "url": "git+https://github.com/energywebfoundation/ewc-system-contracts.git"
   },
   "keywords": [
     "ewf",
     "energyweb",
     "system",
     "contracts",
-    "genome"
+    "ewc"
   ],
   "author": "Adam Nagy <adam.nagy@energyweb.org>",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/energywebfoundation/genome-system-contracts/issues"
+    "url": "https://github.com/energywebfoundation/ewc-system-contracts/issues"
   },
-  "homepage": "https://github.com/energywebfoundation/genome-system-contracts#readme",
+  "homepage": "https://github.com/energywebfoundation/ewc-system-contracts#readme",
   "scripts": {
     "test": "scripts/test.sh",
     "compile": "npx truffle compile",

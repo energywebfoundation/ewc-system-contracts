@@ -32,8 +32,6 @@ contract BlockReward is SCurveProvider, IBlockReward {
     address public communityFund;
     /// Mapping of addresses and their payout addresses where rewards are minted
     mapping(address => address) public payoutAddresses;
-    /// Stores reward amounts
-    mapping(bytes32 => uint256) private uintStorage;
 
     constructor(address _communityFundAddress, uint256 _communityFundAmount)
         public

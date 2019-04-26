@@ -12,7 +12,7 @@ contract Holding {
         uint256 lockedUntilBlocktimestamp;
     }
 
-    ///@notice loads holding data and checks for sanity
+    /// @notice loads holding data and checks for sanity
     constructor()
         public
         payable
@@ -41,10 +41,10 @@ contract Holding {
     }
 
     // solhint-disable function-max-lines
-    ///@notice loads holding data
+    /// @notice loads holding data
     function initHoldingData()
-        internal 
-    {   
+        internal
+    {
         addHolding(0x120470000000000000000000000000000000000a, 10000000000000000000000000, 1564509540);
         addHolding(0x5A3977E000000000000000000000000000000000, 125000000000000000000000, 1572393540);
         addHolding(0xaae0dEBd2a4C519364e6098537145369913b26ec, 8400330000000000000000, 1572393540);
@@ -135,7 +135,6 @@ contract Holding {
         addHolding(0x102fb94000000000000000000000000000000000, 16666670000000000000000, 1572393540);
         addHolding(0x7ed62CF71D519d3Bf293ef90829508F92F4CCCcb, 12500000000000000000000, 1572393540);
         addHolding(0x199a8c5000000000000000000000000000000000, 125000000000000000000000, 1572393540);
-
     } 
     // solhint-enable function-max-lines
 

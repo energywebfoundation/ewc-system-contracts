@@ -42,7 +42,6 @@ contract('Holding', function (accounts) {
         it('Should throw if contract balance is less than expected', async function() {
             holding = await Holding.new({from: deployer, value: TARGET_AMOUNT_BN.sub(web3.utils.toBN('1')).toString(10)}).should.be
                 .rejectedWith('Balance should equal target amount.');
-
         });
 
         it('Should throw if contract balance is higher than expected', async function() {

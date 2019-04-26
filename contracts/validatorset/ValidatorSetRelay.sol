@@ -15,6 +15,7 @@ contract ValidatorSetRelay is IValidatorSet, IValidatorSetRelay, Ownable {
     event NewRelayed(address indexed old, address indexed current);
 
     /// System address, used by the block sealer
+    /// Not constant cause it is changed for testing
     address public systemAddress = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
     
     /// Address of the inner validator set contract
