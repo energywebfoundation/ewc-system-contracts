@@ -58,8 +58,6 @@ contract('NodeControlSimple', (accounts) => {
             assert('chainSpecUrl123' === nodeControl.chainSpecUrl, "chainSpecUrl should be the same as parameter from function")
             assert(true === nodeControl.isSigning, "isSigning should be the same as parameter from function")
             assert(true, "should have set the correct time")
-
-            //check for events
         });
 
         it('should emit multiple UpdateAvailable events when more then one validator is triggered for update', async () => {
@@ -72,8 +70,6 @@ contract('NodeControlSimple', (accounts) => {
 
             nodeControl1 = await nodeControlSimple.retrieveExpectedState(accounts[1])
             nodeControl2 = await nodeControlSimple.retrieveExpectedState(accounts[2])
-
-            //check for events
         });
 
         it('must return the correct stateStruct of a validator', async () => {
@@ -139,9 +135,7 @@ contract('NodeControlSimple', (accounts) => {
             }
             assert(!isFailed, "Should have thrown exception")
         });
-
-        it('must change the state of a validator');
-
+        
         it('should only change if at least one parameter is different', async () => {
             isFailed = false;
             await nodeControlSimple.updateValidator(accounts[1], '0x03', "dockerName123", '0x02', "chainSpecUrl123", true, {
@@ -172,8 +166,6 @@ contract('NodeControlSimple', (accounts) => {
             assert(returnCall.chainSpecUrl === 'chainSpecUrl123', "chainSpecUrl should be the same")
             assert(returnCall.isSigning === true, "isSigning should be the same")
         });
-
-        it('must not change the state');
     });
 
     describe('#updateValidator', () => {
@@ -237,8 +229,6 @@ contract('NodeControlSimple', (accounts) => {
 
             assert(isSigning === nodeControl.isSigning, "isSigning should be the same as parameter from function")
         });
-
-        it('must set the correct timestamp');
 
         it('must emit the UpdateAvailable event', async () => {
             txReturn = await nodeControlSimple.updateValidator(accounts[2], '0x05', "dockerName123", '0x02', "chainSpecUrl123", false, {
