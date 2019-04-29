@@ -109,6 +109,24 @@ On-chain node control logic. Can issue update commands to nodes.
 
   Constructor expects the address of the db and the owner.
 
+### Parity's Name Registry (SimpleRegistry)
+This contract is [Parity's Registry contract](https://github.com/parity-contracts/name-registry/blob/master/contracts/SimpleRegistry.sol). The minor modification is that the SimpleRegistry
+was made Ownable and the following functions are only allowed to be called by the owner:
+```
+reserve()
+confirmReverseAs()
+setFee()
+drain()
+```
+Functionally, this contract is just a placeholer, giving possibilities for future use.
+
+- **Deployment**:
+  ```
+  constructor(address _owner)
+  ```
+
+  Constructor expects the address of the owner only.
+
 ## Compiling the contracts
 
 With the locally installed truffle:
