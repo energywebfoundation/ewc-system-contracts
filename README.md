@@ -127,6 +127,11 @@ Functionally, this contract is just a placeholer, giving possibilities for futur
 
   Constructor expects the address of the owner only.
 
+### Other third party contracts used
+
+ - [OpenZeppelin's SafeMath](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/math/SafeMath.sol)
+ - [OpenZeppelin's Ownable](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/ownership/Ownable.sol)
+
 ## Compiling the contracts
 
 With the locally installed truffle:
