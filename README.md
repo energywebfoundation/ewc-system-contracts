@@ -56,7 +56,7 @@ Contains the reward logic. Rewards are issued upon new blocks. The contract impl
 
 Rewarded entities:
  1. Block authors: rewarded for a total of 10 years with ~10 mil tokens based on a discrete S curve distribution. The S curve calculator can be found [here](https://github.com/energywebfoundation/discrete-scurve-calculator).
- 2. Community fund: A multisig wallet controlled by the community. Rewarded for a total of 10 years with ~10 mil tokens. A constant amount is paid out with each new block.
+ 2. Community fund: A multisig wallet controlled by the community. Rewarded for a total of 10 years with ~37.9 mil tokens. A constant amount is paid out with each new block.
 
  - **Deployment**:
 
