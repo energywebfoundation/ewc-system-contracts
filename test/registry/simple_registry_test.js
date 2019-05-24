@@ -1,6 +1,9 @@
 "use strict";
 
 const SimpleRegistry = artifacts.require("../../contracts/registry/SimpleRegistry.sol");
+const {
+    assertThrowsAsync
+} = require(__dirname + "/../utils.js")
 
 contract("SimpleRegistry", accounts => {
 
@@ -168,6 +171,7 @@ contract("SimpleRegistry", accounts => {
     await simpleReg.proposeReverse(nameEntry, address, {
       from: address
     });
+
     await simpleReg.confirmReverseAs(nameEntry, address);
 
     let txReturn = await simpleReg.proposeReverse(nameEntry, accounts[1]);
@@ -289,6 +293,97 @@ contract("SimpleRegistry", accounts => {
     assert(txReturn.logs[0].args.owner === accounts[1], "Should have the right oldOwner");
   });
 
+  it("should not try to delete unconfirmed reverse entry on a drop", async () => {
+    const testReg = await SimpleRegistry.new(address, { from: address })
+
+    // the victim
+    await testReg.reserve(name, {
+      value: web3.utils.toWei("1", "ether"),
+      from: address
+    });
+
+    await testReg.proposeReverse(nameEntry, address, {
+      from: address
+    });
+
+    await testReg.confirmReverse(nameEntry, {
+      from: address
+    });
+
+    // the "attacker"
+    let attackerNameEntry = "prankmaster69";
+    let attackerName = web3.utils.sha3(attackerNameEntry);
+
+    await testReg.reserve(attackerName, {
+      value: web3.utils.toWei("1", "ether"),
+      from: address
+    });
+
+    await testReg.proposeReverse(attackerNameEntry, address, {
+      from: address
+    });
+
+    await testReg.drop(attackerName, {
+      from: address
+    });
+
+    assert.equal(await testReg.getReverse(name), address);
+
+    await testReg.proposeReverse(nameEntry, accounts[3], {
+      from: address
+    });
+
+    await testReg.confirmReverse(nameEntry, {
+      from: accounts[3]
+    });
+
+    // a new attacker
+    attackerNameEntry = "prankmaster70";
+    attackerName = web3.utils.sha3(attackerNameEntry);
+
+    await testReg.reserve(attackerName, {
+      value: web3.utils.toWei("1", "ether"),
+      from: address
+    });
+
+    await testReg.proposeReverse(attackerNameEntry, accounts[3], {
+      from: address
+    });
+
+    await testReg.drop(attackerName, {
+      from: address
+    });
+
+    assert.equal(await testReg.getReverse(name), accounts[3]);
+  });
+
+  it("should delete confirmed reverse entry on a drop", async () => {
+    const testReg = await SimpleRegistry.new(address, { from: address });
+
+    await testReg.reserve(name, {
+      value: web3.utils.toWei("1", "ether"),
+      from: address
+    });
+
+    await testReg.proposeReverse(nameEntry, address, {
+      from: address
+    });
+
+    await testReg.confirmReverse(nameEntry, {
+      from: address
+    });
+
+    let txReturn = await testReg.drop(name, {
+      from: address
+    });
+
+    assert(txReturn.logs[0].event == "Dropped", "Should have thrown the event")
+    assert(txReturn.logs[0].args.name === name, "Should have the right name");
+    assert(txReturn.logs[0].args.owner === address, "Should have the right oldOwner");
+
+    await assertThrowsAsync(() => testReg.getReverse(name), "Only when entry raw");
+  });
+
   it("should allow the contract owner to drain all the ether from the contract", async () => {
     let isFailed = false
     // only the contract owner can drain the contract
@@ -382,7 +477,7 @@ contract("SimpleRegistry", accounts => {
     assert(!isFailed, "Should have thrown an exception")
 
     try {
-      await simpleReg.dropn(name)
+      await simpleReg.drop(name)
       isFaield = true;
     } catch (e) {
       assert(true, "Should have thrown an exception")
