@@ -70,7 +70,9 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
     }
 
     modifier whenEntry(string memory _name) {
-        require(!entries[keccak256(bytes(_name))].deleted && entries[keccak256(bytes(_name))].owner != address(0), "Error: Only when entry");
+        require(
+            !entries[keccak256(bytes(_name))].deleted && entries[keccak256(bytes(_name))].owner != address(0),
+            "Error: Only when entry");
         _;
     }
 
