@@ -121,6 +121,7 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
         returns (bool success)
     {
         if (keccak256(bytes(reverses[entries[_name].reverse])) == _name) {
+            emit ReverseRemoved(reverses[entries[_name].reverse], entries[_name].reverse);
             delete reverses[entries[_name].reverse];
         }
         entries[_name].deleted = true;

@@ -377,9 +377,13 @@ contract("SimpleRegistry", accounts => {
       from: address
     });
 
-    assert(txReturn.logs[0].event == "Dropped", "Should have thrown the event")
-    assert(txReturn.logs[0].args.name === name, "Should have the right name");
-    assert(txReturn.logs[0].args.owner === address, "Should have the right oldOwner");
+    assert(txReturn.logs[0].event == "ReverseRemoved", "Should have thrown the event")
+    assert(txReturn.logs[0].args.name === nameEntry, "Should have the right name");
+    assert(txReturn.logs[0].args.reverse === address, "Should have the right oldOwner");
+
+    assert(txReturn.logs[1].event == "Dropped", "Should have thrown the event")
+    assert(txReturn.logs[1].args.name === name, "Should have the right name");
+    assert(txReturn.logs[1].args.owner === address, "Should have the right oldOwner");
 
     await assertThrowsAsync(() => testReg.getReverse(name), "Only when entry raw");
   });
