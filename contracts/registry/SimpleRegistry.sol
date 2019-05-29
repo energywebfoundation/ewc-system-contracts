@@ -55,7 +55,9 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
     uint public fee = 1 ether;
 
     modifier whenUnreserved(bytes32 _name) {
-        require(entries[_name].owner == address(0), "Error: Only when unreserved");
+        require(
+            entries[_name].owner == address(0) && !entries[_name].deleted,
+            "Error: Only when unreserved");
         _;
     }
 
@@ -77,7 +79,10 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
     }
 
     modifier whenEntryRaw(bytes32 _name) {
-        require(!entries[_name].deleted, "Error: Only when entry raw");
+        require(
+            !entries[_name].deleted && entries[_name].owner != address(0),
+            "Error: Only when entry raw"
+        );
         _;
     }
 
@@ -94,7 +99,6 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
     function reserve(bytes32 _name)
         external
         payable
-        whenEntryRaw(_name)
         whenUnreserved(_name)
         whenFeePaid
         onlyOwner
