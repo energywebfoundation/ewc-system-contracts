@@ -1,4 +1,5 @@
 pragma solidity 0.5.7;
+
 import "../../../contracts/reward/BlockReward.sol";
 
 
