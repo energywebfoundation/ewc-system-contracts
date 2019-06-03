@@ -3,7 +3,7 @@
 const SimpleRegistry = artifacts.require("../../contracts/registry/SimpleRegistry.sol");
 const {
     assertThrowsAsync
-} = require(__dirname + "/../utils.js")
+} = require(__dirname + "/../utils.js");
 
 contract("SimpleRegistry", accounts => {
 
@@ -13,36 +13,36 @@ contract("SimpleRegistry", accounts => {
   let simpleReg;
 
   before(async () => {
-    simpleReg = await SimpleRegistry.new(accounts[0], { from: accounts[0] })
+    simpleReg = await SimpleRegistry.new(accounts[0], { from: accounts[0] });
   });
 
   it("should only allow owner to reserve a new name", async () => {
-    let isFailed = false
+    let isFailed = false;
     try {
       await simpleReg.reserve(name, {
         value: web3.utils.toWei("1", "ether"),
         from: accounts[1]
-      })
-      isFailed = true
+      });
+      isFailed = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown exception")
+    assert(!isFailed, "Should have thrown exception");
 
   });
 
   it("should only allow to reserve a new name when fee is available", async () => {
-    let isFailed = false
+    let isFailed = false;
     try {
       await simpleReg.reserve(name, {
         value: web3.utils.toWei("0.5", "ether"),
         from: accounts[1]
       })
-      isFailed = true
+      isFailed = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown exception")
+    assert(!isFailed, "Should have thrown exception");
 
   });
 
@@ -53,28 +53,28 @@ contract("SimpleRegistry", accounts => {
     });
 
     // if successful the contract should emit a `Reserved` event
-    assert(txReturn.logs[0].event == 'Reserved', "Should have thrown the event")
+    assert(txReturn.logs[0].event == 'Reserved', "Should have thrown the event");
     // reserved should be true
     const reserved = await simpleReg.reserved(name);
     assert.equal(reserved, true);
   });
 
   it("should allow name owner to set new metadata for the name", async () => {
-    let isFailed = false
+    let isFailed = false;
     try {
       await simpleReg.setData(name, "A", web3.utils.asciiToHex("dummy"), {
         from: accounts[1]
       });
-      isFailed = true
+      isFailed = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown exception")
+    assert(!isFailed, "Should have thrown exception");
 
 
     let txReturn = await simpleReg.setData(name, "A", web3.utils.asciiToHex("dummy"));
 
-    assert(txReturn.logs[0].event == 'DataChanged', "Should have thrown the event")
+    assert(txReturn.logs[0].event == 'DataChanged', "Should have thrown the event");
     assert(txReturn.logs[0].args.key === "A");
     assert(txReturn.logs[0].args.plainKey === "A");
 
@@ -84,15 +84,15 @@ contract("SimpleRegistry", accounts => {
     try {
       await simpleReg.setAddress(name, "A", address, {
         from: accounts[1]
-      })
-      isFailed = true
+      });
+      isFailed = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown exception")
+    assert(!isFailed, "Should have thrown exception");
 
     txReturn = await simpleReg.setAddress(name, "A", address);
-    assert(txReturn.logs[0].event == 'DataChanged', "Should have thrown the event")
+    assert(txReturn.logs[0].event == 'DataChanged', "Should have thrown the event");
     assert(txReturn.logs[0].args.name === name, "Should have the right name");
     assert(txReturn.logs[0].args.key === "A", "Should have the right key");
     //assert.equal(events[0].args.plainKey, "A");
@@ -103,15 +103,15 @@ contract("SimpleRegistry", accounts => {
     try {
       await simpleReg.setUint(name, "A", 100, {
         from: accounts[1]
-      })
+      });
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
 
     txReturn = await simpleReg.setUint(name, "A", 100);
-    assert(txReturn.logs[0].event == "DataChanged", "Should have thrown the event")
+    assert(txReturn.logs[0].event == "DataChanged", "Should have thrown the event");
     assert(txReturn.logs[0].args.name === name, "Should have the right name");
     assert(txReturn.logs[0].args.key === "A", "Should have the right key");
     assert(txReturn.logs[0].args.plainKey === "A", "Should have the same plainKey");
@@ -121,7 +121,7 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should allow owner to propose new reverse address", async () => {
-    let isFailed = false
+    let isFailed = false;
 
     try {
       await simpleReg.proposeReverse(nameEntry, address, {
@@ -129,30 +129,30 @@ contract("SimpleRegistry", accounts => {
       })
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
 
     let txReturn = await simpleReg.proposeReverse(nameEntry, address, {
       from: address
     });
 
-    assert(txReturn.logs[0].event == "ReverseProposed", "Should have thrown the event1")
+    assert(txReturn.logs[0].event == "ReverseProposed", "Should have thrown the event1");
     assert(txReturn.logs[0].args.name === nameEntry, "Should have the right name");
     assert(txReturn.logs[0].args.reverse === address, "Should have the same reverse address");
 
     try {
       await simpleReg.confirmReverse(nameEntry, {
         from: accounts[1]
-      })
+      });
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
 
     txReturn = await simpleReg.confirmReverse(nameEntry);
-    assert(txReturn.logs[0].event == "ReverseConfirmed", "Should have thrown the event2")
+    assert(txReturn.logs[0].event == "ReverseConfirmed", "Should have thrown the event2");
     assert(txReturn.logs[0].args.name === nameEntry, "Should have the right name");
     assert(txReturn.logs[0].args.reverse === address, "Should have the same reverse address");
 
@@ -162,7 +162,7 @@ contract("SimpleRegistry", accounts => {
     assert.equal(await simpleReg.reverse(address), nameEntry);
 
     txReturn = await simpleReg.removeReverse();
-    assert(txReturn.logs[0].event == "ReverseRemoved", "Should have thrown the event3")
+    assert(txReturn.logs[0].event == "ReverseRemoved", "Should have thrown the event3");
     assert(txReturn.logs[0].args.name === nameEntry, "Should have the right name");
     assert(txReturn.logs[0].args.reverse === address, "Should have the same reverse address");
   });
@@ -175,17 +175,17 @@ contract("SimpleRegistry", accounts => {
     await simpleReg.confirmReverseAs(nameEntry, address);
 
     let txReturn = await simpleReg.proposeReverse(nameEntry, accounts[1]);
-    assert(txReturn.logs[1].event == "ReverseProposed", "Should have thrown the event3")
+    assert(txReturn.logs[1].event == "ReverseProposed", "Should have thrown the event3");
     assert(txReturn.logs[1].args.name === nameEntry, "Should have the right name");
     assert(txReturn.logs[1].args.reverse === accounts[1], "Should have the same reverse address");
 
-    assert(txReturn.logs[0].event == "ReverseRemoved", "Should have thrown the event2")
+    assert(txReturn.logs[0].event == "ReverseRemoved", "Should have thrown the event2");
     assert(txReturn.logs[0].args.name === nameEntry, "Should have the right name");
     assert(txReturn.logs[0].args.reverse === address, "Should have the same reverse address");
   });
 
   it("should abort reservation if name is already reserved", async () => {
-    let isFailed = false
+    let isFailed = false;
 
     try {
       await simpleReg.reserve(name, {
@@ -193,37 +193,37 @@ contract("SimpleRegistry", accounts => {
       })
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
   });
 
   it("should abort reservation if the fee is not paid", async () => {
-    let isFailed = false
+    let isFailed = false;
 
     try {
       await simpleReg.reserve("newname", {
         value: web3.utils.toWei("0.5", "ether")
-      })
+      });
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
   });
 
   it("should allow the owner of the contract to transfer ownership", async () => {
-    let isFailed = false
+    let isFailed = false;
 
     try {
       await simpleReg.transfer(name, accounts[1], {
         from: accounts[1]
-      })
+      });
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
 
     let owner = await simpleReg.getOwner(name);
     assert.equal(owner, accounts[0]);
@@ -232,7 +232,7 @@ contract("SimpleRegistry", accounts => {
     owner = await simpleReg.getOwner(name);
     assert.equal(owner, accounts[1]);
 
-    assert(txReturn.logs[0].event == "Transferred", "Should have thrown the event")
+    assert(txReturn.logs[0].event == "Transferred", "Should have thrown the event");
     assert(txReturn.logs[0].args.name === name, "Should have the right name");
     assert(txReturn.logs[0].args.oldOwner === accounts[0], "Should have the right oldOwner");
     assert(txReturn.logs[0].args.newOwner === accounts[1], "Should have the right newOwner");
@@ -241,26 +241,26 @@ contract("SimpleRegistry", accounts => {
     try {
       await simpleReg.transfer(name, accounts[0], {
         from: accounts[0]
-      })
+      });
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
   });
 
   it("should allow the contract owner to set the registration fee", async () => {
-    let isFailed = false
+    let isFailed = false;
     // only the contract owner can set a new fee
     try {
       await simpleReg.setFee(10, {
         from: accounts[1]
-      })
+      });
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
 
     await simpleReg.setFee(10, {
       from: accounts[0]
@@ -271,30 +271,30 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should allow the contract owner to drop a name", async () => {
-    let isFailed = false
+    let isFailed = false;
     // only the contract owner can unregister badges
     // at this moment, `name` is transferred to `accounts[1]`
     try {
       await simpleReg.drop(name, {
         from: accounts[0]
-      })
+      });
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
 
     let txReturn = await simpleReg.drop(name, {
       from: accounts[1]
     });
 
-    assert(txReturn.logs[0].event == "Dropped", "Should have thrown the event")
+    assert(txReturn.logs[0].event == "Dropped", "Should have thrown the event");
     assert(txReturn.logs[0].args.name === name, "Should have the right name");
     assert(txReturn.logs[0].args.owner === accounts[1], "Should have the right oldOwner");
   });
 
   it("should not try to delete unconfirmed reverse entry on a drop", async () => {
-    const testReg = await SimpleRegistry.new(address, { from: address })
+    const testReg = await SimpleRegistry.new(address, { from: address });
 
     // the victim
     await testReg.reserve(name, {
@@ -389,17 +389,17 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should allow the contract owner to drain all the ether from the contract", async () => {
-    let isFailed = false
+    let isFailed = false;
     // only the contract owner can drain the contract
     try {
       await simpleReg.drain({
         from: accounts[1]
-      })
+      });
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
 
     const balance = await web3.eth.getBalance(accounts[0]);
     await simpleReg.drain({
@@ -414,97 +414,97 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should not allow interactions with dropped names", async () => {
-    let isFailed = false
+    let isFailed = false;
 
     try {
-      await simpleReg.getData(name, "A")
+      await simpleReg.getData(name, "A");
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
 
     try {
-      await simpleReg.getAddress(name, "A")
+      await simpleReg.getAddress(name, "A");
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
 
     try {
-      await simpleReg.getUint(name, "A")
+      await simpleReg.getUint(name, "A");
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
 
     try {
-      await simpleReg.getOwner(name)
+      await simpleReg.getOwner(name);
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
 
     try {
-      await simpleReg.setData(name, "A", "dummy")
+      await simpleReg.setData(name, "A", "dummy");
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
 
     try {
-      await simpleReg.setAddress(name, "A", accounts[0])
+      await simpleReg.setAddress(name, "A", accounts[0]);
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
 
     try {
-      await simpleReg.setUint(name, "A", 100)
+      await simpleReg.setUint(name, "A", 100);
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
 
     try {
-      await simpleReg.transfer(name, accounts[1])
+      await simpleReg.transfer(name, accounts[1]);
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
 
     try {
-      await simpleReg.drop(name)
+      await simpleReg.drop(name);
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
 
     try {
-      await simpleReg.confirmReverse(nameEntry)
+      await simpleReg.confirmReverse(nameEntry);
       isFaield = true;
     } catch (e) {
-      assert(true, "Should have thrown an exception")
+      assert(true, "Should have thrown an exception");
     }
-    assert(!isFailed, "Should have thrown an exception")
+    assert(!isFailed, "Should have thrown an exception");
   });
 
   it("should set a new owner", async () => {
-    let isFailed = false
+    let isFailed = false;
 
     let txReturn = await simpleReg.transferOwnership(accounts[1], {
       from: accounts[0]
     });
 
-    assert(txReturn.logs[0].event == "OwnershipTransferred", "Should have thrown the event")
+    assert(txReturn.logs[0].event == "OwnershipTransferred", "Should have thrown the event");
     assert(txReturn.logs[0].args.previousOwner === accounts[0], "Should have the old owner");
     assert(txReturn.logs[0].args.newOwner === accounts[1], "Should have a new owner");
   });
