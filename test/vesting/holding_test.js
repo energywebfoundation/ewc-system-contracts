@@ -114,7 +114,7 @@ contract('Holding', function (accounts) {
             await Utils.timeTravel(2000000000);
             const balanceOfAccountBeforeRelease = new web3.utils.BN(await web3.eth.getBalance(ACCOUNT_WITH_FUNDS));
             const tx = await holding.releaseFunds(ACCOUNT_WITH_FUNDS);
-            tx.logs[0].args._releasedToAccount.should.be.equal(ACCOUNT_WITH_FUNDS)
+            tx.logs[0].args._releasedToAccount.should.be.equal(ACCOUNT_WITH_FUNDS);
             tx.logs[0].args._amount.should.be.bignumber.equal(new web3.utils.BN(ACCOUNT_FUNDING));
         });
 
