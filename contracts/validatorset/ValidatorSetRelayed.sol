@@ -164,18 +164,18 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         onlyRelay
     {
         finalized = true;
-        
-        for (uint256 i = 0; i < migrationValidators.length; i++) {
-            AddressStatus storage vstatus = addressStatus[migrationValidators[i]];
-            vstatus.state = ValidatorState.Finalized;
-            vstatus.index = i;
-        }
 
-        if (toBeRemoved != address(0)) {
+        if (toBeRemoved == address(0)) {
+            // The new added validator is always the last of `migrationValidators` array
+            AddressStatus storage vstatus = addressStatus[migrationValidators[migrationValidators.length - 1]];
+            vstatus.state = ValidatorState.Finalized;
+            vstatus.index = migrationValidators.length - 1;
+        } else {
+            // The to-be-removed validator is explicitly assigned to `toBeRemoved` beforehand
             addressStatus[toBeRemoved].state = ValidatorState.NonValidator;
             addressStatus[toBeRemoved].index = 0;
             toBeRemoved = address(0);
-        }  
+        }
 
         currentValidators = migrationValidators;
         emit ChangeFinalized(currentValidators);
@@ -356,7 +356,7 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
         internal
     {
         addressStatus[_validator].state = ValidatorState.PendingToBeAdded;
-        
+
         migrationValidators.push(_validator);
         _triggerChange();
     }
