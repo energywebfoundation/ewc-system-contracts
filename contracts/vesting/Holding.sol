@@ -12,6 +12,8 @@ contract Holding {
         uint256 lockedUntilBlocktimestamp;
     }
 
+    event FundsReleased(address indexed _releasedToAccount, uint256 _amount);
+
     /// @notice loads holding data and checks for sanity
     constructor()
         public
@@ -38,6 +40,7 @@ contract Holding {
         uint256 amountToTransfer = holder.availableAmount;
         holder.availableAmount = 0;
         holderAddress.transfer(amountToTransfer);
+        emit FundsReleased(holderAddress, amountToTransfer);
     }
 
     // solhint-disable function-max-lines
