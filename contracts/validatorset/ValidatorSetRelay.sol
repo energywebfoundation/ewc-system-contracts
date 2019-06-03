@@ -11,9 +11,6 @@ import "../interfaces/IValidatorSetRelayed.sol";
 /// relays the function calls to a logic contract called Relayed for upgradeability
 contract ValidatorSetRelay is IValidatorSet, IValidatorSetRelay, Ownable {
 
-    /// Emitted in case a new Relayed contract is set
-    event NewRelayed(address indexed old, address indexed current);
-
     /// System address, used by the block sealer
     /// Not constant cause it is changed for testing
     address public systemAddress = 0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE;
@@ -21,12 +18,8 @@ contract ValidatorSetRelay is IValidatorSet, IValidatorSetRelay, Ownable {
     /// Address of the inner validator set contract
     IValidatorSetRelayed public relayedSet;
 
-    constructor(address _owner, address _relayedSet)
-        public
-    {   
-        _transferOwnership(_owner);
-        _setRelayed(_relayedSet);
-    }
+    /// Emitted in case a new Relayed contract is set
+    event NewRelayed(address indexed old, address indexed current);
 
     modifier nonDefaultAddress(address _address) {
         require(_address != address(0), "Address cannot be 0x0");
@@ -41,6 +34,13 @@ contract ValidatorSetRelay is IValidatorSet, IValidatorSetRelay, Ownable {
     modifier onlyRelayed() {
         require(msg.sender == address(relayedSet), "Sender is not the Relayed contract");
         _;
+    }
+
+    constructor(address _owner, address _relayedSet)
+        public
+    {
+        _transferOwnership(_owner);
+        _setRelayed(_relayedSet);
     }
 
     /// @notice This function is used by the Relayed logic contract
