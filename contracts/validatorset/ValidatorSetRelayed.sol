@@ -165,12 +165,15 @@ contract ValidatorSetRelayed is IValidatorSetRelayed, Ownable {
     {
         finalized = true;
 
+        // Finalizing the addition or removal of a validator
         if (toBeRemoved == address(0)) {
+            // Case adding a a validator
             // The new added validator is always the last of `migrationValidators` array
             AddressStatus storage vstatus = addressStatus[migrationValidators[migrationValidators.length - 1]];
             vstatus.state = ValidatorState.Finalized;
             vstatus.index = migrationValidators.length - 1;
         } else {
+            // Case removing a validator
             // The to-be-removed validator is explicitly assigned to `toBeRemoved` beforehand
             addressStatus[toBeRemoved].state = ValidatorState.NonValidator;
             addressStatus[toBeRemoved].index = 0;
