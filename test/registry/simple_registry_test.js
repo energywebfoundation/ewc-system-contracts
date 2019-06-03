@@ -28,7 +28,6 @@ contract("SimpleRegistry", accounts => {
       assert(true, "Should have thrown an exception");
     }
     assert(!isFailed, "Should have thrown exception");
-
   });
 
   it("should only allow to reserve a new name when fee is available", async () => {
@@ -43,7 +42,6 @@ contract("SimpleRegistry", accounts => {
       assert(true, "Should have thrown an exception");
     }
     assert(!isFailed, "Should have thrown exception");
-
   });
 
   it("should allow reserving a new name", async () => {
