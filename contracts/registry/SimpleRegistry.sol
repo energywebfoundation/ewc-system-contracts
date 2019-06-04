@@ -6,8 +6,11 @@
 //!
 //!     https://www.gnu.org/licenses/gpl-3.0.en.html.
 //!
-//! This file has been modified by Energy Web Foundation to make the contract Ownable,
-//! and add related restrictions to reserve-, confirmReverseAs-, setFee- and drain functions.
+//! This file has been modified by Energy Web Foundation:
+//! 1. Contract is made Ownable.
+//! 2. "only-owner" restrictions are added to reserve-, confirmReverseAs-, setFee- and drain functions.
+//! 3. A security vulnerability is fixed where it is possible for a malicious entity to delete
+//!    somebody's reverse entry.
 //!
 //! This file incorporates work covered by the following copyright and  
 //! permission notice:
@@ -52,7 +55,9 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
     uint public fee = 1 ether;
 
     modifier whenUnreserved(bytes32 _name) {
-        require(entries[_name].owner == address(0), "Error: Only when unreserved");
+        require(
+            entries[_name].owner == address(0) && !entries[_name].deleted,
+            "Error: Only when unreserved");
         _;
     }
 
@@ -67,12 +72,17 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
     }
 
     modifier whenEntry(string memory _name) {
-        require(!entries[keccak256(bytes(_name))].deleted, "Error: Only when entry");
+        require(
+            !entries[keccak256(bytes(_name))].deleted && entries[keccak256(bytes(_name))].owner != address(0),
+            "Error: Only when entry");
         _;
     }
 
     modifier whenEntryRaw(bytes32 _name) {
-        require(!entries[_name].deleted, "Error: Only when entry raw");
+        require(
+            !entries[_name].deleted && entries[_name].owner != address(0),
+            "Error: Only when entry raw"
+        );
         _;
     }
 
@@ -89,7 +99,6 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
     function reserve(bytes32 _name)
         external
         payable
-        whenEntryRaw(_name)
         whenUnreserved(_name)
         whenFeePaid
         onlyOwner
@@ -117,7 +126,10 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
         onlyOwnerOf(_name)
         returns (bool success)
     {
-        delete reverses[entries[_name].reverse];
+        if (keccak256(bytes(reverses[entries[_name].reverse])) == _name) {
+            emit ReverseRemoved(reverses[entries[_name].reverse], entries[_name].reverse);
+            delete reverses[entries[_name].reverse];
+        }
         entries[_name].deleted = true;
         emit Dropped(_name, msg.sender);
         return true;
