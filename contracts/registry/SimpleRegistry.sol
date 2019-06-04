@@ -38,10 +38,10 @@ import "./Registry.sol";
 
 
 contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegistry {
+
     struct Entry {
         address owner;
         address reverse;
-        bool deleted;
         mapping (string => bytes32) data;
     }
 
@@ -54,7 +54,7 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
 
     modifier whenUnreserved(bytes32 _name) {
         require(
-            entries[_name].owner == address(0) && !entries[_name].deleted,
+            entries[_name].owner == address(0),
             "Error: Only when unreserved");
         _;
     }
@@ -71,14 +71,14 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
 
     modifier whenEntry(string memory _name) {
         require(
-            !entries[keccak256(bytes(_name))].deleted && entries[keccak256(bytes(_name))].owner != address(0),
+            entries[keccak256(bytes(_name))].owner != address(0),
             "Error: Only when entry");
         _;
     }
 
     modifier whenEntryRaw(bytes32 _name) {
         require(
-            !entries[_name].deleted && entries[_name].owner != address(0),
+            entries[_name].owner != address(0),
             "Error: Only when entry raw"
         );
         _;
@@ -122,7 +122,7 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
             emit ReverseRemoved(reverses[entries[_name].reverse], entries[_name].reverse);
             delete reverses[entries[_name].reverse];
         }
-        entries[_name].deleted = true;
+        delete entries[_name];
         emit Dropped(_name, msg.sender);
         return true;
     }
