@@ -52,8 +52,6 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
     mapping (bytes32 => Entry) public entries;
     mapping (address => string) public reverses;
 
-    uint public fee = 1 ether;
-
     modifier whenUnreserved(bytes32 _name) {
         require(
             entries[_name].owner == address(0) && !entries[_name].deleted,
@@ -86,11 +84,6 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
         _;
     }
 
-    modifier whenFeePaid {
-        require(msg.value >= fee, "Error: only when fee paid");
-        _;
-    }
-
     constructor(address _owner) public {
         _transferOwnership(_owner);
     }
@@ -98,9 +91,7 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
     // Reservation functions
     function reserve(bytes32 _name)
         external
-        payable
         whenUnreserved(_name)
-        whenFeePaid
         onlyOwner
         returns (bool success)
     {
@@ -216,27 +207,6 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
         emit ReverseRemoved(reverses[msg.sender], msg.sender);
         delete entries[keccak256(bytes(reverses[msg.sender]))].reverse;
         delete reverses[msg.sender];
-    }
-
-    // Admin functions for the owner
-    function setFee(uint _amount)
-        external
-        onlyOwner
-        returns (bool)
-    {
-        fee = _amount;
-        emit FeeChanged(_amount);
-        return true;
-    }
-
-    function drain()
-        external
-        onlyOwner
-        returns (bool)
-    {
-        emit Drained(address(this).balance);
-        msg.sender.transfer(address(this).balance);
-        return true;
     }
 
     // MetadataRegistry views

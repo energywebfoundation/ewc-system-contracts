@@ -19,24 +19,7 @@ contract("SimpleRegistry", accounts => {
   it("should only allow owner to reserve a new name", async () => {
     let isFailed = false;
     try {
-      await simpleReg.reserve(name, {
-        value: web3.utils.toWei("1", "ether"),
-        from: accounts[1]
-      });
-      isFailed = true;
-    } catch (e) {
-      assert(true, "Should have thrown an exception");
-    }
-    assert(!isFailed, "Should have thrown exception");
-  });
-
-  it("should only allow to reserve a new name when fee is available", async () => {
-    let isFailed = false;
-    try {
-      await simpleReg.reserve(name, {
-        value: web3.utils.toWei("0.5", "ether"),
-        from: accounts[1]
-      })
+      await simpleReg.reserve(name, { from: accounts[1] });
       isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
@@ -45,10 +28,7 @@ contract("SimpleRegistry", accounts => {
   });
 
   it("should allow reserving a new name", async () => {
-    // reservation requires a fee of 1 ETH
-    let txReturn = await simpleReg.reserve(name, {
-      value: web3.utils.toWei("1", "ether")
-    });
+    let txReturn = await simpleReg.reserve(name);
 
     // if successful the contract should emit a `Reserved` event
     assert(txReturn.logs[0].event == 'Reserved', "Should have thrown the event");
@@ -186,23 +166,7 @@ contract("SimpleRegistry", accounts => {
     let isFailed = false;
 
     try {
-      await simpleReg.reserve(name, {
-        value: web3.utils.toWei("1", "ether")
-      })
-      isFaield = true;
-    } catch (e) {
-      assert(true, "Should have thrown an exception");
-    }
-    assert(!isFailed, "Should have thrown an exception");
-  });
-
-  it("should abort reservation if the fee is not paid", async () => {
-    let isFailed = false;
-
-    try {
-      await simpleReg.reserve("newname", {
-        value: web3.utils.toWei("0.5", "ether")
-      });
+      await simpleReg.reserve(name);
       isFaield = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
@@ -247,27 +211,6 @@ contract("SimpleRegistry", accounts => {
     assert(!isFailed, "Should have thrown an exception");
   });
 
-  it("should allow the contract owner to set the registration fee", async () => {
-    let isFailed = false;
-    // only the contract owner can set a new fee
-    try {
-      await simpleReg.setFee(10, {
-        from: accounts[1]
-      });
-      isFaield = true;
-    } catch (e) {
-      assert(true, "Should have thrown an exception");
-    }
-    assert(!isFailed, "Should have thrown an exception");
-
-    await simpleReg.setFee(10, {
-      from: accounts[0]
-    });
-    const fee = await simpleReg.fee();
-
-    assert.equal(fee, 10);
-  });
-
   it("should allow the contract owner to drop a name", async () => {
     let isFailed = false;
     // only the contract owner can unregister badges
@@ -295,10 +238,7 @@ contract("SimpleRegistry", accounts => {
     const testReg = await SimpleRegistry.new(address, { from: address });
 
     // the victim
-    await testReg.reserve(name, {
-      value: web3.utils.toWei("1", "ether"),
-      from: address
-    });
+    await testReg.reserve(name, { from: address });
 
     await testReg.proposeReverse(nameEntry, address, {
       from: address
@@ -312,10 +252,7 @@ contract("SimpleRegistry", accounts => {
     let attackerNameEntry = "prankmaster69";
     let attackerName = web3.utils.sha3(attackerNameEntry);
 
-    await testReg.reserve(attackerName, {
-      value: web3.utils.toWei("1", "ether"),
-      from: address
-    });
+    await testReg.reserve(attackerName, { from: address });
 
     await testReg.proposeReverse(attackerNameEntry, address, {
       from: address
@@ -339,10 +276,7 @@ contract("SimpleRegistry", accounts => {
     attackerNameEntry = "prankmaster70";
     attackerName = web3.utils.sha3(attackerNameEntry);
 
-    await testReg.reserve(attackerName, {
-      value: web3.utils.toWei("1", "ether"),
-      from: address
-    });
+    await testReg.reserve(attackerName, { from: address });
 
     await testReg.proposeReverse(attackerNameEntry, accounts[3], {
       from: address
@@ -358,10 +292,7 @@ contract("SimpleRegistry", accounts => {
   it("should delete confirmed reverse entry on a drop", async () => {
     const testReg = await SimpleRegistry.new(address, { from: address });
 
-    await testReg.reserve(name, {
-      value: web3.utils.toWei("1", "ether"),
-      from: address
-    });
+    await testReg.reserve(name, { from: address });
 
     await testReg.proposeReverse(nameEntry, address, {
       from: address
@@ -384,31 +315,6 @@ contract("SimpleRegistry", accounts => {
     assert(txReturn.logs[1].args.owner === address, "Should have the right oldOwner");
 
     await assertThrowsAsync(() => testReg.getReverse(name), "Only when entry raw");
-  });
-
-  it("should allow the contract owner to drain all the ether from the contract", async () => {
-    let isFailed = false;
-    // only the contract owner can drain the contract
-    try {
-      await simpleReg.drain({
-        from: accounts[1]
-      });
-      isFaield = true;
-    } catch (e) {
-      assert(true, "Should have thrown an exception");
-    }
-    assert(!isFailed, "Should have thrown an exception");
-
-    const balance = await web3.eth.getBalance(accounts[0]);
-    await simpleReg.drain({
-      from: accounts[0]
-    });
-
-    const newBalance = await web3.eth.getBalance(accounts[0]);
-    const expectedBalance = web3.utils.toBN(balance).add(web3.utils.toBN(web3.utils.toWei("0.99", "ether")));
-
-    // accounts[1]'s balance should have increased by at least 0.99 ETH (to account for gas costs)
-    assert(web3.utils.toBN(newBalance).cmp(web3.utils.toBN(expectedBalance)) === 1, "new balance should be higher then old");
   });
 
   it("should not allow interactions with dropped names", async () => {
