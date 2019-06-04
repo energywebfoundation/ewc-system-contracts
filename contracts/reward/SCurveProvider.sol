@@ -6,6 +6,9 @@ pragma solidity 0.5.7;
 /// based on points of a discrete, inverse S curve
 contract SCurveProvider {
 
+    /// Required length of the discrete S curve
+    uint256 public constant REQUIRED_CURVE_LENGTH = 120;
+
     /// Discrete points of the curve
     uint256[] public sCurve;
     /// Discrete step size
@@ -18,6 +21,9 @@ contract SCurveProvider {
         public
     {
         _initCurve();
+        // This check is for protecting against some tampering
+        // for chainspec deployment
+        require(sCurve.length == REQUIRED_CURVE_LENGTH, "Reward curve is not the required length");
     }
 
     /// @notice Returns the block reward amount based on the block number
@@ -187,7 +193,8 @@ contract SCurveProvider {
         // roughly 1 month with a 5 sec step size
         blockStepSize = 525600;
         //roughly 10 years with a 5 sec step size
-        rewardPeriodEnd = blockStepSize * sCurve.length;
+        rewardPeriodEnd = blockStepSize * REQUIRED_CURVE_LENGTH;
     }
+
     // solhint-enable function-max-lines
 }
