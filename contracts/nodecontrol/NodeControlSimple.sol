@@ -75,6 +75,10 @@ contract NodeControlSimple is INodeControl, Ownable {
             sha256(bytes(_chainSpecUrl)) && nodeControlDb.getIsSigning(_targetValidator) == _isSigning), 
             "Error: No changes in the passed State"
         );
+        require(_dockerSha.length != 0, "DockerSha should not be empty");
+        require(bytes(_dockerName).length != 0, "DockerName should not be empty");
+        require(_chainSpecSha.length != 0, "ChainSpecSha should not be empty");
+        require(bytes(_chainSpecUrl).length != 0, "ChainSpecUrl should not be empty");
         
         nodeControlDb.setState(
             _targetValidator, 
