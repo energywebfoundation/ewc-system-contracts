@@ -68,7 +68,8 @@ contract NodeControlSimple is INodeControl, Ownable {
         public 
         onlyOwner 
     {
-        // It is necessary to generate the hash of the SHAs passed as parameter because bytes need to be hashed to compare them
+        // It is necessary to generate the hash of the SHAs passed as parameter 
+        // because bytes need to be hashed to compare them
         require(
             !(keccak256(bytes(nodeControlDb.getDockerSha(_targetValidator))) == 
             keccak256(bytes(_dockerSha)) && keccak256(bytes(nodeControlDb.getDockerName(_targetValidator))) == 
