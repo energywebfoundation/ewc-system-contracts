@@ -91,7 +91,6 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
     // Reservation functions
     function reserve(bytes32 _name)
         external
-        payable
         whenUnreserved(_name)
         onlyOwner
         returns (bool success)
