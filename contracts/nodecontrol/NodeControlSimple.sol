@@ -68,11 +68,11 @@ contract NodeControlSimple is INodeControl, Ownable {
         onlyOwner 
     {
         require(
-            !(sha256(bytes(nodeControlDb.getDockerSha(_targetValidator))) == 
-            sha256(bytes(_dockerSha)) && sha256(bytes(nodeControlDb.getDockerName(_targetValidator))) == 
-            sha256(bytes(_dockerName)) && sha256(bytes(nodeControlDb.getChainSpecSha(_targetValidator))) == 
-            sha256(bytes(_chainSpecSha)) && sha256(bytes(nodeControlDb.getChainSpecUrl(_targetValidator))) == 
-            sha256(bytes(_chainSpecUrl)) && nodeControlDb.getIsSigning(_targetValidator) == _isSigning), 
+            !(keccak256(bytes(nodeControlDb.getDockerSha(_targetValidator))) == 
+            keccak256(bytes(_dockerSha)) && keccak256(bytes(nodeControlDb.getDockerName(_targetValidator))) == 
+            keccak256(bytes(_dockerName)) && keccak256(bytes(nodeControlDb.getChainSpecSha(_targetValidator))) == 
+            keccak256(bytes(_chainSpecSha)) && keccak256(bytes(nodeControlDb.getChainSpecUrl(_targetValidator))) == 
+            keccak256(bytes(_chainSpecUrl)) && nodeControlDb.getIsSigning(_targetValidator) == _isSigning), 
             "Error: No changes in the passed State"
         );
         
