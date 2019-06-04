@@ -2,7 +2,8 @@
 
 const SimpleRegistry = artifacts.require("../../contracts/registry/SimpleRegistry.sol");
 const {
-    assertThrowsAsync
+    assertThrowsAsync,
+    DEFAULT_ADDRESS
 } = require(__dirname + "/../utils.js");
 
 contract("SimpleRegistry", accounts => {
@@ -209,6 +210,23 @@ contract("SimpleRegistry", accounts => {
       assert(true, "Should have thrown an exception");
     }
     assert(!isFailed, "Should have thrown an exception");
+  });
+
+  it("should not allow to transfer to address 0x0", async () => {
+    let isFailed = false;
+
+    try {
+      await simpleReg.transfer(name, DEFAULT_ADDRESS, {
+        from: accounts[1]
+      });
+      isFaield = true;
+    } catch (e) {
+      assert(true, "Should have thrown an exception");
+    }
+    assert(!isFailed, "Should have thrown an exception");
+
+    let owner = await simpleReg.getOwner(name);
+    assert.equal(owner, accounts[1]);
   });
 
   it("should allow the contract owner to drop a name", async () => {
