@@ -56,7 +56,6 @@ contract NodeControlSimple is INodeControl, Ownable {
     /// @param _chainSpecSha The sha of the chainSpecFile
     /// @param _chainSpecUrl The url where the chainSpecFile can be found
     /// @param _isSigning Indicates if the validator shall sign blocks
-    /// It is necessa
     function updateValidator(
         address _targetValidator, 
         bytes memory _dockerSha, 
