@@ -2,7 +2,8 @@
 
 const SimpleRegistry = artifacts.require("../../contracts/registry/SimpleRegistry.sol");
 const {
-    assertThrowsAsync
+    assertThrowsAsync,
+    DEFAULT_ADDRESS
 } = require(__dirname + "/../utils.js");
 
 contract("SimpleRegistry", accounts => {
@@ -82,7 +83,7 @@ contract("SimpleRegistry", accounts => {
       await simpleReg.setUint(name, "A", 100, {
         from: accounts[1]
       });
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }
@@ -105,7 +106,7 @@ contract("SimpleRegistry", accounts => {
       await simpleReg.proposeReverse(nameEntry, address, {
         from: accounts[1]
       })
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }
@@ -123,7 +124,7 @@ contract("SimpleRegistry", accounts => {
       await simpleReg.confirmReverse(nameEntry, {
         from: accounts[1]
       });
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }
@@ -167,7 +168,7 @@ contract("SimpleRegistry", accounts => {
 
     try {
       await simpleReg.reserve(name);
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }
@@ -181,7 +182,7 @@ contract("SimpleRegistry", accounts => {
       await simpleReg.transfer(name, accounts[1], {
         from: accounts[1]
       });
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }
@@ -204,11 +205,28 @@ contract("SimpleRegistry", accounts => {
       await simpleReg.transfer(name, accounts[0], {
         from: accounts[0]
       });
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }
     assert(!isFailed, "Should have thrown an exception");
+  });
+
+  it("should not allow to transfer to address 0x0", async () => {
+    let isFailed = false;
+
+    try {
+      await simpleReg.transfer(name, DEFAULT_ADDRESS, {
+        from: accounts[1]
+      });
+      isFailed = true;
+    } catch (e) {
+      assert(true, "Should have thrown an exception");
+    }
+    assert(!isFailed, "Should have thrown an exception");
+
+    let owner = await simpleReg.getOwner(name);
+    assert.equal(owner, accounts[1]);
   });
 
   it("should allow the contract owner to drop a name", async () => {
@@ -219,7 +237,7 @@ contract("SimpleRegistry", accounts => {
       await simpleReg.drop(name, {
         from: accounts[0]
       });
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }
@@ -322,7 +340,7 @@ contract("SimpleRegistry", accounts => {
 
     try {
       await simpleReg.getData(name, "A");
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }
@@ -330,7 +348,7 @@ contract("SimpleRegistry", accounts => {
 
     try {
       await simpleReg.getAddress(name, "A");
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }
@@ -338,7 +356,7 @@ contract("SimpleRegistry", accounts => {
 
     try {
       await simpleReg.getUint(name, "A");
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }
@@ -346,7 +364,7 @@ contract("SimpleRegistry", accounts => {
 
     try {
       await simpleReg.getOwner(name);
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }
@@ -354,7 +372,7 @@ contract("SimpleRegistry", accounts => {
 
     try {
       await simpleReg.setData(name, "A", "dummy");
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }
@@ -362,7 +380,7 @@ contract("SimpleRegistry", accounts => {
 
     try {
       await simpleReg.setAddress(name, "A", accounts[0]);
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }
@@ -370,7 +388,7 @@ contract("SimpleRegistry", accounts => {
 
     try {
       await simpleReg.setUint(name, "A", 100);
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }
@@ -378,7 +396,7 @@ contract("SimpleRegistry", accounts => {
 
     try {
       await simpleReg.transfer(name, accounts[1]);
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }
@@ -386,7 +404,7 @@ contract("SimpleRegistry", accounts => {
 
     try {
       await simpleReg.drop(name);
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }
@@ -394,7 +412,7 @@ contract("SimpleRegistry", accounts => {
 
     try {
       await simpleReg.confirmReverse(nameEntry);
-      isFaield = true;
+      isFailed = true;
     } catch (e) {
       assert(true, "Should have thrown an exception");
     }

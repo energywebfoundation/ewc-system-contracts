@@ -106,6 +106,7 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
         onlyOwnerOf(_name)
         returns (bool success)
     {
+        require(_to != address(0), "Error: no transfer to address 0x0");
         entries[_name].owner = _to;
         emit Transferred(_name, msg.sender, _to);
         return true;
