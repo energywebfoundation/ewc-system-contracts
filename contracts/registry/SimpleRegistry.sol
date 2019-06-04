@@ -6,8 +6,11 @@
 //!
 //!     https://www.gnu.org/licenses/gpl-3.0.en.html.
 //!
-//! This file has been modified by Energy Web Foundation to make the contract Ownable,
-//! and add related restrictions to reserve-, confirmReverseAs-, setFee- and drain functions.
+//! This file has been modified by Energy Web Foundation:
+//! 1. Contract is made Ownable.
+//! 2. "only-owner" restrictions are added to reserve-, confirmReverseAs-, setFee- and drain functions.
+//! 3. A security vulnerability is fixed where it is possible for a malicious entity to delete
+//!    somebody's reverse entry.
 //!
 //! This file incorporates work covered by the following copyright and  
 //! permission notice:
@@ -49,10 +52,10 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
     mapping (bytes32 => Entry) public entries;
     mapping (address => string) public reverses;
 
-    uint public fee = 1 ether;
-
     modifier whenUnreserved(bytes32 _name) {
-        require(entries[_name].owner == address(0), "Error: Only when unreserved");
+        require(
+            entries[_name].owner == address(0) && !entries[_name].deleted,
+            "Error: Only when unreserved");
         _;
     }
 
@@ -67,17 +70,17 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
     }
 
     modifier whenEntry(string memory _name) {
-        require(!entries[keccak256(bytes(_name))].deleted, "Error: Only when entry");
+        require(
+            !entries[keccak256(bytes(_name))].deleted && entries[keccak256(bytes(_name))].owner != address(0),
+            "Error: Only when entry");
         _;
     }
 
     modifier whenEntryRaw(bytes32 _name) {
-        require(!entries[_name].deleted, "Error: Only when entry raw");
-        _;
-    }
-
-    modifier whenFeePaid {
-        require(msg.value >= fee, "Error: only when fee paid");
+        require(
+            !entries[_name].deleted && entries[_name].owner != address(0),
+            "Error: Only when entry raw"
+        );
         _;
     }
 
@@ -88,10 +91,7 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
     // Reservation functions
     function reserve(bytes32 _name)
         external
-        payable
-        whenEntryRaw(_name)
         whenUnreserved(_name)
-        whenFeePaid
         onlyOwner
         returns (bool success)
     {
@@ -106,6 +106,7 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
         onlyOwnerOf(_name)
         returns (bool success)
     {
+        require(_to != address(0), "Error: no transfer to address 0x0");
         entries[_name].owner = _to;
         emit Transferred(_name, msg.sender, _to);
         return true;
@@ -117,7 +118,10 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
         onlyOwnerOf(_name)
         returns (bool success)
     {
-        delete reverses[entries[_name].reverse];
+        if (keccak256(bytes(reverses[entries[_name].reverse])) == _name) {
+            emit ReverseRemoved(reverses[entries[_name].reverse], entries[_name].reverse);
+            delete reverses[entries[_name].reverse];
+        }
         entries[_name].deleted = true;
         emit Dropped(_name, msg.sender);
         return true;
@@ -204,27 +208,6 @@ contract SimpleRegistry is Ownable, MetadataRegistry, OwnerRegistry, ReverseRegi
         emit ReverseRemoved(reverses[msg.sender], msg.sender);
         delete entries[keccak256(bytes(reverses[msg.sender]))].reverse;
         delete reverses[msg.sender];
-    }
-
-    // Admin functions for the owner
-    function setFee(uint _amount)
-        external
-        onlyOwner
-        returns (bool)
-    {
-        fee = _amount;
-        emit FeeChanged(_amount);
-        return true;
-    }
-
-    function drain()
-        external
-        onlyOwner
-        returns (bool)
-    {
-        emit Drained(address(this).balance);
-        msg.sender.transfer(address(this).balance);
-        return true;
     }
 
     // MetadataRegistry views
