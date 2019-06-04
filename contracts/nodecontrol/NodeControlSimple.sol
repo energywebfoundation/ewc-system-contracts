@@ -56,6 +56,7 @@ contract NodeControlSimple is INodeControl, Ownable {
     /// @param _chainSpecSha The sha of the chainSpecFile
     /// @param _chainSpecUrl The url where the chainSpecFile can be found
     /// @param _isSigning Indicates if the validator shall sign blocks
+    /// It is necessa
     function updateValidator(
         address _targetValidator, 
         bytes memory _dockerSha, 
@@ -67,6 +68,7 @@ contract NodeControlSimple is INodeControl, Ownable {
         public 
         onlyOwner 
     {
+        // It is necessary to generate the hash of the SHAs passed as parameter because bytes need to be hashed to compare them
         require(
             !(keccak256(bytes(nodeControlDb.getDockerSha(_targetValidator))) == 
             keccak256(bytes(_dockerSha)) && keccak256(bytes(nodeControlDb.getDockerName(_targetValidator))) == 
