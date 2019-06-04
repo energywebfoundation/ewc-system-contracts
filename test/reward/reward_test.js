@@ -1,4 +1,5 @@
 let RewardContract = artifacts.require('./mockcontracts/MockReward.sol');
+let MockInitialRewardCurveContract = artifacts.require('./mockcontracts/MockInitialRewardCurve.sol');
 let MockSystem = artifacts.require('./mockcontracts/MockSystem.sol');
 
 const {
@@ -10,6 +11,7 @@ const {
     send
 } = require(__dirname + "/../utils.js");
 
+const CURVE_LEN_ERR = "Reward curve is not the required length";
 const NOT_SYS_ERR = "Caller is not the system";
 const NOT_CFUND_ERR = "Caller is not the community fund";
 const BENEF_SIZE_ERR = "Benefactors list length is not 1";
@@ -84,6 +86,11 @@ contract('BlockReward [all features]', function (accounts) {
             rewardContract = await RewardContract.new(communityFund, 0, { from: deployer })
                 .should.be.fulfilled;
             (await rewardContract.communityFundAmount.call()).toNumber(10).should.be.equal(expected);
+        });
+
+        it("should not allow to deploy with an S curve with length not equal 120", async function () {
+            rewardContract = await MockInitialRewardCurveContract.new(accounts[3], 0, { from: deployer })
+                .should.be.rejectedWith(CURVE_LEN_ERR);
         });
     });
 
