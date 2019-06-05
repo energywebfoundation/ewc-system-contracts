@@ -57,5 +57,10 @@ contract('NodeControlLookUp', function (accounts) {
             await nodeControlLookUp.changeAddress(accounts[6], { from: accounts[1] }).should.be.rejectedWith("Sender is not owner");
             await nodeControlLookUp.changeAddress(accounts[6], { from: owner }).should.be.fulfilled;
         });
+
+        it('must emit event NodeControlAddressChanged correctly', async function () {
+            const tx = await nodeControlLookUp.changeAddress(accounts[7], { from: owner }).should.be.fulfilled;
+            tx.logs[0].args._newNodeControlAddress.should.be.equal(accounts[7]);
+        });
     });
 });
