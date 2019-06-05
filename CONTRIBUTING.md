@@ -39,7 +39,7 @@ Check out our guidelines repo if you have access: https://github.com/energywebfo
 
 ### Solidity
 
- - Style: [original style guide](https://solidity.readthedocs.io/en/v0.5.7/style-guide.html).
+ - Style: [original style guide](https://solidity.readthedocs.io/en/v0.5.8/style-guide.html).
  - function modifiers below function names.
  - ```npm run lint:solhint``` must pass, which means no error. Warnings pass, but make sure it really doesn't make sense to correct them.
  - ```npm run lint:solium``` must pass, which also checks other things.
