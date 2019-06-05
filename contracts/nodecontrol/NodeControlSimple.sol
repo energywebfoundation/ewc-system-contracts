@@ -68,6 +68,10 @@ contract NodeControlSimple is INodeControl, Ownable {
         public 
         onlyOwner 
     {
+        require(_dockerSha.length != 0, "DockerSha should not be empty");
+        require(bytes(_dockerName).length != 0, "DockerName should not be empty");
+        require(_chainSpecSha.length != 0, "ChainSpecSha should not be empty");
+        require(bytes(_chainSpecUrl).length != 0, "ChainSpecUrl should not be empty");
         // It is necessary to generate the hash of the SHAs passed as parameter 
         // because bytes need to be hashed to compare them
         require(

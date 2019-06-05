@@ -175,6 +175,49 @@ contract('NodeControlSimple', (accounts) => {
             }
             assert(!isFailed, "Should have thrown exception")
         });
+
+        it('should not change if any value is 0', async () => {
+
+            try {
+                await nodeControlSimple.updateValidator(accounts[1], "0x", "dockerName123", '0x02', "chainSpecUrl123", true, {
+                    from: accounts[0]
+                });
+                isFailed = true;
+            } catch (e) {
+                assert(e.toString().includes("DockerSha should not be empty"), "Should have thrown the right exception")
+            }
+            assert(!isFailed, "Should have thrown exception")
+            
+            try {
+                await nodeControlSimple.updateValidator(accounts[1], "0x123", "", '0x02', "chainSpecUrl123", true, {
+                    from: accounts[0]
+                });
+                isFailed = true;
+            } catch (e) {
+                assert(e.toString().includes("DockerName should not be empty"), "Should have thrown the right exception")
+            }
+            assert(!isFailed, "Should have thrown exception")
+            
+            try {
+                await nodeControlSimple.updateValidator(accounts[1], "0x123", "dockerName123", '0x', "chainSpecUrl123", true, {
+                    from: accounts[0]
+                });
+                isFailed = true;
+            } catch (e) {
+                assert(e.toString().includes("ChainSpecSha should not be empty"), "Should have thrown the right exception")
+            }
+            assert(!isFailed, "Should have thrown exception")
+            
+            try {
+                await nodeControlSimple.updateValidator(accounts[1], "0x123", "dockerName123", '0x02', "", true, {
+                    from: accounts[0]
+                });
+                isFailed = true;
+            } catch (e) {
+                assert(e.toString().includes("ChainSpecUrl should not be empty"), "Should have thrown the right exception")
+            }
+            assert(!isFailed, "Should have thrown exception")
+        });
     });
 
     //** Function tests */
