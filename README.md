@@ -24,7 +24,7 @@ and code away. Dependencies are installed locally.
 
 **Important**: all contracts go to the chainspec, deployed at the same time with their addresses known beforehans, so no deployment/migration scripts are written. The contracts are compiled and put into the chainspec by our Genesis/Chainspec generator: https://github.com/energywebfoundation/ewf-genesis-generator
 
-Compiler version: 0.5.7 ([reason](https://blog.ethereum.org/2019/03/26/solidity-optimizer-and-abiencoderv2-bug/))
+Compiler version: 0.5.8 ([reason](https://blog.ethereum.org/2019/03/26/solidity-optimizer-and-abiencoderv2-bug/))
 
 ### Validator set
 
