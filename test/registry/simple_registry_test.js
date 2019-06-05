@@ -252,6 +252,13 @@ contract("SimpleRegistry", accounts => {
     assert(txReturn.logs[0].args.owner === accounts[1], "Should have the right oldOwner");
   });
 
+  it("should allow to re-reserve a dropped name", async () => {
+    const testReg = await SimpleRegistry.new(address, { from: address });
+    await testReg.reserve(name, { from: address });
+    await testReg.drop(name, { from: address });
+    await testReg.reserve(name, { from: address });
+  });
+
   it("should not try to delete unconfirmed reverse entry on a drop", async () => {
     const testReg = await SimpleRegistry.new(address, { from: address });
 
@@ -324,11 +331,11 @@ contract("SimpleRegistry", accounts => {
       from: address
     });
 
-    assert(txReturn.logs[0].event == "ReverseRemoved", "Should have thrown the event")
+    assert(txReturn.logs[0].event == "ReverseRemoved", "Should have thrown the event");
     assert(txReturn.logs[0].args.name === nameEntry, "Should have the right name");
     assert(txReturn.logs[0].args.reverse === address, "Should have the right oldOwner");
 
-    assert(txReturn.logs[1].event == "Dropped", "Should have thrown the event")
+    assert(txReturn.logs[1].event == "Dropped", "Should have thrown the event");
     assert(txReturn.logs[1].args.name === name, "Should have the right name");
     assert(txReturn.logs[1].args.owner === address, "Should have the right oldOwner");
 
