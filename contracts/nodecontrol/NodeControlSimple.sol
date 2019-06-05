@@ -24,6 +24,7 @@ contract NodeControlSimple is INodeControl, Ownable {
         external 
     {
         require(nodeControlDb.getDockerSha(msg.sender).length != 0, "Error: You are not a validator!");
+        require(!this.isUpdateConfirmed(msg.sender), "Error: Already Confirmed");
         nodeControlDb.setUpdateConfirmed(msg.sender);
     }
 
@@ -71,12 +72,14 @@ contract NodeControlSimple is INodeControl, Ownable {
         require(bytes(_dockerName).length != 0, "DockerName should not be empty");
         require(_chainSpecSha.length != 0, "ChainSpecSha should not be empty");
         require(bytes(_chainSpecUrl).length != 0, "ChainSpecUrl should not be empty");
+        // It is necessary to generate the hash of the SHAs passed as parameter 
+        // because bytes need to be hashed to compare them
         require(
-            !(sha256(bytes(nodeControlDb.getDockerSha(_targetValidator))) == 
-            sha256(bytes(_dockerSha)) && sha256(bytes(nodeControlDb.getDockerName(_targetValidator))) == 
-            sha256(bytes(_dockerName)) && sha256(bytes(nodeControlDb.getChainSpecSha(_targetValidator))) == 
-            sha256(bytes(_chainSpecSha)) && sha256(bytes(nodeControlDb.getChainSpecUrl(_targetValidator))) == 
-            sha256(bytes(_chainSpecUrl)) && nodeControlDb.getIsSigning(_targetValidator) == _isSigning), 
+            !(keccak256(bytes(nodeControlDb.getDockerSha(_targetValidator))) == 
+            keccak256(bytes(_dockerSha)) && keccak256(bytes(nodeControlDb.getDockerName(_targetValidator))) == 
+            keccak256(bytes(_dockerName)) && keccak256(bytes(nodeControlDb.getChainSpecSha(_targetValidator))) == 
+            keccak256(bytes(_chainSpecSha)) && keccak256(bytes(nodeControlDb.getChainSpecUrl(_targetValidator))) == 
+            keccak256(bytes(_chainSpecUrl)) && nodeControlDb.getIsSigning(_targetValidator) == _isSigning), 
             "Error: No changes in the passed State"
         );
         
