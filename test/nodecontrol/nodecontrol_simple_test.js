@@ -175,6 +175,49 @@ contract('NodeControlSimple', (accounts) => {
             }
             assert(!isFailed, "Should have thrown exception")
         });
+
+        it('should not change if any value is 0', async () => {
+
+            try {
+                await nodeControlSimple.updateValidator(accounts[1], "0x", "dockerName123", '0x02', "chainSpecUrl123", true, {
+                    from: accounts[0]
+                });
+                isFailed = true;
+            } catch (e) {
+                assert(e.toString().includes("DockerSha should not be empty"), "Should have thrown the right exception")
+            }
+            assert(!isFailed, "Should have thrown exception")
+            
+            try {
+                await nodeControlSimple.updateValidator(accounts[1], "0x123", "", '0x02', "chainSpecUrl123", true, {
+                    from: accounts[0]
+                });
+                isFailed = true;
+            } catch (e) {
+                assert(e.toString().includes("DockerName should not be empty"), "Should have thrown the right exception")
+            }
+            assert(!isFailed, "Should have thrown exception")
+            
+            try {
+                await nodeControlSimple.updateValidator(accounts[1], "0x123", "dockerName123", '0x', "chainSpecUrl123", true, {
+                    from: accounts[0]
+                });
+                isFailed = true;
+            } catch (e) {
+                assert(e.toString().includes("ChainSpecSha should not be empty"), "Should have thrown the right exception")
+            }
+            assert(!isFailed, "Should have thrown exception")
+            
+            try {
+                await nodeControlSimple.updateValidator(accounts[1], "0x123", "dockerName123", '0x02', "", true, {
+                    from: accounts[0]
+                });
+                isFailed = true;
+            } catch (e) {
+                assert(e.toString().includes("ChainSpecUrl should not be empty"), "Should have thrown the right exception")
+            }
+            assert(!isFailed, "Should have thrown exception")
+        });
     });
 
     //** Function tests */
@@ -331,6 +374,19 @@ contract('NodeControlSimple', (accounts) => {
         it('must return true for isUpdateConfirmed', async () => {
             boolReturn = await nodeControlSimple.isUpdateConfirmed(accounts[2])
             assert(boolReturn == true, "Should have returned true")
+        });
+
+        it('must revert if already confirmed', async () => {
+            isFailed = false
+            try {
+                await nodeControlSimple.confirmUpdate({
+                    from: accounts[2]
+                })
+                isFailed = true
+            } catch (e) {
+                assert(e.toString().includes("Error: Already Confirmed"), "Should have thrown the right exception")
+            }
+            assert(!isFailed, "Should have thrown exception")
         });
 
         it('must not be callable by an address whos dockersha length is 0', async () => {

@@ -8,11 +8,14 @@ contract NodeControlLookUp is Ownable {
     
     address public nodeControlContract;
 
+    event NewNodeControlAddress(address indexed _newNodeControlAddress);
+
     constructor(address _nodeControlAddress, address _owner)
         public 
     {
-        nodeControlContract = _nodeControlAddress;
         _transferOwnership(_owner);
+        nodeControlContract = _nodeControlAddress;
+        emit NewNodeControlAddress(_nodeControlAddress);
     }
 
     /// @notice Sets a address at the given index
@@ -22,5 +25,6 @@ contract NodeControlLookUp is Ownable {
         onlyOwner 
     {
         nodeControlContract = _nodeControlAddress;
+        emit NewNodeControlAddress(_nodeControlAddress);
     }
 }
