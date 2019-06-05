@@ -67,6 +67,10 @@ contract NodeControlSimple is INodeControl, Ownable {
         public 
         onlyOwner 
     {
+        require(_dockerSha.length != 0, "DockerSha should not be empty");
+        require(bytes(_dockerName).length != 0, "DockerName should not be empty");
+        require(_chainSpecSha.length != 0, "ChainSpecSha should not be empty");
+        require(bytes(_chainSpecUrl).length != 0, "ChainSpecUrl should not be empty");
         require(
             !(sha256(bytes(nodeControlDb.getDockerSha(_targetValidator))) == 
             sha256(bytes(_dockerSha)) && sha256(bytes(nodeControlDb.getDockerName(_targetValidator))) == 
