@@ -63,7 +63,7 @@ contract('NodeControlLookUp', function (accounts) {
             await nodeControlLookUp.changeAddress(accounts[6], { from: owner }).should.be.fulfilled;
         });
 
-        it('must emit event NodeControlAddressChanged correctly', async function () {
+        it('must emit event NewNodeControlAddress correctly', async function () {
             const tx = await nodeControlLookUp.changeAddress(accounts[7], { from: owner }).should.be.fulfilled;
             tx.logs[0].args._newNodeControlAddress.should.be.equal(accounts[7]);
         });
