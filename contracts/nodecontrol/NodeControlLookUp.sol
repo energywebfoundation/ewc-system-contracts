@@ -13,8 +13,8 @@ contract NodeControlLookUp is Ownable {
     constructor(address _nodeControlAddress, address _owner)
         public 
     {
-        nodeControlContract = _nodeControlAddress;
         _transferOwnership(_owner);
+        nodeControlContract = _nodeControlAddress;
         emit NewNodeControlAddress(_nodeControlAddress);
     }
 
