@@ -44,6 +44,11 @@ contract('NodeControlLookUp', function (accounts) {
         it('should set node-control address correctly', async function () {
             (await nodeControlLookUp.nodeControlContract.call()).should.be.equal(nodeControlSimple.address);
         });
+
+        it('constructor should emit event correctly', async function() {
+            const pastEvents = await nodeControlLookUp.getPastEvents('NewNodeControlAddress');
+            pastEvents[0].returnValues._newNodeControlAddress.should.be.equal(nodeControlSimple.address);
+        });
     });
 
     describe('#changeAddress', function () {
@@ -56,6 +61,11 @@ contract('NodeControlLookUp', function (accounts) {
         it('must only be callable by the owner', async function () {
             await nodeControlLookUp.changeAddress(accounts[6], { from: accounts[1] }).should.be.rejectedWith("Sender is not owner");
             await nodeControlLookUp.changeAddress(accounts[6], { from: owner }).should.be.fulfilled;
+        });
+
+        it('must emit event NewNodeControlAddress correctly', async function () {
+            const tx = await nodeControlLookUp.changeAddress(accounts[7], { from: owner }).should.be.fulfilled;
+            tx.logs[0].args._newNodeControlAddress.should.be.equal(accounts[7]);
         });
     });
 });
