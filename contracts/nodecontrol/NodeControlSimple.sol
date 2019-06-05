@@ -24,7 +24,7 @@ contract NodeControlSimple is INodeControl, Ownable {
         external 
     {
         require(nodeControlDb.getDockerSha(msg.sender).length != 0, "Error: You are not a validator!");
-        require(!this.isUpdateConfirmed(msg.sender), "Error: Already Confirmed");
+        require(this.isUpdateConfirmed(msg.sender));
         nodeControlDb.setUpdateConfirmed(msg.sender);
     }
 
