@@ -333,6 +333,19 @@ contract('NodeControlSimple', (accounts) => {
             assert(boolReturn == true, "Should have returned true")
         });
 
+        it('must revert if already confirmed', async () => {
+            isFailed = false
+            try {
+                await nodeControlSimple.confirmUpdate({
+                    from: accounts[2]
+                })
+                isFailed = true
+            } catch (e) {
+                assert(e.toString().includes("Error: Already Confirmed"), "Should have thrown the right exception")
+            }
+            assert(!isFailed, "Should have thrown exception")
+        });
+
         it('must not be callable by an address whos dockersha length is 0', async () => {
             NodeControl = await nodeControlSimple.retrieveExpectedState(accounts[5])
 
