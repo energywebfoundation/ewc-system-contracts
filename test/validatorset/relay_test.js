@@ -158,8 +158,8 @@ contract('ValidatorSetRELAY [all features]', function (accounts) {
 
     describe('#finalizeChange', async function () {
 
-        beforeEach(async function() {
-            await relayed.addValidator(accounts[2], {from: owner}).should.be.fulfilled;
+        beforeEach(async function () {
+            await relayed.addValidator(accounts[2], { from: owner }).should.be.fulfilled;
         });
 
         it('should only be callable by system', async function () {
@@ -225,10 +225,10 @@ contract('ValidatorSetRELAY [all features]', function (accounts) {
             await relay.finalizeChange({ from: system }).should.be.fulfilled;
 
             await relayed.removeValidator(accounts[2], { from: accounts[3] }).should.be.rejectedWith(REVERT_ERROR_MSG);
-            
+
             let currentValidators;
             let migrationValidators;
-            for(let i = 1; i <= 2; i++) {
+            for (let i = 1; i <= 2; i++) {
                 await relayed.removeValidator(accounts[i], { from: owner }).should.be.fulfilled;
                 await relay.finalizeChange({ from: system }).should.be.fulfilled;
 

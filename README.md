@@ -1,5 +1,5 @@
 # EWC system contracts
-Infrastructure contracts for EnergyWebChain and Volta live launch.
+Infrastructure contracts for EnergyWeb Chain (EWC) live launch.
 
 [![Build Status](https://travis-ci.com/energywebfoundation/ewc-system-contracts.svg?token=citknsDHYPZgYDNiiBdy&branch=master)](https://travis-ci.com/energywebfoundation/ewc-system-contracts)
 [![Coverage Status](https://coveralls.io/repos/github/energywebfoundation/ewc-system-contracts/badge.svg?branch=master)](https://coveralls.io/github/energywebfoundation/ewc-system-contracts?branch=master)
@@ -198,10 +198,10 @@ npm run coverage
 
 - [MythX security checker](https://mythx.io/) (truffle security plugin by ConsenSys):
   
-  Already installed with the other local deps.
-   
+  Already installed with the other local deps. Note that for a full check you need to have a registered account (free).
+  Pass in the account params as env vars. 
   ```
-  npm run verify
+  MYTHX_ETH_ADDRESS=0xYOURADDRESS MYTHX_PASSWORD=yourpass npm run verify
   ```
 
 ## Contributing
