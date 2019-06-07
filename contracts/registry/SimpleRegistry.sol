@@ -11,6 +11,9 @@
 //! 2. "only-owner" restrictions are added to reserve-, confirmReverseAs-, setFee- and drain functions.
 //! 3. A security vulnerability is fixed where it is possible for a malicious entity to delete
 //!    somebody's reverse entry.
+//! 4. It is possible te re-reserve an entry.
+//! 5. It is impossible to transfer an entry to address 0x0.
+//! 6. No need to pay a fee.
 //!
 //! This file incorporates work covered by the following copyright and  
 //! permission notice:
