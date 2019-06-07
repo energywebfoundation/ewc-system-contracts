@@ -5,7 +5,7 @@ import "../misc/Ownable.sol";
 
 /// @notice Serves as a lookup table. Currently used for the NodeControlContract
 contract NodeControlLookUp is Ownable {
-    
+
     address public nodeControlContract;
 
     event NewNodeControlAddress(address indexed _newNodeControlAddress);

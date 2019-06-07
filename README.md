@@ -198,10 +198,10 @@ npm run coverage
 
 - [MythX security checker](https://mythx.io/) (truffle security plugin by ConsenSys):
   
-  Already installed with the other local deps.
-   
+  Already installed with the other local deps. Note that for a full check you need to have a registered account (free).
+  Pass in the account params as env vars. 
   ```
-  npm run verify
+  MYTHX_ETH_ADDRESS=0xYOURADDRESS MYTHX_PASSWORD=yourpass npm run verify
   ```
 
 ## Contributing
