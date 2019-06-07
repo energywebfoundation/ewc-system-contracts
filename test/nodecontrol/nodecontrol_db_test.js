@@ -47,33 +47,29 @@ contract('NodeControlDb', (accounts) => {
             await nodeControlDb.changeLookUpContract(nodeControlLookUp.address);
             postState = await nodeControlDb.nodeControlLookUp();
 
-            assert(postState == nodeControlLookUp.address, "Should be the logic instance address")
+            assert(postState == nodeControlLookUp.address, "Should be the logic instance address");
         });
 
         it("must not allow 0x0 as address for new logic contract", async () => {
             isFailed = false;
             try {
-                await nodeControlDb.changeLookUpContract(DEFAULT_ADDRESS, {
-                    from: accounts[0]
-                });
+                await nodeControlDb.changeLookUpContract(DEFAULT_ADDRESS, { from: accounts[0] });
                 isFailed = true;
             } catch (e) {
-                assert(e.toString().includes("Error: newLookUp is not allowed to be 0x0"), "Should have thrown the right exception")
+                assert(e.toString().includes("Error: newLookUp is not allowed to be 0x0"), "Should have thrown the right exception");
             }
-            assert(!isFailed, "Should have thrown exception")
+            assert(!isFailed, "Should have thrown exception");
         });
 
         it("must only allow owner to change logic contract", async () => {
             isFailed = false;
             try {
-                await nodeControlDb.changeLookUpContract('0x0000000000000000000000000000000000000001', {
-                    from: accounts[1]
-                });
+                await nodeControlDb.changeLookUpContract('0x0000000000000000000000000000000000000001', { from: accounts[1] });
                 isFailed = true;
             } catch (e) {
-                assert(e.toString().includes("Sender is not owner."), "Should have thrown the right exception")
+                assert(e.toString().includes("Sender is not owner."), "Should have thrown the right exception");
             }
-            assert(!isFailed, "Should have thrown exception")
+            assert(!isFailed, "Should have thrown exception");
         });
     });
 
@@ -86,25 +82,21 @@ contract('NodeControlDb', (accounts) => {
 
             assert(postState == accounts[1], "Should be the accounts from the parameter");
 
-            await nodeControlDb.transferOwnership(accounts[0], {
-                from: accounts[1]
-            });
+            await nodeControlDb.transferOwnership(accounts[0], { from: accounts[1] });
             postState = await nodeControlDb.owner();
 
-            assert(postState == accounts[0], "Should be the logic instance address")
+            assert(postState == accounts[0], "Should be the logic instance address");
         });
 
         it("must not allow 0x0 as address for new owner", async () => {
             isFailed = false;
             try {
-                await nodeControlDb.transferOwnership(DEFAULT_ADDRESS, {
-                    from: accounts[0]
-                });
+                await nodeControlDb.transferOwnership(DEFAULT_ADDRESS, { from: accounts[0] });
                 isFailed = true;
             } catch (e) {
-                assert(e.toString().includes("New owner address cannot be 0x0"), "Should have thrown the right exception")
+                assert(e.toString().includes("New owner address cannot be 0x0"), "Should have thrown the right exception");
             }
-            assert(!isFailed, "Should have thrown exception")
+            assert(!isFailed, "Should have thrown exception");
         });
 
         it("must only allow owner to change owner", async () => {
@@ -115,9 +107,9 @@ contract('NodeControlDb', (accounts) => {
                 });
                 isFailed = true;
             } catch (e) {
-                assert(e.toString().includes("Sender is not owner."), "Should have thrown the right exception")
+                assert(e.toString().includes("Sender is not owner."), "Should have thrown the right exception");
             }
-            assert(!isFailed, "Should have thrown exception")
+            assert(!isFailed, "Should have thrown exception");
         });
     });
 
@@ -131,9 +123,9 @@ contract('NodeControlDb', (accounts) => {
                 });
                 isFailed = true;
             } catch (e) {
-                assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
+                assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception");
             }
-            assert(!isFailed, "Should have thrown exception")
+            assert(!isFailed, "Should have thrown exception");
         });
     });
 
@@ -142,14 +134,12 @@ contract('NodeControlDb', (accounts) => {
         it("must only let the logic contract call setUpdateConfirmed", async () => {
             isFailed = false;
             try {
-                await nodeControlDb.setUpdateConfirmed(accounts[1], {
-                    from: accounts[1]
-                });
+                await nodeControlDb.setUpdateConfirmed(accounts[1], { from: accounts[1] });
                 isFailed = true;
             } catch (e) {
-                assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
+                assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception");
             }
-            assert(!isFailed, "Should have thrown exception")
+            assert(!isFailed, "Should have thrown exception");
         })
     });
 
@@ -158,79 +148,67 @@ contract('NodeControlDb', (accounts) => {
         it("must only let the logic contract call getState", async () => {
             isFailed = false;
             try {
-                await nodeControlDb.getState(accounts[1], {
-                    from: accounts[1]
-                });
+                await nodeControlDb.getState(accounts[1], { from: accounts[1] });
                 isFailed = true;
             } catch (e) {
-                assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
+                assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception");
             }
-            assert(!isFailed, "Should have thrown exception")
+            assert(!isFailed, "Should have thrown exception");
         });
 
         it("must only let the logic contract call getDockerSha", async () => {
             isFailed = false;
             try {
-                await nodeControlDb.getDockerSha(accounts[1], {
-                    from: accounts[1]
-                });
+                await nodeControlDb.getDockerSha(accounts[1], { from: accounts[1] });
                 isFailed = true;
             } catch (e) {
-                assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
+                assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception");
             }
-            assert(!isFailed, "Should have thrown exception")
+            assert(!isFailed, "Should have thrown exception");
         });
 
         it("must only let the logic contract call getDockerName", async () => {
             isFailed = false;
             try {
-                await nodeControlDb.getDockerName(accounts[1], {
-                    from: accounts[1]
-                });
+                await nodeControlDb.getDockerName(accounts[1], { from: accounts[1] });
                 isFailed = true;
             } catch (e) {
-                assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
+                assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception");
             }
-            assert(!isFailed, "Should have thrown exception")
+            assert(!isFailed, "Should have thrown exception");
         });
 
         it("must only let the logic contract call getChainSpecSha", async () => {
             isFailed = false;
             try {
-                await nodeControlDb.getChainSpecSha(accounts[1], {
-                    from: accounts[1]
-                });
+                await nodeControlDb.getChainSpecSha(accounts[1], { from: accounts[1] });
                 isFailed = true;
             } catch (e) {
-                assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
+                assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception");
             }
-            assert(!isFailed, "Should have thrown exception")
+            assert(!isFailed, "Should have thrown exception");
         });
 
         it("must only let the logic contract call getChainSpecUrl", async () => {
             isFailed = false;
             try {
-                await nodeControlDb.getChainSpecUrl(accounts[1], {
-                    from: accounts[1]
-                });
+                await nodeControlDb.getChainSpecUrl(accounts[1], { from: accounts[1] });
                 isFailed = true;
             } catch (e) {
-                assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
+                assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception");
             }
-            assert(!isFailed, "Should have thrown exception")
+            assert(!isFailed, "Should have thrown exception");
         });
 
         it("must only let the logic contract call getIsSigning", async () => {
             isFailed = false;
             try {
-                await nodeControlDb.getIsSigning(accounts[1], {
-                    from: accounts[1]
-                });
+                await nodeControlDb.getIsSigning(accounts[1], { from: accounts[1] });
                 isFailed = true;
             } catch (e) {
-                assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception")
+                assert(e.toString().includes("Error: onlyLogic Db"), "Should have thrown the right exception");
             }
-            assert(!isFailed, "Should have thrown exception")
+            assert(!isFailed, "Should have thrown exception");
         });
     });
 });

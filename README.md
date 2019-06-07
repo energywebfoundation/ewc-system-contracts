@@ -1,5 +1,5 @@
 # EWC system contracts
-Infrastructure contracts for EnergyWebChain and Volta live launch.
+Infrastructure contracts for EnergyWeb Chain (EWC) live launch.
 
 [![Build Status](https://travis-ci.com/energywebfoundation/ewc-system-contracts.svg?token=citknsDHYPZgYDNiiBdy&branch=master)](https://travis-ci.com/energywebfoundation/ewc-system-contracts)
 [![Coverage Status](https://coveralls.io/repos/github/energywebfoundation/ewc-system-contracts/badge.svg?branch=master)](https://coveralls.io/github/energywebfoundation/ewc-system-contracts?branch=master)

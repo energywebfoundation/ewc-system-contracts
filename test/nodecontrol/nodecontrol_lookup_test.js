@@ -45,7 +45,7 @@ contract('NodeControlLookUp', function (accounts) {
             (await nodeControlLookUp.nodeControlContract.call()).should.be.equal(nodeControlSimple.address);
         });
 
-        it('constructor should emit event correctly', async function() {
+        it('constructor should emit event correctly', async function () {
             const pastEvents = await nodeControlLookUp.getPastEvents('NewNodeControlAddress');
             pastEvents[0].returnValues._newNodeControlAddress.should.be.equal(nodeControlSimple.address);
         });
