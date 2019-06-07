@@ -17,7 +17,7 @@ contract('Holding', function (accounts) {
     const ACCOUNT_WITH_FUNDS = '0x2526AeE4A3b281a5F17324E1F306a051bb4607Ae';
     const ACCOUNT_FUNDING = web3.utils.toWei('99', 'ether').toString(10);
     const ACCOUNT_WITH_NO_FUNDS = '0xaf9DdE98b6aeB2225bf87C2cB91c58833fbab2Ab';
-    const TARGET_AMOUNT_BN = web3.utils.toBN(web3.utils.toWei('40789499640000000000000000', 'wei'));
+    const TARGET_AMOUNT_BN = web3.utils.toBN(web3.utils.toWei('41198207933333333690000000', 'wei'));
     const TARGET_AMOUNT = TARGET_AMOUNT_BN.toString(10);
     
     describe('Sanity tests regarding the holded amount', async function() {
@@ -47,7 +47,6 @@ contract('Holding', function (accounts) {
         it('Should throw if contract balance is higher than expected', async function() {
             holding = await Holding.new({from: deployer, value:  TARGET_AMOUNT_BN.add(web3.utils.toBN('1')).toString(10)}).should.be
                 .rejectedWith('Balance should equal target amount.');
-
         });
 
         it('Should throw if inital locked up amount does not equal target amount', async function() {
