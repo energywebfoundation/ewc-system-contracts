@@ -1,7 +1,7 @@
 pragma solidity 0.5.8;
 
 import "../interfaces/IBlockReward.sol";
-import "./SCurveProvider.sol";
+import "../reward/SCurveProvider.sol";
 
 import "../libs/SafeMath.sol";
 
@@ -98,10 +98,10 @@ contract BlockReward is SCurveProvider, IBlockReward {
         uint256[] memory rewards = new uint256[](receivers.length);
 
         receivers[0] = _getPayoutAddress(benefactors[0]);
-        rewards[0] = getBlockReward(block.number);
+        rewards[0] = 0;
         
         receivers[1] = _getPayoutAddress(communityFund);
-        rewards[1] = communityFundAmount;
+        rewards[1] = 0;
 
         _logMinted(receivers[0], rewards[0]);
         _logCommunityMinted(receivers[1], rewards[1]);
